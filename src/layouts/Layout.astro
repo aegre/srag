@@ -6,6 +6,10 @@
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
+		<!-- Add Google Fonts -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	</head>
 	<body>
 		<slot />
@@ -13,10 +17,36 @@
 </html>
 
 <style>
+	/* Angella White Font */
+	@font-face {
+		font-family: 'Angella White';
+		src: url('/fonts/AngellaWhite.ttf') format('truetype');
+		font-weight: normal;
+		font-style: normal;
+		font-display: swap;
+	}
+
+	:root {
+		/* Font families */
+		--font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		--font-secondary: 'Georgia', 'Times New Roman', serif;
+		--font-mono: 'Cascadia Code', 'Source Code Pro', 'Fira Code', monospace;
+		--font-angella: 'Angella White', cursive;
+		
+		/* Font sizes */
+		--text-xs: 0.75rem;
+		--text-sm: 0.875rem;
+		--text-base: 1rem;
+		--text-lg: 1.125rem;
+		--text-xl: 1.25rem;
+		--text-2xl: 1.5rem;
+	}
+
 	html,
 	body {
 		margin: 0;
 		width: 100%;
 		height: 100%;
+		font-family: var(--font-primary);
 	}
 </style>
