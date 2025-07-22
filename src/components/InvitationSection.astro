@@ -1,0 +1,15 @@
+---
+export interface Props {
+  id: string;
+  additionalClasses?: string;
+}
+
+const { id, additionalClasses = '' } = Astro.props;
+---
+
+<section 
+  class={`min-h-screen p-8 flex flex-col justify-center snap-start relative ${additionalClasses}`} 
+  id={id}
+>
+  <slot />
+</section> 

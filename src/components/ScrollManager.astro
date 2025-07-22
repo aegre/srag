@@ -24,20 +24,43 @@ const { sectionIds } = Astro.props;
     const scrollContainer = document.getElementById('scroll-container');
     const totalSections = sectionIds.length;
     const dots = [];
+    let sectionElements = [];
+    let sectionOffsets = [];
     
     // Get all dots dynamically
     for (let i = 0; i < totalSections; i++) {
       dots.push(document.getElementById(`dot-${i}`));
     }
 
+    // Get all section elements and calculate their offsets
+    function calculateSectionOffsets() {
+      sectionElements = sectionIds.map(id => document.getElementById(id));
+      sectionOffsets = [];
+      
+      sectionElements.forEach(section => {
+        if (section) {
+          sectionOffsets.push(section.offsetTop);
+        }
+      });
+    }
+
+    // Find the current section based on scroll position
+    function getCurrentSection(scrollTop) {
+      let currentSection = 0;
+      
+      for (let i = sectionOffsets.length - 1; i >= 0; i--) {
+        if (scrollTop >= sectionOffsets[i] - 100) { // 100px offset for better UX
+          currentSection = i;
+          break;
+        }
+      }
+      
+      return currentSection;
+    }
+
     function updateProgressDots() {
       const scrollTop = scrollContainer.scrollTop;
-      const scrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-      const scrollPercent = scrollTop / scrollHeight;
-
-      // Calculate which section we're currently viewing
-      const sectionHeight = 600; // Each section is 600px
-      const currentSection = Math.round(scrollTop / sectionHeight);
+      const currentSection = getCurrentSection(scrollTop);
       
       // Update dot opacity based on current section
       dots.forEach((dot, index) => {
@@ -53,45 +76,65 @@ const { sectionIds } = Astro.props;
       });
     }
 
+    // Initialize after DOM is fully loaded
+    setTimeout(() => {
+      calculateSectionOffsets();
+      updateProgressDots();
+    }, 100);
+
     // Scroll event listener
     scrollContainer.addEventListener('scroll', updateProgressDots);
-    
-    // Initialize dots
-    updateProgressDots();
 
     // Enhanced wheel event for smooth section transitions
     scrollContainer.addEventListener('wheel', function(e) {
       e.preventDefault();
       const delta = e.deltaY;
-      const sectionHeight = 600;
-      const currentSection = Math.round(scrollContainer.scrollTop / sectionHeight);
+      const scrollTop = scrollContainer.scrollTop;
+      const currentSection = getCurrentSection(scrollTop);
       
       if (delta > 0 && currentSection < totalSections - 1) {
         // Scroll down to next section
-        scrollContainer.scrollTo({
-          top: (currentSection + 1) * sectionHeight,
-          behavior: 'smooth'
-        });
+        const nextSection = sectionElements[currentSection + 1];
+        if (nextSection) {
+          scrollContainer.scrollTo({
+            top: nextSection.offsetTop,
+            behavior: 'smooth'
+          });
+        }
       } else if (delta < 0 && currentSection > 0) {
         // Scroll up to previous section
-        scrollContainer.scrollTo({
-          top: (currentSection - 1) * sectionHeight,
-          behavior: 'smooth'
-        });
+        const prevSection = sectionElements[currentSection - 1];
+        if (prevSection) {
+          scrollContainer.scrollTo({
+            top: prevSection.offsetTop,
+            behavior: 'smooth'
+          });
+        }
       }
     });
 
-    // Optional: Click on dots to navigate to sections
+    // Click on dots to navigate to sections
     dots.forEach((dot, index) => {
       dot.addEventListener('click', () => {
-        scrollContainer.scrollTo({
-          top: index * 600,
-          behavior: 'smooth'
-        });
+        const targetSection = sectionElements[index];
+        if (targetSection) {
+          scrollContainer.scrollTo({
+            top: targetSection.offsetTop,
+            behavior: 'smooth'
+          });
+        }
       });
       
       // Add cursor pointer for clickable dots
       dot.style.cursor = 'pointer';
+    });
+
+    // Recalculate offsets on window resize
+    window.addEventListener('resize', () => {
+      setTimeout(() => {
+        calculateSectionOffsets();
+        updateProgressDots();
+      }, 100);
     });
   });
 </script> 

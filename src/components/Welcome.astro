@@ -19,26 +19,13 @@ const enabledSections = sections.filter(section => section.enabled);
 const sectionIds = enabledSections.map(section => section.id);
 ---
 
-<main class="min-h-screen bg-watercolor-gradient relative overflow-hidden flex items-center justify-center p-4" role="main" aria-label="Quinceañera Invitation">
-  <!-- Animated background particles -->
-  <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
-    <div class="absolute top-1/4 left-1/6 w-3 h-3 bg-purple-300/20 rounded-full animate-pulse"></div>
-    <div class="absolute top-1/2 right-1/5 w-2 h-2 bg-purple-200/30 rounded-full animate-bounce" style="animation-delay: 1s"></div>
-    <div class="absolute bottom-1/3 left-1/8 w-2 h-2 bg-purple-400/20 rounded-full animate-ping" style="animation-delay: 2s"></div>
-    <div class="absolute bottom-1/6 right-1/3 w-4 h-4 bg-purple-300/15 rounded-full animate-pulse" style="animation-delay: 3s"></div>
-    <div class="absolute top-3/4 left-1/3 w-1 h-1 bg-yellow-300/40 rounded-full animate-ping" style="animation-delay: 1.5s"></div>
-    <div class="absolute top-1/6 right-1/2 w-1.5 h-1.5 bg-yellow-200/50 rounded-full animate-bounce" style="animation-delay: 2.5s"></div>
-  </div>
+<main class="min-h-screen bg-primary overflow-hidden flex items-center justify-center p-4" role="main" aria-label="Quinceañera Invitation">
 
-  <!-- Decorative border frame with glow effect -->
-  <div class="absolute inset-4 border-2 border-purple-300/40 rounded-lg shadow-lg shadow-purple-500/20" aria-hidden="true"></div>
-  <div class="absolute inset-6 border border-purple-200/30 rounded-lg" aria-hidden="true"></div>
-  
   <!-- Main invitation card with scroll container -->
-  <article class="relative max-w-md w-full bg-gradient-to-br from-slate-800/95 via-slate-700/95 to-slate-600/95 backdrop-blur-xl rounded-2xl text-center text-white shadow-2xl border border-white/10 overflow-hidden" role="article" aria-labelledby="event-title" aria-describedby="event-details">
+  <article class="relative max-w-5xl w-full text-center text-white shadow-2xl overflow-hidden h-[calc(100vh-2rem)]" role="article" aria-labelledby="event-title" aria-describedby="event-details">
     
     <!-- Scrollable content container -->
-    <div id="scroll-container" class="h-[600px] overflow-y-scroll scrollbar-hide snap-y snap-mandatory">
+    <div id="scroll-container" class="h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory">
       <!-- Dynamically render sections -->
       <MainInvitation />
       <EventLocation />
@@ -52,24 +39,7 @@ const sectionIds = enabledSections.map(section => section.id);
 </main>
 
 <style>
-  @keyframes float {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(2deg); }
-  }
   
-  @keyframes sparkle {
-    0%, 100% { opacity: 0.4; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
-  }
-  
-  .float {
-    animation: float 6s ease-in-out infinite;
-  }
-  
-  .sparkle {
-    animation: sparkle 2s ease-in-out infinite;
-  }
-
   /* Hide scrollbar */
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -78,26 +48,6 @@ const sectionIds = enabledSections.map(section => section.id);
   
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
-  }
-  
-  /* Enhanced watercolor background */
-  .bg-watercolor-gradient {
-    background: 
-      radial-gradient(circle at 15% 85%, rgba(147, 51, 234, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 85% 15%, rgba(168, 85, 247, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
-      radial-gradient(circle at 75% 75%, rgba(124, 58, 237, 0.1) 0%, transparent 40%),
-      linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
-  }
-  
-  /* Custom glow effects */
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
-  }
-  
-  .glow-gold {
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
   }
 
   /* Screen reader only content */
