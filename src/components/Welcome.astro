@@ -21,11 +21,26 @@ const sectionIds = enabledSections.map(section => section.id);
 
 <main class="min-h-screen bg-primary overflow-hidden flex items-center justify-center p-4" role="main" aria-label="Quinceañera Invitation">
 
+  <!-- Background container - 2rem bigger for background images -->
+    <div class="absolute inset-0 max-w-6xl m-auto z-100 pointer-events-none">
+      <!-- Top left flowers -->
+      <div class="absolute top-0 left-0 w-64 md:w-92 w-64 md:h-92 bg-contain bg-no-repeat" 
+           style="background-image: url('images/flowers.webp');">
+      </div>
+      
+      <!-- Bottom right flowers (rotated 180°) -->
+      <div class="absolute bottom-0 right-0 w-64 md:w-92 w-64 md:h-92 bg-contain bg-no-repeat rotate-180" 
+           style="background-image: url('images/flowers.webp');">
+      </div>
+    </div>
+
   <!-- Main invitation card with scroll container -->
-  <article class="relative max-w-5xl w-full text-center text-white shadow-md overflow-hidden h-[calc(100vh-2rem)]" role="article" aria-labelledby="event-title" aria-describedby="event-details">
+  <article class="relative max-w-5xl w-full text-center text-white shadow-md  overflow-hidden h-[calc(100vh-2rem)]" role="article" aria-labelledby="event-title" aria-describedby="event-details">
     
+  
+
     <!-- Scrollable content container -->
-    <div id="scroll-container" class="h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory">
+    <div id="scroll-container" class="relative z-10 h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory border border-secondary">
       <!-- Dynamically render sections -->
       <MainInvitation />
       <EventLocation />
