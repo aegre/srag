@@ -21,16 +21,47 @@ const sectionIds = enabledSections.map(section => section.id);
 
 <main class="min-h-screen bg-primary overflow-hidden flex items-center justify-center p-4" role="main" aria-label="Quinceañera Invitation">
 
-  <!-- Background container - 2rem bigger for background images -->
-    <div class="absolute inset-0 max-w-6xl m-auto z-100 pointer-events-none">
+      <!-- Background container - 2rem bigger for background images -->
+    <div class="absolute inset-0 max-w-6xl m-auto pointer-events-none overflow-hidden">
+      <!-- Clouds in each corner (behind other elements) -->
+      <!-- Top left cloud -->
+      <div class="absolute top-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat z-10 opacity-30" 
+           style="background-image: url('images/cloud.webp'); transform: translate(-60%, -20%) rotate(40deg);">
+      </div>
+      
+      <!-- Top right cloud -->
+      <div class="absolute top-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat z-10 opacity-30" 
+           style="background-image: url('images/cloud.webp'); transform: translate(50%, -50%) rotate(90deg);">
+      </div>
+      
+      <!-- Bottom right cloud -->
+      <div class="absolute bottom-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat z-10 opacity-30" 
+           style="background-image: url('images/cloud.webp'); transform: translate(60%, 30%) rotate(300deg);">
+      </div>
+      
+      <!-- Bottom left cloud -->
+      <div class="absolute bottom-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat z-10 opacity-30" 
+           style="background-image: url('images/cloud.webp'); transform: translate(-30%, 40%) rotate(270deg);">
+      </div>
+      
       <!-- Top left flowers -->
-      <div class="absolute top-0 left-0 w-64 md:w-92 w-64 md:h-92 bg-contain bg-no-repeat" 
+      <div class="absolute top-0 left-0 w-48 md:w-92 h-48 md:h-92 bg-contain bg-no-repeat z-100" 
            style="background-image: url('images/flowers.webp');">
       </div>
       
       <!-- Bottom right flowers (rotated 180°) -->
-      <div class="absolute bottom-0 right-0 w-64 md:w-92 w-64 md:h-92 bg-contain bg-no-repeat rotate-180" 
+      <div class="absolute bottom-0 right-0 w-48 md:w-92 h-48 md:h-92 bg-contain bg-no-repeat rotate-180 z-100" 
            style="background-image: url('images/flowers.webp');">
+      </div>
+      
+      <!-- Top right drops (rotated, 50% visible) -->
+      <div class="absolute top-0 right-0 w-64 h-64 bg-contain bg-no-repeat rotate-180 z-100" 
+           style="background-image: url('images/drops.webp'); transform: translate(-40%, -5%);">
+      </div>
+      
+      <!-- Bottom left drops (50% visible) -->
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-contain bg-no-repeat z-100" 
+           style="background-image: url('images/drops.webp'); transform: translate(-50%, 5%);">
       </div>
     </div>
 
