@@ -1,0 +1,98 @@
+---
+import InvitationSection from '../InvitationSection.astro';
+---
+
+<InvitationSection id="section-countdown-timer">
+  <div class="relative z-10 space-y-8 px-4" id="countdown-details">
+    
+    <!-- "Faltan" header -->
+    <header class="space-y-6 pt-8">
+      <h2 class="font-hero text-2xl md:text-3xl tracking-[0.3em] text-secondary-light uppercase font-light">
+        Faltan
+      </h2>
+    </header>
+
+    <!-- Counter-up decorative border -->
+    <div class="flex justify-center md:py-4">
+      <div class="w-full h-12 bg-contain bg-center bg-no-repeat md:h-20"
+           style="background-image: url('images/counter-up.webp');">
+      </div>
+    </div>
+
+          <!-- Dynamic countdown display -->
+      <section class="space-y-6" aria-label="Event countdown">
+        <div id="countdown-display" class="flex font-angella items-center justify-center space-x-2 md:space-x-6 text-secondary-light">
+          <!-- Days -->
+          <div class="text-center">
+            <span id="days" class="text-3xl md:text-5xl font-light">--</span>
+            <span class="text-sm md:text-lg font-light ml-1">D</span>
+          </div>
+          
+          <!-- Hours -->
+          <div class="text-center">
+            <span id="hours" class="text-3xl md:text-5xl font-light">--</span>
+            <span class="text-sm md:text-lg font-light ml-1">Hrs</span>
+          </div>
+          
+          <!-- Minutes -->
+          <div class="text-center">
+            <span id="minutes" class="text-3xl md:text-5xl font-light">--</span>
+            <span class="text-sm md:text-lg font-light ml-1">Min</span>
+          </div>
+          
+          <!-- Seconds -->
+          <div class="text-center">
+            <span id="seconds" class="text-3xl md:text-5xl font-light">--</span>
+            <span class="text-sm md:text-lg font-light ml-1">Seg</span>
+          </div>
+        </div>
+      </section>
+
+    <!-- Counter-down decorative border -->
+    <div class="flex justify-center md:py-4">
+      <div class="w-full h-12 bg-contain bg-center bg-no-repeat md:h-20"
+           style="background-image: url('images/counter-down.webp');">
+      </div>
+    </div>
+
+    <!-- Message text -->
+    <section class="space-y-4 pt-6 pb-8">
+      <p class="font-hero text-sm md:text-base leading-relaxed text-secondary-light/90 font-light max-w-2xl mx-auto px-4">
+        Hay momentos inolvidables que se atesoran en el corazón para siempre, por esa razón quiero que compartas conmigo mi gran noche.
+      </p>
+    </section>
+
+  </div>
+
+  <!-- Countdown Timer JavaScript -->
+  <script>
+    function updateCountdown() {
+      
+      const eventDate = new Date('2025-09-13T19:00:00').getTime();
+      const now = new Date().getTime();
+      const timeLeft = eventDate - now;
+
+      if (timeLeft > 0) {
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        document.getElementById('days').textContent = days.toString().padStart(2, '0');
+        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+      } else {
+        // Event has passed
+        document.getElementById('days').textContent = '00';
+        document.getElementById('hours').textContent = '00';
+        document.getElementById('minutes').textContent = '00';
+        document.getElementById('seconds').textContent = '00';
+      }
+    }
+
+    // Update countdown immediately and then every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</InvitationSection> 

@@ -1,0 +1,39 @@
+---
+import InvitationSection from '../InvitationSection.astro';
+---
+
+<InvitationSection id="section-invitation-details">
+  <div class="relative z-10 flex flex-col items-center justify-center h-full min-h-screen px-4 space-y-8">
+    
+    <!-- Flower frame container -->
+    <div class="relative w-60 h-60 md:w-96 md:h-96 lg:w-[480px] lg:h-[480px] flex flex-col items-center justify-center"
+         style="background-image: url('images/flower-frame.webp'); background-size: contain; background-position: center; background-repeat: no-repeat;">
+      
+      <!-- Content inside the frame -->
+      <div class="text-center space-y-6 px-8">
+        
+        <!-- Main name -->
+        <header>
+          <h1 class="font-hero text-2xl md:text-4xl lg:text-5xl tracking-wide text-white font-light">
+            Gabriela Durán
+          </h1>
+        </header>
+
+        <!-- "Te esperamos" message -->
+        <section>
+          <p class="font-hero text-sm md:text-lg lg:text-xl text-white/90 font-light tracking-wider">
+            Te esperamos
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <footer class="pt-4">
+      <p class="font-hero text-base md:text-xl lg:text-2xl text-white font-light tracking-wide">
+        <span class="font-cormorant textlg">5</span> pases
+      </p>
+    </footer>
+
+  </div>
+</InvitationSection> 
