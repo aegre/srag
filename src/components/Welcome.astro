@@ -7,6 +7,7 @@ import PersonalGreetings from './sections/PersonalGreetings.astro';
 import EventLocation from './sections/EventLocation.astro';
 import DetailsRSVP from './sections/DetailsRSVP.astro';
 import ThankYou from './sections/ThankYou.astro';
+import ImportantInformation from './sections/ImportantInformation.astro';
 import ScrollManager from './ScrollManager.astro';
 
 // Define sections configuration - easy to add/remove sections
@@ -18,8 +19,7 @@ const sections = [
   { id: 'section-personal-greetings', component: PersonalGreetings, enabled: true },
   { id: 'section-event-location', component: EventLocation, enabled: true },
   { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
-  { id: 'section-thank-you', component: ThankYou, enabled: true },
-  // Add more sections here as needed
+  { id: 'section-important-information', component: ImportantInformation, enabled: true },
 ];
 
 // Filter enabled sections
@@ -91,7 +91,7 @@ const sectionIds = enabledSections.map(section => section.id);
       <PersonalGreetings />
       <EventLocation />
       <DetailsRSVP />
-      <ThankYou />
+      <ImportantInformation />
     </div>
 
     <!-- Dynamic progress indicator -->
