@@ -1,0 +1,20 @@
+name = "srg-xv-site"
+compatibility_date = "2024-01-15"
+
+# This is a Cloudflare Pages project
+pages_build_output_dir = "dist"
+
+# Environment variables (if needed)
+# [vars]
+# MY_VARIABLE = "my-value"
+
+# Configuration for Pages Functions (SSR)
+[build]
+command = "npm run build"
+cwd = ""
+watch_dir = "src"
+
+# Optional: Custom domains and routes
+# [[routes]]
+# pattern = "example.com/*"
+# zone_name = "example.com" 

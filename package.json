@@ -6,11 +6,19 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "cf:dev": "wrangler pages dev dist --compatibility-date=2024-01-15",
+    "cf:deploy": "wrangler pages deploy dist",
+    "cf:tail": "wrangler pages deployment tail"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
     "astro": "^5.11.1",
     "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@astrojs/cloudflare": "^12.6.0",
+    "wrangler": "^4.25.1"
   }
 }
