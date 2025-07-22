@@ -1,0 +1,82 @@
+---
+import InvitationSection from '../InvitationSection.astro';
+
+// Color palette for the quinceañera
+const colorPalette = [
+  '#22223B', // Dark blue
+  '#4A4E69', // Medium blue-gray
+  '#9A8C98', // Light purple-gray
+  '#C9ADA7', // Light beige-pink
+  '#F2E9E4',  // Light cream
+  '#C4AF90' // Pale orange
+];
+---
+
+<InvitationSection id="section-dress-code">
+  <div class="relative z-10 space-y-12 text-center">
+    
+    <!-- Header -->
+    <header class="space-y-6">
+      <h2 class="font-hero text-3xl md:text-4xl tracking-[0.2em] text-secondary-light font-light">
+        Código de vestimenta
+      </h2>
+    </header>
+
+    <!-- Formal with decorative ornament -->
+    <section class="space-y-8">
+      <div class="relative">
+        <h3 class="font-angella text-8xl md:text-8xl lg:text-9xl text-secondary-light leading-tight">
+          Formal
+        </h3>
+                  <!-- Decorative ornament -->
+          <div class="flex justify-center -mt-8">
+            <div class="w-40 h-6 bg-contain bg-no-repeat bg-center opacity-60 ml-12 lg:ml-8" 
+                 style="background-image: url('images/ornament.webp');"
+                 role="img"
+                 aria-label="Decorative ornament">
+            </div>
+          </div>
+      </div>
+    </section>
+
+    <!-- Icons Section -->
+    <section class="flex justify-center items-center space-x-16 md:space-x-24">
+      <!-- Girl icon -->
+      <div class="w-20 h-20 md:w-24 md:h-24 bg-contain bg-no-repeat bg-center opacity-70" 
+           style="background-image: url('images/girl.webp');"
+           role="img"
+           aria-label="Formal attire for ladies">
+      </div>
+      
+      <!-- Ribbon/bow tie icon -->
+      <div class="w-20 h-20 md:w-24 md:h-24 bg-contain bg-no-repeat bg-center opacity-70" 
+           style="background-image: url('images/ribbon.webp');"
+           role="img"
+           aria-label="Formal attire accessories">
+      </div>
+    </section>
+
+    <!-- Color Palette Section -->
+    <section class="space-y-6">
+      <h4 class="font-hero text-lg md:text-xl text-secondary-light font-light">
+        Colores reservados para la quinceañera
+      </h4>
+      
+      <!-- Color swatches -->
+      <div class="flex justify-center items-center">
+        {colorPalette.map((color, index) => (
+          <div 
+            key={index}
+            class="w-12 h-16 md:w-16 md:h-20  border border-secondary-light/20 shadow-sm"
+            style={`background-color: ${color};`}
+            role="img"
+            aria-label={`Color swatch ${color}`}>
+          </div>
+        ))}
+      </div>
+      
+    
+    </section>
+
+  </div>
+</InvitationSection> 

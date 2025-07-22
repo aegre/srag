@@ -6,6 +6,7 @@ import ParentsGreetings from './sections/ParentsGreetings.astro';
 import PersonalGreetings from './sections/PersonalGreetings.astro';
 import Itinerary from './sections/Itinerary.astro';
 import EventLocation from './sections/EventLocation.astro';
+import DressCode from './sections/DressCode.astro';
 import DetailsRSVP from './sections/DetailsRSVP.astro';
 import ThankYou from './sections/ThankYou.astro';
 import ImportantInformation from './sections/ImportantInformation.astro';
@@ -20,6 +21,7 @@ const sections = [
   { id: 'section-personal-greetings', component: PersonalGreetings, enabled: true },
   { id: 'section-itinerary', component: Itinerary, enabled: true },
   { id: 'section-event-location', component: EventLocation, enabled: true },
+  { id: 'section-dress-code', component: DressCode, enabled: true },
   { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
   { id: 'section-important-information', component: ImportantInformation, enabled: true },
 ];
@@ -86,6 +88,7 @@ const sectionIds = enabledSections.map(section => section.id);
     <!-- Scrollable content container -->
     <div id="scroll-container" class="relative z-20 h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory">
       <!-- Dynamically render sections -->
+      <DressCode />
       <MainInvitation />
       <CountdownTimer />
       <InvitationDetails />
@@ -93,6 +96,7 @@ const sectionIds = enabledSections.map(section => section.id);
       <PersonalGreetings />
       <Itinerary />
       <EventLocation />
+      
       <DetailsRSVP />
       <ImportantInformation />
     </div>
