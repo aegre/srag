@@ -2,6 +2,8 @@
 import MainInvitation from './sections/MainInvitation.astro';
 import CountdownTimer from './sections/CountdownTimer.astro';
 import InvitationDetails from './sections/InvitationDetails.astro';
+import ParentsGreetings from './sections/ParentsGreetings.astro';
+import PersonalGreetings from './sections/PersonalGreetings.astro';
 import EventLocation from './sections/EventLocation.astro';
 import DetailsRSVP from './sections/DetailsRSVP.astro';
 import ThankYou from './sections/ThankYou.astro';
@@ -12,6 +14,8 @@ const sections = [
   { id: 'section-main-invitation', component: MainInvitation, enabled: true },
   { id: 'section-countdown-timer', component: CountdownTimer, enabled: true },
   { id: 'section-invitation-details', component: InvitationDetails, enabled: true },
+  { id: 'section-parents-greetings', component: ParentsGreetings, enabled: true },
+  { id: 'section-personal-greetings', component: PersonalGreetings, enabled: true },
   { id: 'section-event-location', component: EventLocation, enabled: true },
   { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
   { id: 'section-thank-you', component: ThankYou, enabled: true },
@@ -59,12 +63,12 @@ const sectionIds = enabledSections.map(section => section.id);
       </div>
       
       <!-- Top right drops (rotated, 50% visible) -->
-      <div class="absolute top-0 right-0 w-64 h-64 bg-contain bg-no-repeat rotate-180 z-5" 
+      <div class="absolute top-0 right-0 w-64 h-64 bg-contain bg-no-repeat rotate-180 z-5 opacity-60" 
            style="background-image: url('images/drops.webp'); transform: translate(-40%, -5%);">
       </div>
       
       <!-- Bottom left drops (50% visible) -->
-      <div class="absolute bottom-0 left-0 w-64 h-64 bg-contain bg-no-repeat z-5" 
+      <div class="absolute bottom-0 left-0 w-64 h-64 bg-contain bg-no-repeat z-5 opacity-60" 
            style="background-image: url('images/drops.webp'); transform: translate(-50%, 5%);">
       </div>
       
@@ -83,6 +87,8 @@ const sectionIds = enabledSections.map(section => section.id);
       <MainInvitation />
       <CountdownTimer />
       <InvitationDetails />
+      <ParentsGreetings />
+      <PersonalGreetings />
       <EventLocation />
       <DetailsRSVP />
       <ThankYou />
