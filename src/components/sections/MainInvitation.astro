@@ -1,5 +1,6 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
+import EventDetail from '../EventDetail.astro';
 ---
 
 <InvitationSection id="section-main-invitation">
@@ -23,14 +24,9 @@ import InvitationSection from '../InvitationSection.astro';
 
     <!-- Event details -->
     <section class="space-y-6 pt-4" aria-label="Event date and time">
-      <div class="flex items-center text-secondary font-hero justify-center space-x-12">
+      <div class="flex items-center text-secondary font-hero justify-center space-x-1 md:space-x-12">
         <!-- Day of week -->
-        <div class="text-center space-y-0 md:space-y-2">
-          <p class="font-hero border-y-1 py-2 px-3 text-xs tracking-[0.2em] text-secondary-light uppercase font-light">
-            <span class="sr-only">Day of the week: </span>
-            Sábado
-          </p>
-        </div>
+        <EventDetail content="Sábado" srText="Day of the week: " />
 
         <!-- Date -->
         <div class="text-center lg:space-y-2">
@@ -44,23 +40,17 @@ import InvitationSection from '../InvitationSection.astro';
         </div>
 
         <!-- Time -->
-        <div class="text-center space-y-2">
-          <time datetime="19:00" class="font-hero text-xs tracking-[0.2em] text-secondary-light border-y-1 py-2 px-3 uppercase font-light">
-            <span class="sr-only">Time: </span>
-            7:00 P.M.
-          </time>
+        <EventDetail content="7:00 P.M." srText="Time: " datetime="19:00" type="time" />
         </div>
-        </div>
-</InvitationSection>
+    </section>
 
-  </div>
-  <!-- Scroll indicator -->
-  <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-secondary-light/60" aria-hidden="true">
-    <div class="animate-bounce">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
-      </svg>
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-secondary-light/60" aria-hidden="true">
+      <div class="animate-bounce">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+        </svg>
+      </div>
     </div>
   </div>
-  
-</section> 
+</InvitationSection> 

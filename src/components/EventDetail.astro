@@ -1,0 +1,24 @@
+---
+export interface Props {
+  content: string;
+  srText: string;
+  datetime?: string;
+  type?: 'time' | 'text';
+}
+
+const { content, srText, datetime, type = 'text' } = Astro.props;
+---
+
+<div class="text-center space-y-2 text-secondary-light border-y-1 py-2 px-3 text-xs tracking-[0.2em] uppercase">
+  {type === 'time' ? (
+    <time datetime={datetime} class="font-light">
+      <span class="sr-only">{srText}</span>
+      {content}
+    </time>
+  ) : (
+    <p class="font-light">
+      <span class="sr-only">{srText}</span>
+      {content}
+    </p>
+  )}
+</div> 
