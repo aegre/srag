@@ -3,17 +3,58 @@ import InvitationSection from '../InvitationSection.astro';
 ---
 
 <InvitationSection id="section-event-location">
-  <div class="relative z-10 space-y-8">
-    <header class="space-y-3">
-      <h2 class="font-hero text-2xl tracking-[0.2em] text-secondary-light uppercase font-medium">
-        Celebración
+  <div class="relative z-10 space-y-12 text-center">
+    
+    <!-- Header -->
+    <header class="space-y-6">
+      <h2 class="font-hero text-3xl md:text-4xl tracking-[0.2em] text-secondary-light font-light">
+        Ubicación
       </h2>
-      <hr class="w-20 h-px bg-gradient-to-r from-transparent via-secondary-light to-transparent mx-auto border-0" aria-hidden="true" />
     </header>
 
-    <div class="space-y-6">
-      <div class="text-center">
-        <h3 class="font-cormorant text-xl text-secondary-light mb-4">Iglesia</h3>
+    <!-- Location Icon -->
+   
+
+    <!-- Location Toggle Buttons -->
+    <section class="space-y-6">
+      <div class="flex justify-center space-x-4">
+        <button 
+          id="btn-iglesia" 
+          class="location-btn active px-6 py-2 rounded-full border border-secondary-light/40 text-secondary-light font-hero text-sm font-light transition-all duration-300 hover:border-secondary-light hover:bg-secondary-light/10"
+          data-location="iglesia">
+          Iglesia
+        </button>
+        <button 
+          id="btn-recepcion" 
+          class="location-btn px-6 py-2 rounded-full border border-secondary-light/40 text-secondary-light font-hero text-sm font-light transition-all duration-300 hover:border-secondary-light hover:bg-secondary-light/10"
+          data-location="recepcion">
+          Recepción
+        </button>
+      </div>
+
+      <!-- Google Maps Frame -->
+      <div class="w-full max-w-md mx-auto">
+        <div class="aspect-video bg-secondary-light/10 rounded-lg overflow-hidden border border-secondary-light/20">
+          <iframe 
+            id="maps-iframe"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8154094394525!2d-74.12343632529999!3d4.652069595352514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9a1234567890%3A0xabcdef1234567890!2sParroquia%20San%20Jos%C3%A9!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+            width="100%" 
+            height="100%" 
+            style="border:0; filter: invert(0.9) hue-rotate(180deg);" 
+            allowfullscreen="" 
+            loading="lazy" 
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Event location map">
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location Details -->
+    <section class="space-y-8 pt-4">
+      <!-- Iglesia Details -->
+      <div id="details-iglesia" class="location-details text-center">
+        <h3 class="font-hero text-lg md:text-xl text-secondary-light font-light mb-3">Iglesia</h3>
         <p class="text-secondary-light font-serif text-sm leading-relaxed">
           Parroquia San José<br/>
           Av. Principal #123<br/>
@@ -21,16 +62,65 @@ import InvitationSection from '../InvitationSection.astro';
         </p>
       </div>
 
-      <hr class="w-16 h-px bg-gradient-to-r from-transparent via-secondary-light/40 to-transparent mx-auto border-0" aria-hidden="true" />
-
-      <div class="text-center">
-        <h3 class="font-cormorant text-xl text-secondary-light mb-4">Recepción</h3>
+      <!-- Recepción Details -->
+      <div id="details-recepcion" class="location-details text-center hidden">
+        <h3 class="font-hero text-lg md:text-xl text-secondary-light font-light mb-3">Recepción</h3>
         <p class="text-secondary-light font-serif text-sm leading-relaxed">
           Salón de Eventos Luna<br/>
           Calle de la Fiesta #456<br/>
           7:00 P.M.
         </p>
       </div>
-    </div>
+    </section>
+
   </div>
-</InvitationSection> 
+</InvitationSection>
+
+<style>
+  .location-btn.active {
+    background-color: rgba(var(--color-secondary-light), 0.2);
+    border-color: rgba(var(--color-secondary-light), 0.8);
+  }
+</style>
+
+<script>
+  // Map URLs for different locations
+  const mapUrls = {
+    iglesia: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8154094394525!2d-74.12343632529999!3d4.652069595352514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9a1234567890%3A0xabcdef1234567890!2sParroquia%20San%20Jos%C3%A9!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus",
+    recepcion: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8154094394525!2d-74.08343632529999!3d4.672069595352514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9b1234567890%3A0xfedcba0987654321!2sSal%C3%B3n%20de%20Eventos%20Luna!5e0!3m2!1sen!2sus!4v1234567890124!5m2!1sen!2sus"
+  };
+
+  // Get elements
+  const iframe = document.getElementById('maps-iframe');
+  const buttons = document.querySelectorAll('.location-btn');
+  const locationDetails = document.querySelectorAll('.location-details');
+
+  // Function to switch location
+  function switchLocation(location) {
+    // Update iframe source
+    if (mapUrls[location]) {
+      iframe.src = mapUrls[location];
+    }
+    
+    // Update active button state
+    buttons.forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`btn-${location}`).classList.add('active');
+    
+    // Show/hide location details
+    locationDetails.forEach(detail => {
+      if (detail.id === `details-${location}`) {
+        detail.classList.remove('hidden');
+      } else {
+        detail.classList.add('hidden');
+      }
+    });
+  }
+
+  // Add click event listeners to buttons
+  buttons.forEach(button => {
+    button.addEventListener('click', () => {
+      const location = button.getAttribute('data-location');
+      switchLocation(location);
+    });
+  });
+</script> 
