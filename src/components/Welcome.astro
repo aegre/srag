@@ -4,6 +4,7 @@ import CountdownTimer from './sections/CountdownTimer.astro';
 import InvitationDetails from './sections/InvitationDetails.astro';
 import ParentsGreetings from './sections/ParentsGreetings.astro';
 import PersonalGreetings from './sections/PersonalGreetings.astro';
+import Itinerary from './sections/Itinerary.astro';
 import EventLocation from './sections/EventLocation.astro';
 import DetailsRSVP from './sections/DetailsRSVP.astro';
 import ThankYou from './sections/ThankYou.astro';
@@ -17,6 +18,7 @@ const sections = [
   { id: 'section-invitation-details', component: InvitationDetails, enabled: true },
   { id: 'section-parents-greetings', component: ParentsGreetings, enabled: true },
   { id: 'section-personal-greetings', component: PersonalGreetings, enabled: true },
+  { id: 'section-itinerary', component: Itinerary, enabled: true },
   { id: 'section-event-location', component: EventLocation, enabled: true },
   { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
   { id: 'section-important-information', component: ImportantInformation, enabled: true },
@@ -89,6 +91,7 @@ const sectionIds = enabledSections.map(section => section.id);
       <InvitationDetails />
       <ParentsGreetings />
       <PersonalGreetings />
+      <Itinerary />
       <EventLocation />
       <DetailsRSVP />
       <ImportantInformation />
