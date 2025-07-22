@@ -11,13 +11,37 @@ const { sectionIds } = Astro.props;
   {sectionIds.map((sectionId, index) => (
     <div 
       id={`dot-${index}`} 
-      class={`w-3 h-3 rounded-full transition-all duration-300 border border-secondary-light/30 cursor-pointer ${
-        index === 0 ? 'bg-secondary-light shadow-lg' : 'bg-secondary-light/20'
+      class={`progress-dot w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${
+        index === 0 ? 'active' : ''
       }`}
       data-section={sectionId}
     ></div>
   ))}
 </div>
+
+<style>
+  /* Dot color variables - easy to customize */
+  :root {
+    --dot-selected-bg: rgba(240, 230, 224, 0.5);
+    --dot-unselected-bg: rgba(240, 230, 224, 0.1);
+    --dot-hover-bg: rgba(240, 230, 224, 0.4);
+  }
+
+  .progress-dot {
+    background-color: var(--dot-unselected-bg);
+  }
+
+  .progress-dot.active {
+    background-color: var(--dot-selected-bg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.1);
+  }
+
+  .progress-dot:hover:not(.active) {
+    background-color: var(--dot-hover-bg);
+    transform: scale(1.1);
+  }
+</style>
 
 <script define:vars={{ sectionIds }}>
   document.addEventListener('DOMContentLoaded', function() {
@@ -25,7 +49,7 @@ const { sectionIds } = Astro.props;
     const isSafariMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent);
     
     if (isSafariMobile) {
-      // Wait for page to fully load, then scroll down 50% of the main window
+      // Wait for page to fully load, then scroll down 80% of the main window
       setTimeout(() => {
         const documentHeight = Math.max(
           document.body.scrollHeight,
@@ -89,13 +113,9 @@ const { sectionIds } = Astro.props;
       // Update dot appearance based on current section
       dots.forEach((dot, index) => {
         if (index === currentSection) {
-          dot.classList.remove('bg-secondary-light/20');
-          dot.classList.add('bg-secondary-light', 'shadow-lg', 'scale-110');
-          dot.style.borderColor = 'rgba(240, 230, 224, 0.8)';
+          dot.classList.add('active');
         } else {
-          dot.classList.remove('bg-secondary-light', 'shadow-lg', 'scale-110');
-          dot.classList.add('bg-secondary-light/20');
-          dot.style.borderColor = 'rgba(240, 230, 224, 0.3)';
+          dot.classList.remove('active');
         }
       });
     }
@@ -146,21 +166,6 @@ const { sectionIds } = Astro.props;
             top: targetSection.offsetTop,
             behavior: 'smooth'
           });
-        }
-      });
-      
-      // Add hover effects
-      dot.addEventListener('mouseenter', () => {
-        if (!dot.classList.contains('bg-secondary-light')) {
-          dot.style.transform = 'scale(1.1)';
-          dot.style.backgroundColor = 'rgba(240, 230, 224, 0.4)';
-        }
-      });
-      
-      dot.addEventListener('mouseleave', () => {
-        if (!dot.classList.contains('bg-secondary-light')) {
-          dot.style.transform = 'scale(1)';
-          dot.style.backgroundColor = 'rgba(240, 230, 224, 0.2)';
         }
       });
     });

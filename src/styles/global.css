@@ -1,5 +1,10 @@
 @import 'tailwindcss';
 
+/* Prevent dark mode modifications */
+* {
+  color-scheme: light only !important;
+}
+
 @theme {
 
   --color-primary: #22223B;
