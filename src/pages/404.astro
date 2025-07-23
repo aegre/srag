@@ -1,0 +1,93 @@
+---
+import "../styles/global.css";
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <main class="min-h-screen bg-primary overflow-hidden flex items-center justify-center p-4">
+    
+    <!-- Background elements -->
+    <div class="fixed inset-0 max-w-6xl mx-auto pointer-events-none overflow-hidden">
+      <!-- Clouds -->
+      <div class="absolute top-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-20" 
+           style="background-image: url('/images/cloud.webp'); transform: translate(-60%, -20%) rotate(40deg);">
+      </div>
+      
+      <div class="absolute bottom-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-20" 
+           style="background-image: url('/images/cloud.webp'); transform: translate(60%, 30%) rotate(300deg);">
+      </div>
+      
+      <!-- Flowers -->
+      <div class="absolute top-0 left-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat opacity-40" 
+           style="background-image: url('/images/flowers.webp');">
+      </div>
+      
+      <div class="absolute bottom-0 right-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat opacity-40" 
+           style="background-image: url('/images/flowers.webp'); transform: rotate(180deg);">
+      </div>
+    </div>
+
+    <!-- 404 Content -->
+    <div class="relative z-10 text-center max-w-2xl mx-auto">
+      
+      <!-- 404 Number -->
+      <div class="mb-8">
+        <h1 class="font-hero text-8xl md:text-9xl text-secondary-light font-light opacity-60">
+          404
+        </h1>
+      </div>
+
+      <!-- Message -->
+      <div class="space-y-6 mb-12">
+        <h2 class="font-hero text-2xl md:text-3xl tracking-[0.2em] text-secondary-light uppercase font-medium">
+          Página no encontrada
+        </h2>
+        
+        <div class="space-y-4">
+          <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
+            Lo sentimos, esta página se ha perdido en el baile.
+          </p>
+          
+          <p class="font-hero text-sm md:text-base text-secondary-light font-light opacity-80">
+            Pero no te preocupes, ¡la celebración continúa!
+          </p>
+        </div>
+      </div>
+
+      <!-- Decorative hearts -->
+      <div class="flex justify-center space-x-4 opacity-60 mb-8">
+        <span class="text-secondary-light text-2xl">💕</span>
+        <span class="text-secondary-light text-xl">✨</span>
+        <span class="text-secondary-light text-2xl">💕</span>
+      </div>
+
+      <!-- Back to invitation button -->
+      <div class="space-y-4">
+        <p class="font-hero text-xs text-secondary-light font-light opacity-70">
+          Volvamos a la fiesta de Julietta 👑
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Border decoration -->
+    <div class="absolute inset-8 border border-secondary-light/20 pointer-events-none rounded-lg"></div>
+
+  </main>
+</Layout>
+
+<style>
+  /* Ensure images load properly */
+  [style*="background-image"] {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 4rem;
+    }
+  }
+</style> 

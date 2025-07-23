@@ -3,5 +3,10 @@
   "include": [
     "/*"
   ],
-  "exclude": []
+  "exclude": [
+    "/images/*",
+    "/fonts/*",
+    "/audio/*",
+    "/favicon*"
+  ]
 }
