@@ -1,6 +1,9 @@
 ---
 import "../styles/global.css";
 import Layout from '../layouts/Layout.astro';
+
+// Prevent indexing of 404 page
+export const prerender = true;
 ---
 
 <Layout>
