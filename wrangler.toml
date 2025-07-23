@@ -1,14 +1,12 @@
-name = "srg-xv-site"
+name = "julifestxv"
 compatibility_date = "2024-01-15"
 
-# This is a Cloudflare Pages project
-pages_build_output_dir = "dist"
+[env.production]
+name = "julifestxv"
+routes = [
+  { pattern = "julifestxv.aegre.me/*", custom_domain = true }
+]
 
-# Environment variables (if needed)
-# [vars]
-# MY_VARIABLE = "my-value"
-
-# Optional: Custom domains and routes
-# [[routes]]
-# pattern = "example.com/*"
-# zone_name = "example.com" 
+[[env.production.route]]
+pattern = "julifestxv.aegre.me/*"
+custom_domain = true 
