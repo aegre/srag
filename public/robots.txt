@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /
+
+# Quinceañera invitation - private event
+# No crawling or indexing allowed 
