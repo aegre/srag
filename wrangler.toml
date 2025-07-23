@@ -1,12 +1,21 @@
 name = "julifestxv"
 compatibility_date = "2024-01-15"
 
+# Database configuration
+[[d1_databases]]
+binding = "DB"
+database_name = "julifestdb"
+database_id = "dbe5f30e-c490-4020-bdb4-e47cb0884140"
+preview_database_id = "dbe5f30e-c490-4020-bdb4-e47cb0884140"
+
 [env.production]
 name = "julifestxv"
 routes = [
   { pattern = "julifestxv.aegre.me/*", custom_domain = true }
 ]
 
-[[env.production.route]]
-pattern = "julifestxv.aegre.me/*"
-custom_domain = true 
+# Production database configuration
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "julifestdb-prod"
+database_id = "8415ca5b-6ff3-4584-bb07-530bc99c814c" 
