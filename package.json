@@ -20,5 +20,8 @@
   "devDependencies": {
     "@astrojs/cloudflare": "^12.6.0",
     "wrangler": "^4.25.1"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.9.5"
   }
 }
