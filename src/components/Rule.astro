@@ -1,0 +1,15 @@
+---
+export interface Props {
+  number: number;
+  text: string;
+}
+
+const { number, text } = Astro.props;
+---
+
+<div class="flex items-start text-left w-full space-x-3">
+  <span class="font-hero text-lg  text-secondary-light font-medium min-w-[2rem]">{number}.</span>
+  <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
+    {text}
+  </p>
+</div> 

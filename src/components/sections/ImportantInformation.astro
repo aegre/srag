@@ -1,5 +1,6 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
+import Rule from '../Rule.astro';
 ---
 
 <InvitationSection id="section-important-information">
@@ -17,33 +18,10 @@ import InvitationSection from '../InvitationSection.astro';
     <section class="space-y-6 max-w-2xl mx-auto">
       <div class="text-center space-y-4">
         
-        <div class="flex items-center text-center space-x-3 justify-center">
-          <span class="font-hero text-lg text-secondary-light font-medium min-w-[2rem]">1.</span>
-          <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
-            regla a
-          </p>
-        </div>
-
-        <div class="flex items-center text-center space-x-3 justify-center">
-          <span class="font-hero text-lg text-secondary-light font-medium min-w-[2rem]">2.</span>
-          <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
-            regla b
-          </p>
-        </div>
-
-        <div class="flex items-center text-center space-x-3 justify-center">
-          <span class="font-hero text-lg text-secondary-light font-medium min-w-[2rem]">3.</span>
-          <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
-            regla c
-          </p>
-        </div>
-
-        <div class="flex items-center text-center space-x-3 justify-center">
-          <span class="font-hero text-lg text-secondary-light font-medium min-w-[2rem]">4.</span>
-          <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
-            regla d
-          </p>
-        </div>
+        <Rule number={1} text="Toma en cuenta que eres una parte especial de la celebración." />
+        <Rule number={2} text="Los lugares son reservados." />
+        <Rule number={3} text="Estacionamiento está incluido por el salón." />
+        <Rule number={4} text="No te quedes sentado ¡Disfruta y diviértete al máximo!" />
 
       </div>
     </section>

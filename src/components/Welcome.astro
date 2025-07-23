@@ -10,6 +10,10 @@ import DressCode from './sections/DressCode.astro';
 import DetailsRSVP from './sections/DetailsRSVP.astro';
 import ThankYou from './sections/ThankYou.astro';
 import ImportantInformation from './sections/ImportantInformation.astro';
+import GiftTable from './sections/GiftTable.astro';
+import FinalMessage from './sections/FinalMessage.astro';
+import MusicController from './MusicController.astro';
+import EntryScreen from './EntryScreen.astro';
 import ScrollManager from './ScrollManager.astro';
 
 // Define sections configuration - easy to add/remove sections
@@ -24,6 +28,8 @@ const sections = [
   { id: 'section-dress-code', component: DressCode, enabled: true },
   { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
   { id: 'section-important-information', component: ImportantInformation, enabled: true },
+  { id: 'section-gift-table', component: GiftTable, enabled: true },
+  { id: 'section-final-message', component: FinalMessage, enabled: true },
 ];
 
 // Filter enabled sections
@@ -89,11 +95,19 @@ const sectionIds = enabledSections.map(section => section.id);
       <DressCode />
       <DetailsRSVP />
       <ImportantInformation />
+      <GiftTable />
+      <FinalMessage />
     </div>
 
     <!-- Dynamic progress indicator -->
     <ScrollManager sectionIds={sectionIds} />
   </article>
+
+  <!-- Fixed Music Controller -->
+  <MusicController />
+
+  <!-- Entry Screen - shown first to enable user interaction -->
+  <EntryScreen />
 </main>
 
 <style>

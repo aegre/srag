@@ -1,0 +1,186 @@
+---
+// Music Controller for background music
+---
+
+<!-- Fixed Music Controller -->
+<div id="music-controller" class="fixed z-50">
+  <div class="bg-black/80 backdrop-blur-sm rounded-full p-2 shadow-lg border border-white/20">
+    <button 
+      id="music-toggle"
+      class="flex items-center justify-center w-8 h-8 text-white hover:text-secondary-light transition-colors duration-200"
+      aria-label="Toggle music"
+    >
+      <!-- Play Icon (hidden by default) -->
+      <svg id="play-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+      
+      <!-- Pause Icon (visible by default) -->
+      <svg id="pause-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+      </svg>
+      
+      <!-- Mute Icon (hidden by default) -->
+      <svg id="mute-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Audio element -->
+<audio 
+  id="background-music" 
+  loop 
+  preload="auto"
+  class="hidden"
+>
+  <source src="/audio/young-and-beautiful.mp3" type="audio/mpeg">
+  <source src="/audio/young-and-beautiful.ogg" type="audio/ogg">
+  <!-- Fallback for browsers that don't support audio element -->
+  Your browser does not support the audio element.
+</audio>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Music controller initializing...');
+    
+    const audio = document.getElementById('background-music') as HTMLAudioElement;
+    const musicToggle = document.getElementById('music-toggle');
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    const muteIcon = document.getElementById('mute-icon');
+    
+    if (!audio) {
+      console.error('Audio element not found');
+      return;
+    }
+
+    let isPlaying = false;
+
+    // Update icons based on state
+    function updateIcons() {
+      console.log('Updating icons, isPlaying:', isPlaying);
+      
+      if (!playIcon || !pauseIcon || !muteIcon) return;
+
+      // Hide all icons first
+      playIcon.classList.add('hidden');
+      pauseIcon.classList.add('hidden');
+      muteIcon.classList.add('hidden');
+
+      // Show appropriate icon
+      if (isPlaying) {
+        pauseIcon.classList.remove('hidden');
+      } else {
+        playIcon.classList.remove('hidden');
+      }
+    }
+
+    // Set initial volume
+    audio.volume = 0.3;
+    console.log('Audio volume set to:', audio.volume);
+
+    // Simple play/pause toggle
+    musicToggle?.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('Button clicked, current isPlaying:', isPlaying);
+      
+      if (!audio) return;
+
+      if (isPlaying) {
+        // Pause the music
+        audio.pause();
+        isPlaying = false;
+        console.log('Pausing audio');
+      } else {
+        // Play the music
+        audio.play().then(() => {
+          isPlaying = true;
+          console.log('Audio started playing');
+          updateIcons();
+        }).catch((error) => {
+          console.error('Error playing audio:', error);
+          isPlaying = false;
+          updateIcons();
+        });
+      }
+      updateIcons();
+    });
+
+    // Handle audio events to keep state in sync
+    audio.addEventListener('play', function() {
+      console.log('Audio play event fired');
+      isPlaying = true;
+      updateIcons();
+    });
+
+    audio.addEventListener('pause', function() {
+      console.log('Audio pause event fired');
+      isPlaying = false;
+      updateIcons();
+    });
+
+    audio.addEventListener('ended', function() {
+      console.log('Audio ended event fired');
+      isPlaying = false;
+      updateIcons();
+    });
+
+    // Listen for user interaction event from entry screen
+    window.addEventListener('userInteractionComplete', function(event) {
+      const withAudio = event.detail?.withAudio;
+      console.log('User interaction detected, with audio:', withAudio);
+      
+      if (withAudio) {
+        audio.play().then(() => {
+          console.log('Audio started successfully after user interaction');
+          isPlaying = true;
+          updateIcons();
+        }).catch((error) => {
+          console.log('Audio failed even after user interaction:', error);
+          isPlaying = false;
+          updateIcons();
+        });
+      } else {
+        console.log('User chose to enter without audio - keeping music paused');
+        isPlaying = false;
+        updateIcons();
+      }
+    });
+
+    // Initialize icons
+    updateIcons();
+  });
+</script>
+
+<style>
+  /* Ensure the controller stays above everything */
+  #music-controller {
+    z-index: 9999;
+    left: 0;
+    width: fit-content;
+    bottom: .5rem;
+    opacity: 1.9;
+  }
+
+  /* Smooth transitions for hover effects */
+  #music-controller button {
+    transition: all 0.2s ease-in-out;
+  }
+
+  #music-controller button:hover {
+    transform: scale(1.05);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    #music-controller {
+      bottom: .5rem;
+      left: 0;
+      width: fit-content;
+      bottom: .5rem;
+      opacity: 0.96;
+    }
+  }
+</style> 

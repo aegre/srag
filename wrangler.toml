@@ -8,12 +8,6 @@ pages_build_output_dir = "dist"
 # [vars]
 # MY_VARIABLE = "my-value"
 
-# Configuration for Pages Functions (SSR)
-[build]
-command = "npm run build"
-cwd = ""
-watch_dir = "src"
-
 # Optional: Custom domains and routes
 # [[routes]]
 # pattern = "example.com/*"

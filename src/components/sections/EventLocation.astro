@@ -17,7 +17,7 @@ import InvitationSection from '../InvitationSection.astro';
 
     <!-- Location Toggle Buttons -->
     <section class="space-y-6">
-      <div class="flex justify-center space-x-4">
+      <div class="flex justify-center space-x-4 hidden">
         <button 
           id="btn-iglesia" 
           class="location-btn active px-6 py-2 rounded-full border border-secondary-light/40 text-secondary-light font-hero text-sm font-light transition-all duration-300 hover:border-secondary-light hover:bg-secondary-light/10"
@@ -36,15 +36,14 @@ import InvitationSection from '../InvitationSection.astro';
       <div class="w-full max-w-md mx-auto">
         <div class="aspect-video bg-secondary-light/10 rounded-lg overflow-hidden border border-secondary-light/20">
           <iframe 
-            id="maps-iframe"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8154094394525!2d-74.12343632529999!3d4.652069595352514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9a1234567890%3A0xabcdef1234567890!2sParroquia%20San%20Jos%C3%A9!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
-            width="100%" 
-            height="100%" 
-            style="border:0; filter: invert(0.9) hue-rotate(180deg);" 
-            allowfullscreen="" 
-            loading="lazy" 
-            referrerpolicy="no-referrer-when-downgrade"
-            title="Event location map">
+          id="maps-iframe"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3766.0054504489126!2d-99.21816162387759!3d19.28212918196548!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cdfe4bd8303315%3A0x68ea6ef72c513e23!2sCarr.%20Picacho-Ajusco%20886%2C%20H%C3%A9roes%20de%20Padierna%2C%20Tlalpan%2C%2014200%20Ciudad%20de%20M%C3%A9xico%2C%20CDMX%2C%20Mexico!5e0!3m2!1sen!2sus!4v1753243198262!5m2!1sen!2sus"
+          width="100%"
+          height="100%"
+          style="border:0; filter: invert(0.9) hue-rotate(180deg);" 
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
           </iframe>
         </div>
       </div>
@@ -54,11 +53,12 @@ import InvitationSection from '../InvitationSection.astro';
     <section class="space-y-8 pt-4">
       <!-- Iglesia Details -->
       <div id="details-iglesia" class="location-details text-center">
-        <h3 class="font-hero text-lg md:text-xl text-secondary-light font-light mb-3">Iglesia</h3>
+        <h3 class="font-hero text-lg md:text-xl text-secondary-light font-light mb-3">Jardín Herra</h3>
         <p class="text-secondary-light font-serif text-sm leading-relaxed">
-          Parroquia San José<br/>
-          Av. Principal #123<br/>
-          5:00 P.M.
+          Carretera Picacho-Ajusco #886<br/>
+          Col, Héroes de Padierna<br/>
+          Tlalpan, 14200<br/>
+          CDMX
         </p>
       </div>
 
@@ -68,7 +68,7 @@ import InvitationSection from '../InvitationSection.astro';
         <p class="text-secondary-light font-serif text-sm leading-relaxed">
           Salón de Eventos Luna<br/>
           Calle de la Fiesta #456<br/>
-          7:00 P.M.
+          5:30 P.M.
         </p>
       </div>
     </section>
@@ -86,8 +86,8 @@ import InvitationSection from '../InvitationSection.astro';
 <script>
   // Map URLs for different locations
   const mapUrls = {
-    iglesia: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8154094394525!2d-74.12343632529999!3d4.652069595352514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9a1234567890%3A0xabcdef1234567890!2sParroquia%20San%20Jos%C3%A9!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus",
-    recepcion: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.8154094394525!2d-74.08343632529999!3d4.672069595352514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9b1234567890%3A0xfedcba0987654321!2sSal%C3%B3n%20de%20Eventos%20Luna!5e0!3m2!1sen!2sus!4v1234567890124!5m2!1sen!2sus"
+    iglesia: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3766.0054504489126!2d-99.21816162387759!3d19.28212918196548!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cdfe4bd8303315%3A0x68ea6ef72c513e23!2sCarr.%20Picacho-Ajusco%20886%2C%20H%C3%A9roes%20de%20Padierna%2C%20Tlalpan%2C%2014200%20Ciudad%20de%20M%C3%A9xico%2C%20CDMX%2C%20Mexico!5e0!3m2!1sen!2sus!4v1753243198262!5m2!1sen!2sus",
+    recepcion: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3766.0054504489126!2d-99.21816162387759!3d19.28212918196548!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85cdfe4bd8303315%3A0x68ea6ef72c513e23!2sCarr.%20Picacho-Ajusco%20886%2C%20H%C3%A9roes%20de%20Padierna%2C%20Tlalpan%2C%2014200%20Ciudad%20de%20M%C3%A9xico%2C%20CDMX%2C%20Mexico!5e0!3m2!1sen!2sus!4v1753243198262!5m2!1sen!2sus"
   };
 
   // Get elements

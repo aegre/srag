@@ -1,0 +1,173 @@
+---
+// Entry screen that requires user interaction to enable audio
+---
+
+<div id="entry-screen" class="fixed inset-0 z-[10000] bg-primary flex items-center justify-center">
+  
+  <!-- Background elements for entry screen -->
+  <div class="absolute inset-0 max-w-6xl mx-auto pointer-events-none overflow-hidden opacity-50">
+    <!-- Decorative clouds -->
+    <div class="absolute top-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-20" 
+         style="background-image: url('images/cloud.webp'); transform: translate(-60%, -20%) rotate(40deg);">
+    </div>
+    
+    <div class="absolute bottom-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-20" 
+         style="background-image: url('images/cloud.webp'); transform: translate(60%, 30%) rotate(300deg);">
+    </div>
+    
+    <!-- Decorative flowers -->
+    <div class="absolute top-0 left-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat opacity-60" 
+         style="background-image: url('images/flowers.webp');">
+    </div>
+    
+    <div class="absolute bottom-0 right-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat opacity-60" 
+         style="background-image: url('images/flowers.webp'); transform: rotate(180deg);">
+    </div>
+  </div>
+
+  <!-- Entry content -->
+  <div class="relative z-10 text-center max-w-md mx-auto p-8">
+    
+    <!-- Welcome message -->
+    <div class="space-y-6 mb-8">
+     <p class="font-angella text-xl md:text-xl text-secondary-light font-light">
+          Mis XV años Julietta
+        </p>
+      <h1 class="font-hero text-3xl md:text-4xl tracking-[0.2em] text-secondary-light uppercase font-medium">
+        Bienvenidos
+      </h1>
+      
+      <div class="space-y-4">
+        <p class="font-hero text-base md:text-lg text-secondary-light font-light">
+          Todos los detalles aquí:
+        </p>
+      </div>
+    </div>
+
+    
+
+    <!-- Enter button -->
+    <button 
+      id="enter-button"
+      class="group relative overflow-hidden bg-secondary-light text-primary px-8 py-4 rounded-full font-hero font-medium text-lg md:text-xl hover:bg-white transition-all duration-300 transform hover:scale-105 shadow-lg"
+    >
+      <span class="relative z-10">Entrar a la invitación</span>
+      
+      <!-- Button animation background -->
+      <div class="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+    </button>
+
+    <!-- Enter without audio link -->
+    <div class="mt-2">
+      <button 
+        id="enter-no-audio-button"
+        class="font-hero text-xs text-secondary-light font-light hover:text-white transition-colors duration-200 underline"
+      >
+        Entrar sin audio
+      </button>
+    </div>
+
+    <!-- Headphones recommendation -->
+    <div class="flex items-center justify-center gap-3 mt-24 mb-6">
+      <svg class="w-5 h-5 text-secondary-light" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 3a9 9 0 0 0-9 9v7c0 1.1.9 2 2 2h2v-6H5v-3c0-3.9 3.1-7 7-7s7 3.1 7 7v3h-2v6h2c1.1 0 2-.9 2-2v-7a9 9 0 0 0-9-9Z"/>
+      </svg>
+      <p class="font-hero text-sm text-secondary-light font-light">
+        Se recomienda usar audífonos
+      </p>
+    </div>
+    
+
+  </div>
+
+  <!-- Border decoration -->
+  <div class="absolute inset-8 border border-secondary-light/30 pointer-events-none rounded-lg"></div>
+  
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const entryScreen = document.getElementById('entry-screen');
+    const enterButton = document.getElementById('enter-button');
+    const enterNoAudioButton = document.getElementById('enter-no-audio-button');
+    
+    if (!entryScreen || !enterButton || !enterNoAudioButton) return;
+
+    // Function to hide entry screen
+    function hideEntryScreen(withAudio = true) {
+      console.log('Hiding entry screen, with audio:', withAudio);
+      
+      // Add fade out animation
+      entryScreen.style.transition = 'opacity 0.8s ease-out, visibility 0.8s ease-out';
+      entryScreen.style.opacity = '0';
+      entryScreen.style.visibility = 'hidden';
+      
+      // Remove from DOM after animation
+      setTimeout(() => {
+        entryScreen.remove();
+        
+        // Dispatch custom event to notify that user has interacted
+        window.dispatchEvent(new CustomEvent('userInteractionComplete', { 
+          detail: { withAudio: withAudio } 
+        }));
+        
+        // Try to start audio after user interaction (only if withAudio is true)
+        if (withAudio) {
+          const audio = document.getElementById('background-music') as HTMLAudioElement;
+          if (audio) {
+            console.log('Starting audio after user interaction');
+            audio.play().then(() => {
+              console.log('Audio started successfully after user interaction');
+            }).catch((error) => {
+              console.log('Audio still failed after user interaction:', error);
+            });
+          }
+        } else {
+          console.log('Entering without audio - skipping audio start');
+        }
+      }, 800);
+    }
+
+    // Enter with audio
+    enterButton.addEventListener('click', function() {
+      hideEntryScreen(true);
+    });
+
+    // Enter without audio
+    enterNoAudioButton.addEventListener('click', function() {
+      hideEntryScreen(false);
+    });
+
+    // Prevent scrolling on the entry screen
+    document.body.style.overflow = 'hidden';
+    
+    // Re-enable scrolling when entry screen is removed
+    window.addEventListener('userInteractionComplete', function() {
+      document.body.style.overflow = 'auto';
+    });
+  });
+</script>
+
+<style>
+  /* Ensure entry screen covers everything */
+  #entry-screen {
+    backdrop-filter: blur(2px);
+  }
+
+  /* Button hover effects */
+  #enter-button:hover span {
+    color: var(--primary, #22223b);
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    #entry-screen .space-y-6 {
+      margin-bottom: 2rem;
+    }
+    
+    #enter-button {
+      padding: 1rem 2rem;
+      font-size: 1rem;
+    }
+  }
+</style> 
