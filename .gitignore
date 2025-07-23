@@ -22,3 +22,6 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Wrangler local state (D1 databases, KV, etc.)
+.wrangler/
