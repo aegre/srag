@@ -4,17 +4,28 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "start": "astro dev",
+    "build": "astro check && astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "db:init": "node database/init.js",
+    "db:migrate": "wrangler d1 migrations apply julifestdb --local",
+    "db:migrate:prod": "wrangler d1 migrations apply julifestdb-prod",
+    "db:studio": "wrangler d1 execute julifestdb --local --command='SELECT name FROM sqlite_master WHERE type=\"table\";'",
+    "db:reset": "wrangler d1 execute julifestdb --local --command='DROP TABLE IF EXISTS invitations; DROP TABLE IF EXISTS analytics; DROP TABLE IF EXISTS rsvp_responses; DROP TABLE IF EXISTS admin_users; DROP TABLE IF EXISTS sessions;' && npm run db:migrate",
     "deploy": "npm run build && wrangler pages deploy dist",
     "cf:dev": "wrangler pages dev dist --compatibility-date=2024-01-15",
     "cf:deploy": "wrangler pages deploy dist",
     "cf:tail": "wrangler pages deployment tail"
   },
   "dependencies": {
+    "@astrojs/react": "^4.3.0",
     "@tailwindcss/vite": "^4.1.11",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "astro": "^5.11.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
