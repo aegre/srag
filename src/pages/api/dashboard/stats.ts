@@ -36,7 +36,7 @@ export const GET: APIRoute = async (context) => {
     const user = await authenticateAdmin(context);
     if (!user) {
       return new Response(JSON.stringify({
-        error: 'Unauthorized'
+        error: 'No autorizado'
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -45,7 +45,7 @@ export const GET: APIRoute = async (context) => {
 
     const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
-      throw new Error('Database not available');
+      throw new Error('Base de datos no disponible');
     }
 
     // Get total invitations count
@@ -123,7 +123,7 @@ export const GET: APIRoute = async (context) => {
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
     return new Response(JSON.stringify({
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

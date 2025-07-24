@@ -1,8 +1,15 @@
 ---
 import Welcome from '../../components/Welcome.astro';
 import Layout from '../../layouts/Layout.astro';
+
+export interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.params;
+const preview = Astro.url.searchParams.get('preview') === 'true';
 ---
 
 <Layout>
-	<Welcome />
+	<Welcome preview={preview} />
 </Layout>

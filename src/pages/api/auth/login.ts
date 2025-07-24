@@ -9,7 +9,7 @@ export const POST: APIRoute = async (context) => {
     // Validate input
     if (!username || !password) {
       return new Response(JSON.stringify({
-        error: 'Username and password are required'
+        error: 'El nombre de usuario y contraseña son requeridos'
       }), {
         status: 400,
         headers: {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async (context) => {
 
     if (!userResult) {
       return new Response(JSON.stringify({
-        error: 'Invalid username or password'
+        error: 'Nombre de usuario o contraseña inválidos'
       }), {
         status: 401,
         headers: {
@@ -49,7 +49,7 @@ export const POST: APIRoute = async (context) => {
 
     if (!passwordValid) {
       return new Response(JSON.stringify({
-        error: 'Invalid username or password'
+        error: 'Nombre de usuario o contraseña inválidos'
       }), {
         status: 401,
         headers: {
@@ -110,7 +110,7 @@ export const POST: APIRoute = async (context) => {
   } catch (error) {
     console.error('Login error:', error);
     return new Response(JSON.stringify({
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: {

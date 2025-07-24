@@ -50,7 +50,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
       }
     } catch (err) {
       console.error('Error loading settings:', err);
-      setError('Failed to load settings');
+      setError('Error al cargar la configuración');
     } finally {
       setIsLoadingSettings(false);
     }
@@ -81,7 +81,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
 
     try {
       if (!token) {
-        setError('Authentication required');
+        setError('Autenticación requerida');
         return;
       }
 
@@ -101,21 +101,21 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
       if (onSuccess) {
         onSuccess(result.data);
       } else {
-        alert('Settings updated successfully!');
+        alert('¡Configuración actualizada exitosamente!');
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setError('Authentication required');
+        setError('Autenticación requerida');
         return;
       }
-      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
+      setError(err instanceof Error ? err.message : 'Ocurrió un error. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+    if (confirm('¿Estás seguro de que quieres cancelar? Cualquier cambio sin guardar se perderá.')) {
       if (onCancel) {
         onCancel();
       } else {
@@ -129,7 +129,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">{authLoading ? 'Authenticating...' : 'Loading settings...'}</p>
+          <p className="text-gray-600">{authLoading ? 'Autenticando...' : 'Cargando configuración...'}</p>
         </div>
       </div>
     );
@@ -150,7 +150,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">Global Settings</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Configuración Global</h1>
             </div>
           </div>
         </div>
@@ -162,14 +162,14 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
           {/* Event Details */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Event Details</h3>
-              <p className="text-sm text-gray-600 mb-6">These settings apply to all invitations</p>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Detalles del Evento</h3>
+              <p className="text-sm text-gray-600 mb-6">Estos ajustes se aplican a todas las invitaciones</p>
               
               <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label htmlFor="event_date" className="block text-sm font-medium text-gray-700">
-                      Event Date
+                      Fecha del Evento
                     </label>
                     <input
                       type="date"
@@ -184,7 +184,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
 
                   <div>
                     <label htmlFor="event_time" className="block text-sm font-medium text-gray-700">
-                      Event Time
+                      Hora del Evento
                     </label>
                     <input
                       type="time"
@@ -204,7 +204,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
           {/* RSVP Settings */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">RSVP Settings</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Configuración de RSVP</h3>
               
               <div className="space-y-6">
                 <div className="flex items-center">
@@ -218,14 +218,14 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                   />
                   <label htmlFor="rsvp_enabled" className="ml-2 block text-sm text-gray-900">
-                    Enable RSVP functionality
+                    Habilitar funcionalidad de RSVP
                   </label>
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
                     <label htmlFor="rsvp_deadline" className="block text-sm font-medium text-gray-700">
-                      RSVP Deadline
+                      Fecha Límite de RSVP
                     </label>
                     <input
                       type="date"
@@ -240,7 +240,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
 
                   <div>
                     <label htmlFor="rsvp_phone" className="block text-sm font-medium text-gray-700">
-                      RSVP Phone
+                      Teléfono para RSVP
                     </label>
                     <input
                       type="tel"
@@ -256,7 +256,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
 
                   <div>
                     <label htmlFor="rsvp_whatsapp" className="block text-sm font-medium text-gray-700">
-                      RSVP WhatsApp
+                      WhatsApp para RSVP
                     </label>
                     <input
                       type="tel"
@@ -277,7 +277,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
           {/* Publication Settings */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Publication Settings</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Configuración de Publicación</h3>
               
               <div className="space-y-6">
                 <div className="flex items-center">
@@ -291,11 +291,11 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
                     className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                   />
                   <label htmlFor="is_published" className="ml-2 block text-sm text-gray-900">
-                    Publish invitations (make them publicly accessible)
+                    Publicar invitaciones (hacerlas accesibles públicamente)
                   </label>
                 </div>
                 <p className="text-sm text-gray-600">
-                  When published, all active invitations will be accessible to guests. When unpublished, invitations will show a "coming soon" message.
+                  Cuando esté publicado, todas las invitaciones activas serán accesibles para los invitados. Cuando no esté publicado, las invitaciones mostrarán un mensaje de "próximamente".
                 </p>
               </div>
             </div>
@@ -328,7 +328,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
               disabled={isLoading}
               className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
             >
-              Cancel
+              Cancelar
             </button>
             <button
               type="submit"
@@ -338,10 +338,10 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
               {isLoading ? (
                 <div className="flex items-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Updating...
+                  Actualizando...
                 </div>
               ) : (
-                'Update Settings'
+                'Actualizar Configuración'
               )}
             </button>
           </div>

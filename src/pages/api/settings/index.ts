@@ -84,7 +84,7 @@ export const GET: APIRoute = async (context) => {
   } catch (error) {
     console.error('Error fetching settings:', error);
     return new Response(JSON.stringify({
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -120,7 +120,7 @@ export const PUT: APIRoute = async (context) => {
 
     if (!currentSettings) {
       return new Response(JSON.stringify({
-        error: 'No settings found'
+        error: 'No se encontraron configuraciones'
       }), {
         status: 404,
         headers: { 'Content-Type': 'application/json' }
@@ -151,7 +151,7 @@ export const PUT: APIRoute = async (context) => {
     ).run();
 
     if (!result.success) {
-      throw new Error('Failed to update settings');
+      throw new Error('Error al actualizar la configuración');
     }
 
     // Get updated settings
@@ -162,7 +162,7 @@ export const PUT: APIRoute = async (context) => {
     return new Response(JSON.stringify({
       success: true,
       data: updatedSettings,
-      message: 'Settings updated successfully'
+      message: 'Configuración actualizada exitosamente'
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -171,7 +171,7 @@ export const PUT: APIRoute = async (context) => {
   } catch (error) {
     console.error('Error updating settings:', error);
     return new Response(JSON.stringify({
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

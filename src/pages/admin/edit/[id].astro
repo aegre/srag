@@ -1,0 +1,67 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import InvitationForm from '../../../components/admin/InvitationForm';
+import AdminRoute from '../../../components/admin/AdminRoute';
+
+export interface Props {
+  id: string;
+}
+
+const { id } = Astro.params;
+const search = Astro.url.searchParams.get('search') || '';
+const filter = Astro.url.searchParams.get('filter') || '';
+---
+
+<Layout title="Editar Invitación - Panel de Administración">
+  <AdminRoute client:load>
+    <InvitationForm
+      mode="edit"
+      invitationId={id}
+      searchParams={{ search, filter }}
+      client:load
+    />
+  </AdminRoute>
+</Layout>
+
+<script>
+  // Handle delete functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    const search = new URLSearchParams(window.location.search).get('search') || '';
+    const filter = new URLSearchParams(window.location.search).get('filter') || '';
+    
+    window.handleDeleteInvitation = async (invitationId) => {
+      try {
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+          alert('No autorizado');
+          return;
+        }
+
+        const response = await fetch(`/api/invitations/${invitationId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          // Redirect back to admin with search params
+          const adminUrl = new URL('/admin', window.location.origin);
+          if (search) {
+            adminUrl.searchParams.set('search', search);
+          }
+          if (filter) {
+            adminUrl.searchParams.set('filter', filter);
+          }
+          window.location.href = adminUrl.toString();
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Error al eliminar la invitación');
+        }
+      } catch (error) {
+        alert('Error al eliminar la invitación');
+      }
+    };
+  });
+</script> 

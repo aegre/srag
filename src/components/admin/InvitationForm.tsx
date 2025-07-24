@@ -6,15 +6,21 @@ import { adminApi, ApiError } from '../../utils/api';
 interface InvitationFormProps {
   onSuccess?: (invitation: any) => void;
   onCancel?: () => void;
+  onDelete?: (id: number) => void;
   initialData?: Partial<InvitationFormData>;
   mode?: 'create' | 'edit';
+  invitationId?: string;
+  searchParams?: { search?: string; filter?: string };
 }
 
 const InvitationForm: React.FC<InvitationFormProps> = ({ 
   onSuccess, 
   onCancel,
+  onDelete,
   initialData,
-  mode = 'create' 
+  mode = 'create',
+  invitationId,
+  searchParams
 }) => {
   const { token, isLoading: authLoading } = useAdminAuth();
   const [formData, setFormData] = useState<InvitationFormData>({
@@ -24,7 +30,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     number_of_passes: 1,
     is_confirmed: false,
     is_active: true,
-    ...initialData
+    ...(mode === 'create' ? initialData : {}) // Only use initialData in create mode
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +44,44 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       setFormData(prev => ({ ...prev, slug }));
     }
   }, [formData.name, formData.lastname, slugGenerated, mode]);
+
+  // Load invitation data when in edit mode
+  useEffect(() => {
+    if (mode === 'edit' && invitationId && token) {
+      loadInvitationData();
+    }
+  }, [mode, invitationId, token]);
+
+  const loadInvitationData = async () => {
+    if (!invitationId || !token) return;
+    
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const result = await adminApi.getInvitation(parseInt(invitationId));
+      if (result.data) {
+        console.log('Loaded invitation data:', result.data); // Debug log
+        setFormData({
+          name: result.data.name || '',
+          lastname: result.data.lastname || '',
+          slug: result.data.slug || '',
+          number_of_passes: result.data.number_of_passes || 1,
+          is_confirmed: Boolean(result.data.is_confirmed),
+          is_active: Boolean(result.data.is_active)
+        });
+        setSlugGenerated(true); // Don't auto-generate slug in edit mode
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        setError('Autenticación requerida');
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Error al cargar la invitación');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const generateSlug = (firstName: string, lastName: string): string => {
     return `${firstName}-${lastName}`
@@ -74,11 +118,11 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
   };
 
   const validateForm = (): string | null => {
-    if (!formData.name.trim()) return 'First name is required';
-    if (!formData.lastname.trim()) return 'Last name is required';
-    if (!formData.slug.trim()) return 'URL slug is required';
-    if (!/^[a-z0-9-]+$/.test(formData.slug)) return 'URL slug can only contain lowercase letters, numbers, and hyphens';
-    if (formData.number_of_passes < 1 || formData.number_of_passes > 10) return 'Number of passes must be between 1 and 10';
+    if (!formData.name.trim()) return 'El nombre es requerido';
+    if (!formData.lastname.trim()) return 'El apellido es requerido';
+    if (!formData.slug.trim()) return 'La URL personalizada es requerida';
+    if (!/^[a-z0-9-]+$/.test(formData.slug)) return 'La URL personalizada solo puede contener letras minúsculas, números y guiones';
+    if (formData.number_of_passes < 1 || formData.number_of_passes > 10) return 'El número de pases debe estar entre 1 y 10';
     
     return null;
   };
@@ -97,7 +141,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
     try {
       if (!token) {
-        setError('Authentication required');
+        setError('Autenticación requerida');
         return;
       }
 
@@ -106,33 +150,66 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         name: formData.name.trim(),
         lastname: formData.lastname.trim(),
         slug: formData.slug.trim(),
-        number_of_passes: formData.number_of_passes
+        number_of_passes: formData.number_of_passes,
+        is_confirmed: formData.is_confirmed,
+        is_active: formData.is_active
       };
 
-      const result = await adminApi.createInvitation(requestData);
+      let result;
+      if (mode === 'edit' && invitationId) {
+        // Update existing invitation
+        result = await adminApi.updateInvitation(parseInt(invitationId), requestData);
+      } else {
+        // Create new invitation
+        result = await adminApi.createInvitation(requestData);
+      }
 
       if (onSuccess) {
         onSuccess(result.data);
       } else {
-        window.location.href = '/admin';
+        // Preserve search parameters when redirecting back
+        const adminUrl = new URL('/admin', window.location.origin);
+        if (searchParams?.search) {
+          adminUrl.searchParams.set('search', searchParams.search);
+        }
+        if (searchParams?.filter) {
+          adminUrl.searchParams.set('filter', searchParams.filter);
+        }
+        window.location.href = adminUrl.toString();
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
-        setError('Authentication required');
+        setError('Autenticación requerida');
         return;
       }
-      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
+      setError(err instanceof Error ? err.message : 'Ocurrió un error. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCancel = () => {
-    if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+    if (confirm('¿Estás seguro de que quieres cancelar? Cualquier cambio sin guardar se perderá.')) {
       if (onCancel) {
         onCancel();
       } else {
-        window.location.href = '/admin';
+        // Preserve search parameters when redirecting back
+        const adminUrl = new URL('/admin', window.location.origin);
+        if (searchParams?.search) {
+          adminUrl.searchParams.set('search', searchParams.search);
+        }
+        if (searchParams?.filter) {
+          adminUrl.searchParams.set('filter', searchParams.filter);
+        }
+        window.location.href = adminUrl.toString();
+      }
+    }
+  };
+
+  const handleDelete = () => {
+    if (confirm(`¿Estás seguro de que quieres eliminar la invitación de ${formData.name} ${formData.lastname}? Esta acción no se puede deshacer.`)) {
+      if (invitationId && (window as any).handleDeleteInvitation) {
+        (window as any).handleDeleteInvitation(parseInt(invitationId));
       }
     }
   };
@@ -141,7 +218,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     if (formData.slug) {
       window.open(`/invite/${formData.slug}?preview=true`, '_blank');
     } else {
-      alert('Please fill in the guest names to generate a preview URL');
+      alert('Por favor completa los nombres de los invitados para generar una URL de vista previa');
     }
   };
 
@@ -150,7 +227,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Authenticating...</p>
+          <p className="text-gray-600">Autenticando...</p>
         </div>
       </div>
     );
@@ -172,7 +249,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                 </svg>
               </button>
               <h1 className="text-2xl font-bold text-gray-900">
-                {mode === 'create' ? 'Create New Invitation' : 'Edit Invitation'}
+                {mode === 'create' ? 'Crear Nueva Invitación' : 'Editar Invitación'}
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -182,7 +259,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                 disabled={!formData.slug}
                 className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
               >
-                Preview
+                Vista Previa
               </button>
             </div>
           </div>
@@ -195,12 +272,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
           {/* Guest Information */}
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Guest Information</h3>
+              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">Información del Invitado</h3>
               
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                    First Name *
+                    Nombre *
                   </label>
                   <input
                     type="text"
@@ -217,7 +294,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
                 <div>
                   <label htmlFor="lastname" className="block text-sm font-medium text-gray-700">
-                    Last Name *
+                    Apellido *
                   </label>
                   <input
                     type="text"
@@ -234,7 +311,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
                 <div>
                   <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-                    URL Slug *
+                    URL Personalizada *
                   </label>
                   <div className="mt-1 flex rounded-md shadow-sm">
                     <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -253,12 +330,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                       placeholder="maria-rodriguez"
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">Only lowercase letters, numbers, and hyphens</p>
+                  <p className="mt-1 text-xs text-gray-500">Solo letras minúsculas, números y guiones</p>
                 </div>
 
                 <div>
                   <label htmlFor="number_of_passes" className="block text-sm font-medium text-gray-700">
-                    Number of Passes *
+                    Número de Pases *
                   </label>
                   <input
                     type="number"
@@ -288,7 +365,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                         className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                       />
                       <label htmlFor="is_confirmed" className="ml-2 block text-sm text-gray-900">
-                        Confirmed
+                        Confirmado
                       </label>
                     </div>
                     <div className="flex items-center">
@@ -302,7 +379,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                         className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                       />
                       <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
-                        Active
+                        Activo
                       </label>
                     </div>
                   </div>
@@ -320,9 +397,9 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">Global Settings</h3>
+                <h3 className="text-sm font-medium text-blue-800">Configuración Global</h3>
                 <div className="mt-2 text-sm text-blue-700">
-                  <p>Event details and RSVP settings are managed globally and apply to all invitations. You can configure these in the Settings tab.</p>
+                  <p>Los detalles del evento y la configuración de RSVP se gestionan globalmente y se aplican a todas las invitaciones. Puedes configurar estos en la pestaña de Configuración.</p>
                 </div>
               </div>
             </div>
@@ -348,29 +425,44 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
           )}
 
           {/* Action Buttons */}
-          <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={isLoading}
-              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="bg-purple-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {mode === 'create' ? 'Creating...' : 'Updating...'}
-                </div>
-              ) : (
-                mode === 'create' ? 'Create Invitation' : 'Update Invitation'
-              )}
-            </button>
+          <div className="flex justify-between items-center">
+            {mode === 'edit' && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isLoading}
+                className="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Eliminar Invitación
+              </button>
+            )}
+            <div className="flex space-x-4 ml-auto">
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={isLoading}
+                className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="bg-purple-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    {mode === 'create' ? 'Creando...' : 'Actualizando...'}
+                  </div>
+                ) : (
+                  mode === 'create' ? 'Crear Invitación' : 'Actualizar Invitación'
+                )}
+              </button>
+            </div>
           </div>
         </form>
       </div>

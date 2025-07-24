@@ -58,6 +58,8 @@ export interface CreateInvitationRequest {
   lastname: string;
   slug: string;
   number_of_passes: number;
+  is_confirmed?: boolean;
+  is_active?: boolean;
 }
 
 export interface UpdateInvitationRequest {

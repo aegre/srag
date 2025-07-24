@@ -7,7 +7,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return new Response(JSON.stringify({
         success: false,
-        error: 'No token provided'
+        error: 'No se proporcionó token'
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -21,7 +21,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (token === 'admin123' || token.length > 10) {
       return new Response(JSON.stringify({
         success: true,
-        message: 'Token is valid'
+        message: 'Token válido'
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     return new Response(JSON.stringify({
       success: false,
-      error: 'Invalid token'
+      error: 'Token inválido'
     }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ request }) => {
     console.error('Token validation error:', error);
     return new Response(JSON.stringify({
       success: false,
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

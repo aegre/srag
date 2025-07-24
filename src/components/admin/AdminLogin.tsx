@@ -39,7 +39,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     e.preventDefault();
     
     if (!formData.username || !formData.password) {
-      setError('Username and password are required');
+      setError('El nombre de usuario y contraseña son requeridos');
       return;
     }
 
@@ -71,10 +71,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           window.location.href = '/admin';
         }
       } else {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.error || 'Error en el inicio de sesión');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred. Please try again.');
+      setError(err instanceof Error ? err.message : 'Ocurrió un error. Por favor intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
@@ -88,11 +88,11 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
             <svg className="h-8 w-8 text-purple-600" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
             </svg>
-            <h1 className="text-2xl font-bold text-gray-900">Admin Login</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Inicio de Sesión</h1>
           </div>
         </div>
         <p className="mt-2 text-center text-sm text-gray-600">
-          Julietta XV Años - Invitation Management
+          Julietta XV Años - Gestión de Invitaciones
         </p>
       </div>
 
@@ -101,9 +101,9 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           {/* Login Form */}
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                Username
-              </label>
+                              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                  Nombre de Usuario
+                </label>
               <div className="mt-1">
                 <input
                   id="username"
@@ -115,15 +115,15 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                   onChange={handleInputChange}
                   disabled={isLoading}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
-                  placeholder="Enter your username"
+                  placeholder="Ingresa tu nombre de usuario"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+                              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                  Contraseña
+                </label>
               <div className="mt-1">
                 <input
                   id="password"
@@ -135,7 +135,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                   onChange={handleInputChange}
                   disabled={isLoading}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
-                  placeholder="Enter your password"
+                  placeholder="Ingresa tu contraseña"
                 />
               </div>
             </div>
@@ -152,7 +152,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                   className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded disabled:opacity-50"
                 />
                 <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
-                  Remember me
+                  Recordarme
                 </label>
               </div>
             </div>
@@ -166,10 +166,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Signing in...
+                    Iniciando sesión...
                   </div>
                 ) : (
-                  'Sign in'
+                  'Iniciar Sesión'
                 )}
               </button>
             </div>
@@ -185,7 +185,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                   </div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">
-                      Authentication failed
+                      Error de autenticación
                     </h3>
                     <div className="mt-2 text-sm text-red-700">
                       <p>{error}</p>
@@ -199,9 +199,9 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           {/* Development Info */}
           <div className="mt-6 p-4 bg-gray-50 rounded-md">
             <p className="text-xs text-gray-600 text-center">
-              <strong>Development Login:</strong><br />
-              Username: <code className="bg-gray-200 px-1 rounded font-mono">admin</code><br />
-              Password: <code className="bg-gray-200 px-1 rounded font-mono">admin123</code>
+              <strong>Login de Desarrollo:</strong><br />
+              Usuario: <code className="bg-gray-200 px-1 rounded font-mono">admin</code><br />
+              Contraseña: <code className="bg-gray-200 px-1 rounded font-mono">admin123</code>
             </p>
           </div>
         </div>

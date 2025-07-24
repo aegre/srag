@@ -45,7 +45,7 @@ export const GET: APIRoute = async (context) => {
 
     const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
-      throw new Error('Database not available');
+      throw new Error('Base de datos no disponible');
     }
 
     // Get query parameters for pagination
@@ -100,7 +100,7 @@ export const GET: APIRoute = async (context) => {
   } catch (error) {
     console.error('Error listing invitations:', error);
     return new Response(JSON.stringify({
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
@@ -115,7 +115,7 @@ export const POST: APIRoute = async (context) => {
     const user = await authenticateAdmin(context);
     if (!user) {
       return new Response(JSON.stringify({
-        error: 'Unauthorized'
+        error: 'No autorizado'
       }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' }
@@ -124,7 +124,7 @@ export const POST: APIRoute = async (context) => {
 
     const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
-      throw new Error('Database not available');
+      throw new Error('Base de datos no disponible');
     }
 
     const invitationData = await context.request.json();
@@ -132,7 +132,7 @@ export const POST: APIRoute = async (context) => {
     // Validate required fields
     if (!invitationData.name || !invitationData.lastname || !invitationData.slug) {
       return new Response(JSON.stringify({
-        error: 'Name, last name, and slug are required'
+        error: 'El nombre, apellido y URL personalizada son requeridos'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -146,7 +146,7 @@ export const POST: APIRoute = async (context) => {
 
     if (existingInvitation) {
       return new Response(JSON.stringify({
-        error: 'Slug already exists. Please choose a different URL slug.'
+        error: 'La URL personalizada ya existe. Por favor elige una URL diferente.'
       }), {
         status: 409,
         headers: { 'Content-Type': 'application/json' }
@@ -169,7 +169,7 @@ export const POST: APIRoute = async (context) => {
     ).run();
 
     if (!result.success) {
-      throw new Error('Failed to create invitation');
+      throw new Error('Error al crear la invitación');
     }
 
     // Get the created invitation
@@ -180,7 +180,7 @@ export const POST: APIRoute = async (context) => {
     return new Response(JSON.stringify({
       success: true,
       data: newInvitation,
-      message: 'Invitation created successfully'
+      message: 'Invitación creada exitosamente'
     }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' }
@@ -189,7 +189,7 @@ export const POST: APIRoute = async (context) => {
   } catch (error) {
     console.error('Error creating invitation:', error);
     return new Response(JSON.stringify({
-      error: 'Internal server error'
+      error: 'Error interno del servidor'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

@@ -16,6 +16,12 @@ import MusicController from './MusicController.astro';
 import EntryScreen from './EntryScreen.astro';
 import ScrollManager from './ScrollManager.astro';
 
+export interface Props {
+  preview?: boolean;
+}
+
+const { preview = false } = Astro.props;
+
 // Define sections configuration - easy to add/remove sections
 const sections = [
   { id: 'section-main-invitation', component: MainInvitation, enabled: true },
@@ -38,6 +44,14 @@ const sectionIds = enabledSections.map(section => section.id);
 ---
 
 <main class="min-h-screen bg-primary overflow-hidden flex items-center justify-center p-4" role="main" aria-label="Quinceañera Invitation">
+
+  <!-- Preview Flag -->
+  {preview && (
+    <div class="fixed top-2 sm:top-4 right-2 sm:right-4 z-50 bg-yellow-500 text-black px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium shadow-lg">
+      <span class="hidden sm:inline">👁️ Vista Previa</span>
+      <span class="sm:hidden">👁️ Previa</span>
+    </div>
+  )}
 
   <!-- Background container - fixed positioning for better mobile compatibility -->
   <div class="fixed inset-0 max-w-6xl mx-auto pointer-events-none overflow-hidden">
