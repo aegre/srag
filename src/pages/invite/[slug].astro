@@ -17,7 +17,7 @@ let settings = null;
 let error = null;
 
 try {
-  const db = (Astro.locals as any).runtime?.env?.DB;
+  const db = (Astro as any).env?.DB;
   if (db && slug) {
     // Get all settings (with cache busting)
     const settingsResult = await db.prepare(

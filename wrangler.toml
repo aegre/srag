@@ -19,4 +19,5 @@ routes = [
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "julifestdb-prod"
-database_id = "8415ca5b-6ff3-4584-bb07-530bc99c814c" 
+database_id = "8415ca5b-6ff3-4584-bb07-530bc99c814c"
+migrations_dir = "database/migrations" 

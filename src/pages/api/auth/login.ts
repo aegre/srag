@@ -19,7 +19,7 @@ export const POST: APIRoute = async (context) => {
     }
 
     // Get database from context (Cloudflare D1 binding)
-    const db = (context.locals as any).runtime?.env?.DB;
+    const db = (context as any).env?.DB;
 
 
     // Find user by username
@@ -75,7 +75,7 @@ export const POST: APIRoute = async (context) => {
 
     // Create JWT token
     const secret = new TextEncoder().encode(
-      (context.locals as any).runtime?.env?.JWT_SECRET || 'your-secret-key-change-in-production'
+      (context as any).env?.JWT_SECRET || 'your-secret-key-change-in-production'
     );
 
     const token = await new SignJWT({

@@ -19,7 +19,7 @@ async function authenticateAdmin(context: any) {
   }
 
   const token = authHeader.substring(7);
-  const secret = (context.locals as any).runtime?.env?.JWT_SECRET || 'your-secret-key-change-in-production';
+  const secret = (context as any).env?.JWT_SECRET || 'your-secret-key-change-in-production';
 
   const payload = await verifyToken(token, secret);
   if (!payload) {
@@ -43,7 +43,7 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    const db = (context.locals as any).runtime?.env?.DB;
+    const db = (context as any).env?.DB;
     if (!db) {
       throw new Error('Database not available');
     }
@@ -106,7 +106,7 @@ export const PUT: APIRoute = async (context) => {
       });
     }
 
-    const db = (context.locals as any).runtime?.env?.DB;
+    const db = (context as any).env?.DB;
     if (!db) {
       throw new Error('Database not available');
     }

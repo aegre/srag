@@ -24,7 +24,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    const db = (locals as any).runtime?.env?.DB;
+    const db = (locals as any).env?.DB;
     if (!db) {
       return new Response(JSON.stringify({
         success: false,
