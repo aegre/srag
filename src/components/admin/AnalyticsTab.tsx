@@ -221,8 +221,23 @@ const AnalyticsTab: React.FC = () => {
                       <div className="ml-3">
                         <p className="text-sm font-medium text-gray-900">
                           {isConfirmation ? (
-                            <span>
-                              {isConfirm ? '✅ Confirmó' : '❌ Canceló'} /{activity.slug}
+                            <span className="flex items-center gap-1">
+                              {isConfirm ? (
+                                <>
+                                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                  </svg>
+                                  <span>Confirmó</span>
+                                </>
+                              ) : (
+                                <>
+                                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                  <span>Canceló</span>
+                                </>
+                              )}
+                              /{activity.slug}
                               <span className="text-xs text-gray-400 ml-2">
                                 {activity.event_type === 'rsvp_button_click' && '(Click)'}
                                 {activity.event_type === 'rsvp_action_success' && '(Éxito)'}

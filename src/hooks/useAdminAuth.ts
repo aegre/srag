@@ -49,7 +49,7 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
       return false;
     }
 
-    // Optionally validate token with server
+    // Validate token with server
     try {
       const response = await fetch('/api/auth/validate', {
         headers: {
@@ -63,54 +63,37 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
         return false;
       }
 
-      // Token is valid
-      setToken(storedToken);
-      setIsAuthenticated(true);
+      if (!response.ok) {
+        // Other error, clear token and redirect
+        logout();
+        return false;
+      }
 
-      // Get user info from localStorage
-      const userStr = localStorage.getItem('admin_user');
-      if (userStr) {
-        try {
-          const userData = JSON.parse(userStr);
-          setUser(userData);
-          setIsAdmin(userData.role === 'admin');
-        } catch (err) {
-          console.error('Error parsing user data:', err);
-          setUser(null);
-          setIsAdmin(false);
-        }
+      // Token is valid, get response data
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        // Update localStorage with fresh user data from server
+        localStorage.setItem('admin_user', JSON.stringify(data.user));
+
+        setToken(storedToken);
+        setIsAuthenticated(true);
+        setUser(data.user);
+        setIsAdmin(data.user.role === 'admin');
       } else {
-        setUser(null);
-        setIsAdmin(false);
+        // Invalid response, clear token and redirect
+        logout();
+        return false;
       }
 
       setIsLoading(false);
       return true;
     } catch (error) {
       console.error('Auth validation error:', error);
-      // On network error, assume token is valid for now
-      setToken(storedToken);
-      setIsAuthenticated(true);
-
-      // Get user info from localStorage
-      const userStr = localStorage.getItem('admin_user');
-      if (userStr) {
-        try {
-          const userData = JSON.parse(userStr);
-          setUser(userData);
-          setIsAdmin(userData.role === 'admin');
-        } catch (err) {
-          console.error('Error parsing user data:', err);
-          setUser(null);
-          setIsAdmin(false);
-        }
-      } else {
-        setUser(null);
-        setIsAdmin(false);
-      }
-
-      setIsLoading(false);
-      return true;
+      // On network error, be more conservative and require re-authentication
+      // This prevents security issues when the server is unreachable
+      logout();
+      return false;
     }
   };
 

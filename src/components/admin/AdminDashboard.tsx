@@ -4,7 +4,6 @@ import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { adminApi, ApiError } from '../../utils/api';
 import SettingsForm from './SettingsForm';
 import AnalyticsTab from './AnalyticsTab';
-import CreateUserForm from './CreateUserForm';
 import { useToast } from '../ui/Toast';
 import { ToastProvider } from '../ui/Toast';
 
@@ -13,11 +12,11 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboardContent: React.FC = () => {
-  const { token, isLoading: authLoading, logout } = useAdminAuth();
+  const { token, isLoading: authLoading, logout, user, isAdmin } = useAdminAuth();
   const { showToast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [activeTab, setActiveTab] = useState<'invitations' | 'analytics' | 'settings' | 'users'>('invitations');
+  const [activeTab, setActiveTab] = useState<'invitations' | 'analytics' | 'settings'>('invitations');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -215,7 +214,20 @@ const AdminDashboardContent: React.FC = () => {
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
               <div className="flex items-center space-x-3">
-                <span className="text-sm text-gray-600">Bienvenido, Administrador</span>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">
+                    Bienvenido, {user?.username || 'Administrador'}
+                  </span>
+                  {isAdmin && (
+                    <a
+                      href="/admin/users"
+                      className="text-xs text-purple-600 hover:text-purple-800 underline"
+                      title="Gestionar usuarios del sistema"
+                    >
+                      Usuarios
+                    </a>
+                  )}
+                </div>
                 {stats?.settings?.is_published ? (
                   <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -247,25 +259,25 @@ const AdminDashboardContent: React.FC = () => {
             <StatCard 
               title="Total de Invitaciones" 
               value={stats.totals.invitations} 
-              icon="👥"
+              icon="users"
               color="purple" 
             />
             <StatCard 
               title="Invitaciones Confirmadas" 
               value={stats.totals.rsvps} 
-              icon="✅"
+              icon="check"
               color="green" 
             />
             <StatCard 
               title="Total de Vistas" 
               value={stats.totals.views} 
-              icon="👀"
+              icon="eye"
               color="blue" 
             />
             <StatCard 
               title="Invitaciones Pendientes" 
               value={stats.totals.pending_rsvps} 
-              icon="⏰"
+              icon="calendar"
               color="yellow" 
             />
           </div>
@@ -277,12 +289,11 @@ const AdminDashboardContent: React.FC = () => {
             {[
               { key: 'invitations', label: 'Invitaciones' },
               { key: 'analytics', label: 'Analíticas' },
-              { key: 'settings', label: 'Configuración' },
-              { key: 'users', label: 'Usuarios' }
+              { key: 'settings', label: 'Configuración' }
             ].map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key as any)}
+                onClick={() => setActiveTab(tab.key as 'invitations' | 'analytics' | 'settings')}
                 className={`whitespace-nowrap py-3 sm:py-2 px-3 sm:px-1 border-b-2 font-medium text-xs sm:text-sm capitalize min-w-fit ${
                   activeTab === tab.key
                     ? 'border-purple-500 text-purple-600'
@@ -318,15 +329,6 @@ const AdminDashboardContent: React.FC = () => {
               onCancel={handleSettingsCancel}
             />
           </div>
-          
-          <div className={activeTab === 'users' ? 'block' : 'hidden'}>
-            <CreateUserForm 
-              onSuccess={() => {
-                // Toast is handled inside CreateUserForm component
-              }}
-              onCancel={() => setActiveTab('invitations')}
-            />
-          </div>
         </div>
       </div>
     </main>
@@ -337,16 +339,45 @@ const AdminDashboardContent: React.FC = () => {
 interface StatCardProps {
   title: string;
   value: number;
-  icon: string;
+  icon: 'users' | 'check' | 'eye' | 'calendar' | 'chart';
   color: 'purple' | 'green' | 'blue' | 'yellow';
 }
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => {
   const colorClasses = {
-    purple: 'text-purple-600',
-    green: 'text-green-600',
-    blue: 'text-blue-600',
-    yellow: 'text-yellow-600'
+    purple: 'bg-purple-100 text-purple-600',
+    green: 'bg-green-100 text-green-600',
+    blue: 'bg-blue-100 text-blue-600',
+    yellow: 'bg-yellow-100 text-yellow-600'
+  };
+
+  const iconComponents = {
+    users: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    check: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+      </svg>
+    ),
+    eye: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </svg>
+    ),
+    calendar: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    chart: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      </svg>
+    )
   };
 
   return (
@@ -354,7 +385,9 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => {
       <div className="p-5">
         <div className="flex items-center">
           <div className="flex-shrink-0">
-            <span className={`text-2xl ${colorClasses[color]}`}>{icon}</span>
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${colorClasses[color]}`}>
+              {iconComponents[icon]}
+            </div>
           </div>
           <div className="ml-5 w-0 flex-1">
             <dl>
@@ -732,8 +765,19 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
             Slug: <code className="bg-gray-100 px-1 rounded break-all">{invitation.slug}</code>
           </p>
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-            <span>👥 {invitation.number_of_passes} pases</span>
-            <span>👀 {invitation.view_count} vistas</span>
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+              </svg>
+              {invitation.number_of_passes} pases
+            </span>
+            <span className="flex items-center gap-1">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              {invitation.view_count} vistas
+            </span>
           </div>
           <div className="mt-2 text-xs text-gray-500">
             Creado: {new Date(invitation.created_at).toLocaleDateString()}

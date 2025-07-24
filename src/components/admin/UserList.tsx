@@ -196,7 +196,7 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
   return (
     <div className="bg-white shadow rounded-lg">
       <div className="px-4 py-5 sm:p-6">
-        <div className="mb-6 flex justify-between items-start">
+        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start space-y-4 sm:space-y-0">
           <div>
             <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">
               Usuarios del Sistema
@@ -207,7 +207,7 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
           </div>
           <a
             href="/admin/users/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 w-full sm:w-auto justify-center"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -230,7 +230,8 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -328,33 +329,105 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
               </table>
             </div>
 
+            {/* Mobile Card View */}
+            <div className="lg:hidden space-y-4">
+              {users.map((user) => (
+                <div key={user.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <h4 className="text-sm font-medium text-gray-900 mb-1">
+                        {user.username}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-2">
+                        {user.email}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getRoleBadgeClass(user.role)}`}>
+                          {getRoleLabel(user.role)}
+                        </span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full border ${getStatusBadgeClass(user.is_active)}`}>
+                          {user.is_active ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex space-x-2 ml-4">
+                      <a
+                        href={`/admin/users/edit/${user.id}`}
+                        className="text-purple-600 hover:text-purple-900 text-sm font-medium"
+                      >
+                        Editar
+                      </a>
+                      <button
+                        onClick={() => handleDeleteUser(user.id, user.username)}
+                        disabled={deletingUserId === user.id || user.username.toLowerCase() === 'admin' || currentUserId === user.id}
+                        className={`text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium ${
+                          deletingUserId === user.id || user.username.toLowerCase() === 'admin' || currentUserId === user.id ? 'cursor-not-allowed' : ''
+                        }`}
+                        title={
+                          user.username.toLowerCase() === 'admin' 
+                            ? 'No se puede eliminar el usuario administrador principal' 
+                            : currentUserId === user.id 
+                              ? 'No puedes eliminar tu propia cuenta'
+                              : ''
+                        }
+                      >
+                        {deletingUserId === user.id ? (
+                          <div className="flex items-center">
+                            <svg className="animate-spin w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Eliminando...
+                          </div>
+                        ) : (
+                          'Eliminar'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <div>Creado: {formatDate(user.created_at)}</div>
+                    <div>Último acceso: {user.last_login ? formatDate(user.last_login) : 'Nunca'}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             {/* Pagination */}
             {pagination.totalPages > 1 && (
-              <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+                <div className="text-sm text-gray-700 text-center sm:text-left">
                   Mostrando <span className="font-medium">{((pagination.page - 1) * pagination.limit) + 1}</span> a{' '}
                   <span className="font-medium">
                     {Math.min(pagination.page * pagination.limit, pagination.total)}
                   </span> de{' '}
                   <span className="font-medium">{pagination.total}</span> resultados
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex items-center space-x-2">
                   <button
                     onClick={() => handlePageChange(pagination.page - 1)}
                     disabled={pagination.page <= 1}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
-                    Anterior
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                    <span className="hidden sm:inline">Anterior</span>
+                    <span className="sm:hidden">Ant</span>
                   </button>
-                  <span className="px-3 py-1 text-sm text-gray-700">
-                    Página {pagination.page} de {pagination.totalPages}
+                  <span className="px-3 py-2 text-sm text-gray-700 bg-gray-50 rounded-md">
+                    {pagination.page} / {pagination.totalPages}
                   </span>
                   <button
                     onClick={() => handlePageChange(pagination.page + 1)}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="px-3 py-1 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
-                    Siguiente
+                    <span className="hidden sm:inline">Siguiente</span>
+                    <span className="sm:hidden">Sig</span>
+                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
               </div>
