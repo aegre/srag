@@ -306,14 +306,14 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
   const getInitialStatusFilter = () => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
-      const filter = urlParams.get('filter') as 'all' | 'confirmed' | 'pending' | 'inactive';
-      return filter && ['all', 'confirmed', 'pending', 'inactive'].includes(filter) ? filter : 'all';
+      const filter = urlParams.get('filter') as 'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened';
+      return filter && ['all', 'confirmed', 'pending', 'inactive', 'unopened'].includes(filter) ? filter : 'all';
     }
     return 'all';
   };
 
   const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'inactive'>(getInitialStatusFilter);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened'>(getInitialStatusFilter);
 
   // Update URL with current filters
   const updateURL = (newSearchTerm: string, newStatusFilter: string) => {
@@ -340,7 +340,7 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
   };
 
   // Handle status filter change
-  const handleStatusFilterChange = (filter: 'all' | 'confirmed' | 'pending' | 'inactive') => {
+  const handleStatusFilterChange = (filter: 'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened') => {
     setStatusFilter(filter);
     updateURL(searchTerm, filter);
   };
@@ -355,7 +355,8 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
     const matchesStatus = statusFilter === 'all' ||
       (statusFilter === 'confirmed' && invitation.is_confirmed) ||
       (statusFilter === 'pending' && !invitation.is_confirmed && invitation.is_active) ||
-      (statusFilter === 'inactive' && !invitation.is_active);
+      (statusFilter === 'inactive' && !invitation.is_active) ||
+      (statusFilter === 'unopened' && invitation.view_count === 0);
     
     return matchesSearch && matchesStatus;
   });
@@ -425,16 +426,26 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
               >
                 Pendientes ({invitations.filter(i => !i.is_confirmed && i.is_active).length})
               </button>
-              <button
-                onClick={() => handleStatusFilterChange('inactive')}
-                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                  statusFilter === 'inactive'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                Inactivos ({invitations.filter(i => !i.is_active).length})
-              </button>
+                          <button
+              onClick={() => handleStatusFilterChange('inactive')}
+              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                statusFilter === 'inactive'
+                  ? 'bg-red-100 text-red-800'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Inactivos ({invitations.filter(i => !i.is_active).length})
+            </button>
+            <button
+              onClick={() => handleStatusFilterChange('unopened')}
+              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                statusFilter === 'unopened'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              Sin Abrir ({invitations.filter(i => i.view_count === 0).length})
+            </button>
             </div>
           </div>
 

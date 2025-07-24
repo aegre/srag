@@ -58,30 +58,25 @@ export const GET: APIRoute = async (context) => {
     const countResult = await db.prepare('SELECT COUNT(*) as total FROM invitations').first();
     const total = countResult?.total || 0;
 
-    // Get invitations with pagination
+    // Get invitations with pagination and view counts
     const invitations = await db.prepare(`
       SELECT 
-        id, slug, name, lastname, number_of_passes, 
-        is_confirmed, is_active, view_count,
-        created_at, updated_at
-      FROM invitations 
-      ORDER BY created_at DESC 
+        i.id, i.slug, i.name, i.lastname, i.number_of_passes, 
+        i.is_confirmed, i.is_active, i.created_at, i.updated_at,
+        COALESCE(COUNT(a.id), 0) as view_count
+      FROM invitations i
+      LEFT JOIN analytics a ON i.id = a.invitation_id AND a.event_type = 'view'
+      GROUP BY i.id, i.slug, i.name, i.lastname, i.number_of_passes, 
+               i.is_confirmed, i.is_active, i.created_at, i.updated_at
+      ORDER BY i.created_at DESC 
       LIMIT ? OFFSET ?
     `).bind(limit, offset).all();
 
-    // Get RSVP counts for each invitation
-    const invitationsWithStats = await Promise.all(
-      invitations.results.map(async (invitation: any) => {
-        const rsvpCount = await db.prepare(
-          'SELECT COUNT(*) as count FROM rsvp_responses WHERE invitation_id = ?'
-        ).bind(invitation.id).first();
-
-        return {
-          ...invitation,
-          rsvp_count: rsvpCount?.count || 0
-        };
-      })
-    );
+    // Since we removed the RSVP responses table, we don't need to calculate RSVP counts
+    const invitationsWithStats = invitations.results.map((invitation: any) => ({
+      ...invitation,
+      rsvp_count: 0 // No RSVP responses table, so always 0
+    }));
 
     return new Response(JSON.stringify({
       success: true,

@@ -1,6 +1,7 @@
 ---
 import Welcome from '../../components/Welcome.astro';
 import Layout from '../../layouts/Layout.astro';
+import NotFound from '../404.astro';
 
 export interface Props {
   slug: string;
@@ -8,8 +9,37 @@ export interface Props {
 
 const { slug } = Astro.params;
 const preview = Astro.url.searchParams.get('preview') === 'true';
+
+// Load invitation data from database
+let invitation = null;
+let error = null;
+
+try {
+  const db = Astro.locals.runtime?.env?.DB;
+  if (db && slug) {
+    const result = await db.prepare(
+      'SELECT * FROM invitations WHERE slug = ? AND is_active = 1'
+    ).bind(slug).first();
+    
+          if (result) {
+        invitation = result;
+      }
+  }
+} catch (err) {
+  console.error('Error loading invitation:', err);
+  error = err;
+}
+
+// If no invitation found, show 404
+if (!invitation && !error) {
+  return Astro.redirect('/404');
+}
 ---
 
 <Layout>
-	<Welcome preview={preview} />
+	<Welcome 
+		preview={preview} 
+		invitation={invitation}
+		slug={slug}
+	/>
 </Layout>

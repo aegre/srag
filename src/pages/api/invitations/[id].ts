@@ -58,14 +58,17 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    // Get invitation
+    // Get invitation with view count
     const invitation = await db.prepare(`
       SELECT 
-        id, slug, name, lastname, number_of_passes, 
-        is_confirmed, is_active, view_count,
-        created_at, updated_at
-      FROM invitations 
-      WHERE id = ?
+        i.id, i.slug, i.name, i.lastname, i.number_of_passes, 
+        i.is_confirmed, i.is_active, i.created_at, i.updated_at,
+        COALESCE(COUNT(a.id), 0) as view_count
+      FROM invitations i
+      LEFT JOIN analytics a ON i.id = a.invitation_id AND a.event_type = 'view'
+      WHERE i.id = ?
+      GROUP BY i.id, i.slug, i.name, i.lastname, i.number_of_passes, 
+               i.is_confirmed, i.is_active, i.created_at, i.updated_at
     `).bind(id).first();
 
     if (!invitation) {
@@ -77,14 +80,9 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    // Get RSVP count
-    const rsvpCount = await db.prepare(
-      'SELECT COUNT(*) as count FROM rsvp_responses WHERE invitation_id = ?'
-    ).bind(id).first();
-
     const invitationWithStats = {
       ...invitation,
-      rsvp_count: rsvpCount?.count || 0
+      rsvp_count: 0 // No RSVP responses table, so always 0
     };
 
     return new Response(JSON.stringify({

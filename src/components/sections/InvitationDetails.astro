@@ -1,5 +1,16 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
+
+export interface Props {
+  invitation?: any;
+}
+
+const { invitation } = Astro.props;
+
+// Use invitation data if available, otherwise fallback to default
+const guestName = invitation?.name || 'Gabriela';
+const guestLastname = invitation?.lastname || 'Durán';
+const numberOfPasses = invitation?.number_of_passes || 5;
 ---
 
 <InvitationSection id="section-invitation-details">
@@ -20,7 +31,7 @@ import InvitationSection from '../InvitationSection.astro';
         <!-- Main name -->
         <header>
           <h1 class="font-hero text-2xl md:text-4xl lg:text-5xl tracking-wide text-white font-light">
-            Gabriela Durán
+            {guestName} {guestLastname}
           </h1>
         </header>
       </div>
@@ -28,7 +39,7 @@ import InvitationSection from '../InvitationSection.astro';
 
     <footer class="pt-4">
       <p class="font-hero text-base md:text-xl lg:text-2xl text-white font-light tracking-wide">
-        <span class="font-cormorant textlg">5</span> pases
+        <span class="font-cormorant textlg">{numberOfPasses}</span> pases
       </p>
     </footer>
 
