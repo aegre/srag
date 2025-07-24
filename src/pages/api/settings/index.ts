@@ -142,7 +142,7 @@ export const PUT: APIRoute = async (context) => {
     `).bind(
       settingsData.event_date || null,
       settingsData.event_time || null,
-      settingsData.rsvp_enabled !== false, // default to true
+      settingsData.rsvp_enabled === undefined ? true : Boolean(settingsData.rsvp_enabled),
       settingsData.rsvp_deadline || null,
       settingsData.rsvp_phone || null,
       settingsData.rsvp_whatsapp || null,

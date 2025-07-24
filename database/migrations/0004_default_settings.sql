@@ -13,10 +13,10 @@ INSERT OR IGNORE INTO invitation_settings (
     created_at,
     updated_at
 ) VALUES (
-    '2024-09-13',           -- Event date: September 13, 2024
+    '2025-09-13',           -- Event date: September 13, 2024
     '19:00',                -- Event time: 7:00 PM
     1,                      -- RSVP enabled: true
-    '2024-09-01',           -- RSVP deadline: September 1, 2024
+    '2025-09-01',           -- RSVP deadline: September 1, 2024
     '+525555555555',        -- Default phone number
     '+525555555555',        -- Default WhatsApp number
     0,                      -- Not published by default

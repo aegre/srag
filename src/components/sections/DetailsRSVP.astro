@@ -12,7 +12,7 @@ const { settings, invitation } = Astro.props;
 const confirmationPhone = settings?.rsvp_phone || "+525555555555";
 const whatsappNumber = settings?.rsvp_whatsapp || confirmationPhone;
 const deadline = settings?.rsvp_deadline || "1 de Septiembre";
-const rsvpEnabled = settings?.rsvp_enabled !== false;
+const rsvpEnabled = settings?.rsvp_enabled === 1 || settings?.rsvp_enabled === true;
 const whatsappMessage = "¡Hola! Confirmo mi asistencia a los XV años de Julietta el 13 de septiembre.";
 const invitationSlug = invitation?.slug;
 const invitationId = invitation?.id;
@@ -70,7 +70,7 @@ const invitationId = invitation?.id;
             )}
 
             <!-- Direct Confirmation Button -->
-            {invitationSlug && !invitation?.is_confirmed ? (
+            {rsvpEnabled && invitationSlug && !invitation?.is_confirmed ? (
               <button 
                 id="confirm-btn"
                 data-action="confirm"
@@ -83,7 +83,7 @@ const invitationId = invitation?.id;
             ) : null}
 
             <!-- Cancel Confirmation Button -->
-            {invitationSlug && invitation?.is_confirmed ? (
+            {rsvpEnabled && invitationSlug && invitation?.is_confirmed ? (
               <button 
                 id="unconfirm-btn"
                 data-action="unconfirm"
@@ -108,8 +108,8 @@ const invitationId = invitation?.id;
       )}
 
   <!-- Confirmation JavaScript -->
-  <script define:vars={{ invitationSlug, invitationId }}>
-    if (invitationSlug) {
+  <script define:vars={{ invitationSlug, invitationId, rsvpEnabled }}>
+    if (invitationSlug && rsvpEnabled) {
       const confirmBtn = document.getElementById('confirm-btn');
       const confirmText = document.getElementById('confirm-text');
       const unconfirmBtn = document.getElementById('unconfirm-btn');

@@ -41,7 +41,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
         setFormData({
           event_date: result.data.event_date || '',
           event_time: result.data.event_time || '',
-          rsvp_enabled: result.data.rsvp_enabled !== false,
+          rsvp_enabled: result.data.rsvp_enabled === 1 || result.data.rsvp_enabled === true,
           rsvp_deadline: result.data.rsvp_deadline || '',
           rsvp_phone: result.data.rsvp_phone || '',
           rsvp_whatsapp: result.data.rsvp_whatsapp || '',
@@ -95,6 +95,8 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
         rsvp_whatsapp: formData.rsvp_whatsapp.trim() || undefined,
         is_published: formData.is_published
       };
+
+
 
       const result = await adminApi.updateSettings(requestData);
 

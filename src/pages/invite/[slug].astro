@@ -19,7 +19,7 @@ let error = null;
 try {
   const db = Astro.locals.runtime?.env?.DB;
   if (db && slug) {
-    // Get all settings
+    // Get all settings (with cache busting)
     const settingsResult = await db.prepare(
       'SELECT * FROM invitation_settings ORDER BY id DESC LIMIT 1'
     ).first();
@@ -29,7 +29,7 @@ try {
       settings = {
         event_date: settingsResult.event_date,
         event_time: settingsResult.event_time,
-        rsvp_enabled: Boolean(settingsResult.rsvp_enabled),
+        rsvp_enabled: settingsResult.rsvp_enabled === 1 || settingsResult.rsvp_enabled === true,
         rsvp_deadline: settingsResult.rsvp_deadline,
         rsvp_phone: settingsResult.rsvp_phone,
         rsvp_whatsapp: settingsResult.rsvp_whatsapp,
