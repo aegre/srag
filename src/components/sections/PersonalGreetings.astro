@@ -1,15 +1,5 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
-
-export interface Props {
-  invitation?: any;
-}
-
-const { invitation } = Astro.props;
-
-// Use invitation data if available, otherwise fallback to default
-const guestName = invitation?.name || 'Ma. Lourdes Velázquez';
-const guestLastname = invitation?.lastname || 'Humberto Rodríguez';
 ---
 
 <InvitationSection id="section-personal-greetings">
@@ -26,7 +16,7 @@ const guestLastname = invitation?.lastname || 'Humberto Rodríguez';
     <section class="space-y-8">
       <div class="space-y-4">
         <p class="font-angella text-4xl md:text-7xl lg:text-8xl text-secondary-light leading-tight">
-          {guestName}
+          Ma. Lourdes Velázquez
         </p>
        <!-- Elegant separator -->
       <div class="flex justify-center items-center space-x-4">
@@ -35,7 +25,7 @@ const guestLastname = invitation?.lastname || 'Humberto Rodríguez';
         <hr class="w-12 h-px bg-gradient-to-r from-transparent via-secondary-light/40 to-transparent border-0" aria-hidden="true" />
       </div>
         <p class="font-angella text-4xl md:text-7xl lg:text-8xl text-secondary-light leading-tight">
-        {guestLastname}
+        Humberto Rodríguez
         </p>
       </div>
     </section>

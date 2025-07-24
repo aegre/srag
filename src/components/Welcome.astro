@@ -60,32 +60,32 @@ const sectionIds = enabledSections.map(section => section.id);
     <!-- Clouds in each corner (behind other elements) -->
     <!-- Top left cloud -->
     <div class="absolute top-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-30" 
-         style="background-image: url('images/cloud.webp'); transform: translate(-60%, -20%) rotate(40deg); z-index: 1;">
+         style="background-image: url('/images/cloud.webp'); transform: translate(-60%, -20%) rotate(40deg); z-index: 1;">
     </div>
     
     <!-- Top right cloud -->
     <div class="absolute top-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-30" 
-         style="background-image: url('images/cloud.webp'); transform: translate(50%, -50%) rotate(90deg); z-index: 1;">
+         style="background-image: url('/images/cloud.webp'); transform: translate(50%, -50%) rotate(90deg); z-index: 1;">
     </div>
     
     <!-- Bottom right cloud -->
     <div class="absolute bottom-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-30" 
-         style="background-image: url('images/cloud.webp'); transform: translate(60%, 30%) rotate(300deg); z-index: 1;">
+         style="background-image: url('/images/cloud.webp'); transform: translate(60%, 30%) rotate(300deg); z-index: 1;">
     </div>
     
     <!-- Bottom left cloud -->
     <div class="absolute bottom-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-30" 
-         style="background-image: url('images/cloud.webp'); transform: translate(-30%, 40%) rotate(270deg); z-index: 1;">
+         style="background-image: url('/images/cloud.webp'); transform: translate(-30%, 40%) rotate(270deg); z-index: 1;">
     </div>
     
     <!-- Top left flowers -->
     <div class="absolute top-0 left-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat" 
-         style="background-image: url('images/flowers.webp'); z-index: 2;">
+         style="background-image: url('/images/flowers.webp'); z-index: 2;">
     </div>
     
     <!-- Bottom right flowers (rotated 180°) -->
     <div class="absolute bottom-0 right-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat" 
-         style="background-image: url('images/flowers.webp'); transform: rotate(180deg); z-index: 2;">
+         style="background-image: url('/images/flowers.webp'); transform: rotate(180deg); z-index: 2;">
     </div>
     
     
@@ -105,7 +105,7 @@ const sectionIds = enabledSections.map(section => section.id);
       <CountdownTimer />
       <InvitationDetails invitation={invitation} />
       <ParentsGreetings />
-      <PersonalGreetings invitation={invitation} />
+      <PersonalGreetings />
       <Itinerary />
       <EventLocation />
       <DressCode />

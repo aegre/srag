@@ -8,7 +8,7 @@ const { icon, alt = '' } = Astro.props;
 ---
 
 <div class="w-12 h-12 bg-contain bg-no-repeat bg-center" 
-     style={`background-image: url('images/${icon}.webp');`}
+     style={`background-image: url('/images/${icon}.webp');`}
      role="img"
      aria-label={alt}>
 </div> 
