@@ -7,8 +7,8 @@ interface AdminLoginProps {
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState<LoginRequest>({
-    username: 'admin', // Pre-filled for development
-    password: 'admin123',
+    username: '', // Pre-filled for development
+    password: '',
     rememberMe: false
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -196,14 +196,6 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
             )}
           </form>
 
-          {/* Development Info */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-md">
-            <p className="text-xs text-gray-600 text-center">
-              <strong>Login de Desarrollo:</strong><br />
-              Usuario: <code className="bg-gray-200 px-1 rounded font-mono">admin</code><br />
-              Contraseña: <code className="bg-gray-200 px-1 rounded font-mono">admin123</code>
-            </p>
-          </div>
         </div>
       </div>
     </main>
