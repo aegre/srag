@@ -102,7 +102,7 @@ const sectionIds = enabledSections.map(section => section.id);
     <!-- Scrollable content container -->
     <div id="scroll-container" class="relative h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory" style="z-index: 20;">
       <!-- Dynamically render sections -->
-      <MainInvitation />
+      <MainInvitation settings={settings} />
       <CountdownTimer settings={settings} />
       <InvitationDetails invitation={invitation} />
       <ParentsGreetings />

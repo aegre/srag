@@ -1,6 +1,21 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
 import EventDetail from '../EventDetail.astro';
+import { getDayNumber, getMonthName, getDayOfWeek, formatTime } from '../../utils/dateUtils';
+
+export interface Props {
+  settings?: any;
+}
+
+const { settings } = Astro.props;
+
+// Use settings if available, otherwise fallback to defaults
+const eventDate = settings?.event_date || '2024-09-13';
+const eventTime = settings?.event_time || '19:00';
+const dayNumber = getDayNumber(eventDate);
+const monthName = getMonthName(eventDate);
+const dayOfWeek = getDayOfWeek(eventDate);
+const formattedTime = formatTime(eventTime);
 ---
 
 <InvitationSection id="section-main-invitation">
@@ -26,21 +41,21 @@ import EventDetail from '../EventDetail.astro';
     <section class="space-y-6 pt-4" aria-label="Event date and time">
       <div class="flex items-center text-secondary font-hero justify-center space-x-1 md:space-x-12">
         <!-- Day of week -->
-        <EventDetail content="Sábado" srText="Day of the week: " />
+        <EventDetail content={dayOfWeek} srText="Day of the week: " />
 
         <!-- Date -->
         <div class="text-center lg:space-y-2">
-          <time datetime="2024-09-13" class="font-serif text-5xl mb-1 font-light text-secondary-light drop-shadow-xl">
-            13
+          <time datetime={eventDate} class="font-serif text-5xl mb-1 font-light text-secondary-light drop-shadow-xl">
+            {dayNumber}
           </time>
           <p class="font-hero text-xs mt-1 tracking-[0.2em] text-secondary-light uppercase font-light">
             <span class="sr-only">Month: </span>
-            Septiembre
+            {monthName}
           </p>
         </div>
 
         <!-- Time -->
-        <EventDetail content="5:30 P.M." srText="Time: " datetime="17:30" type="time" />
+        <EventDetail content={formattedTime} srText="Time: " datetime={eventTime} type="time" />
         </div>
     </section>
 
