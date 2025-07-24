@@ -6,6 +6,11 @@ export const POST: APIRoute = async (context, env) => {
   try {
     const { username, password, rememberMe } = await context.request.json();
 
+    console.log(context);
+    console.log(context.locals);
+    console.log(context.locals.runtime);
+    console.log(context.locals.runtime.env);
+
     // Validate input
     if (!username || !password) {
       return new Response(JSON.stringify({
