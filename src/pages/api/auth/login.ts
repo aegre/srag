@@ -2,14 +2,11 @@ import type { APIRoute } from 'astro';
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
-export const POST: APIRoute = async (context, env) => {
+export const POST: APIRoute = async (context) => {
   try {
     const { username, password, rememberMe } = await context.request.json();
 
-    console.log(context);
-    console.log(context.locals);
-    console.log(context.locals.runtime);
-    console.log(context.locals.runtime.env);
+    console.log((context.locals as any).runtime?.env);
 
     // Validate input
     if (!username || !password) {
@@ -24,7 +21,7 @@ export const POST: APIRoute = async (context, env) => {
     }
 
     // Get database from context (Cloudflare D1 binding)
-    const db = env.DB;
+    const db = (context.locals as any).runtime?.env?.DB;
 
 
     // Find user by username
@@ -80,7 +77,7 @@ export const POST: APIRoute = async (context, env) => {
 
     // Create JWT token
     const secret = new TextEncoder().encode(
-      env.JWT_SECRET || 'your-secret-key-change-in-production'
+      (context.locals as any).runtime?.env?.JWT_SECRET || 'your-secret-key-change-in-production'
     );
 
     const token = await new SignJWT({

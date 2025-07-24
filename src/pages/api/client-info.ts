@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-export const GET: APIRoute = async (context, env) => {
+export const GET: APIRoute = async (context) => {
   try {
     // Get client information from headers
     const clientInfo = {

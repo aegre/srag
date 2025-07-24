@@ -19,7 +19,7 @@ async function authenticateAdmin(context: any) {
   }
 
   const token = authHeader.substring(7);
-  const secret = env.JWT_SECRET || 'your-secret-key-change-in-production';
+  const secret = (context.locals as any).runtime?.env?.JWT_SECRET || 'your-secret-key-change-in-production';
 
   const payload = await verifyToken(token, secret);
   if (!payload) {
@@ -30,7 +30,7 @@ async function authenticateAdmin(context: any) {
 }
 
 // GET - Get single invitation
-export const GET: APIRoute = async (context, env) => {
+export const GET: APIRoute = async (context) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -43,7 +43,7 @@ export const GET: APIRoute = async (context, env) => {
       });
     }
 
-    const db = env.DB;
+    const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       throw new Error('Base de datos no disponible');
     }
@@ -105,7 +105,7 @@ export const GET: APIRoute = async (context, env) => {
 };
 
 // PUT - Update invitation
-export const PUT: APIRoute = async (context, env) => {
+export const PUT: APIRoute = async (context) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -118,7 +118,7 @@ export const PUT: APIRoute = async (context, env) => {
       });
     }
 
-    const db = env.DB;
+    const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       throw new Error('Base de datos no disponible');
     }
@@ -219,7 +219,7 @@ export const PUT: APIRoute = async (context, env) => {
 };
 
 // DELETE - Delete invitation
-export const DELETE: APIRoute = async (context, env) => {
+export const DELETE: APIRoute = async (context) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -232,7 +232,7 @@ export const DELETE: APIRoute = async (context, env) => {
       });
     }
 
-    const db = env.DB;
+    const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       throw new Error('Base de datos no disponible');
     }

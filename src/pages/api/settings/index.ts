@@ -19,7 +19,7 @@ async function authenticateAdmin(context: any) {
   }
 
   const token = authHeader.substring(7);
-  const secret = env.JWT_SECRET || 'your-secret-key-change-in-production';
+  const secret = (context.locals as any).runtime?.env?.JWT_SECRET || 'your-secret-key-change-in-production';
 
   const payload = await verifyToken(token, secret);
   if (!payload) {
@@ -30,7 +30,7 @@ async function authenticateAdmin(context: any) {
 }
 
 // GET - Get current settings
-export const GET: APIRoute = async (context, env) => {
+export const GET: APIRoute = async (context) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -43,7 +43,7 @@ export const GET: APIRoute = async (context, env) => {
       });
     }
 
-    const db = env.DB;
+    const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       throw new Error('Database not available');
     }
@@ -93,7 +93,7 @@ export const GET: APIRoute = async (context, env) => {
 };
 
 // PUT - Update settings
-export const PUT: APIRoute = async (context, env) => {
+export const PUT: APIRoute = async (context) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -106,7 +106,7 @@ export const PUT: APIRoute = async (context, env) => {
       });
     }
 
-    const db = env.DB;
+    const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       throw new Error('Database not available');
     }
