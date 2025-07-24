@@ -170,7 +170,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
               color="purple" 
             />
             <StatCard 
-              title="Respuestas RSVP" 
+              title="Invitaciones Confirmadas" 
               value={stats.totals.rsvps} 
               icon="✅"
               color="green" 
@@ -182,7 +182,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
               color="blue" 
             />
             <StatCard 
-              title="RSVPs Pendientes" 
+              title="Invitaciones Pendientes" 
               value={stats.totals.pending_rsvps} 
               icon="⏰"
               color="yellow" 
@@ -577,7 +577,6 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
           <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
             <span>👥 {invitation.number_of_passes} pases</span>
             <span>👀 {invitation.view_count} vistas</span>
-            <span>✉️ {invitation.rsvp_count || 0} RSVPs</span>
           </div>
           <div className="mt-2 text-xs text-gray-500">
             Creado: {new Date(invitation.created_at).toLocaleDateString()}

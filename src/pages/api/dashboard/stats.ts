@@ -53,36 +53,36 @@ export const GET: APIRoute = async (context) => {
       'SELECT COUNT(*) as count FROM invitations WHERE is_active = 1'
     ).first();
 
-    // Get total RSVP responses count  
-    const totalRSVPs = await db.prepare(
-      'SELECT COUNT(*) as count FROM rsvp_responses'
+    // Get total confirmed invitations count  
+    const totalConfirmed = await db.prepare(
+      'SELECT COUNT(*) as count FROM invitations WHERE is_active = 1 AND is_confirmed = 1'
     ).first();
 
-    // Get total views count
+    // Get total unique invitations viewed
     const totalViews = await db.prepare(
-      'SELECT COUNT(*) as count FROM analytics WHERE event_type = "view"'
+      'SELECT COUNT(DISTINCT invitation_id) as count FROM analytics WHERE event_type = "view"'
     ).first();
 
-    // Get pending RSVPs (invitations without responses)
-    const pendingRSVPs = await db.prepare(`
+    // Get pending invitations (active but not confirmed)
+    const pendingInvitations = await db.prepare(`
       SELECT COUNT(*) as count 
-      FROM invitations i 
-      LEFT JOIN rsvp_responses r ON i.id = r.invitation_id 
-      WHERE i.is_active = 1 AND r.id IS NULL
+      FROM invitations 
+      WHERE is_active = 1 AND is_confirmed = 0
     `).first();
 
     // Get recent activity (last 7 days)
     const recentViews = await db.prepare(`
-      SELECT COUNT(*) as count 
+      SELECT COUNT(DISTINCT invitation_id) as count 
       FROM analytics 
       WHERE event_type = "view" 
       AND timestamp >= datetime('now', '-7 days')
     `).first();
 
-    const recentRSVPs = await db.prepare(`
+    const recentConfirmations = await db.prepare(`
       SELECT COUNT(*) as count 
-      FROM rsvp_responses 
-      WHERE created_at >= datetime('now', '-7 days')
+      FROM invitations 
+      WHERE is_confirmed = 1 
+      AND updated_at >= datetime('now', '-7 days')
     `).first();
 
     // Get top viewed invitations
@@ -105,13 +105,13 @@ export const GET: APIRoute = async (context) => {
       data: {
         totals: {
           invitations: totalInvitations?.count || 0,
-          rsvps: totalRSVPs?.count || 0,
+          rsvps: totalConfirmed?.count || 0,
           views: totalViews?.count || 0,
-          pending_rsvps: pendingRSVPs?.count || 0
+          pending_rsvps: pendingInvitations?.count || 0
         },
         recent: {
           views_last_7_days: recentViews?.count || 0,
-          rsvps_last_7_days: recentRSVPs?.count || 0
+          rsvps_last_7_days: recentConfirmations?.count || 0
         },
         top_invitations: topInvitations.results || []
       }
