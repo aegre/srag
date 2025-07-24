@@ -18,6 +18,7 @@ export const GET: APIRoute = async (context) => {
       viewsLast7Days,
       viewsLast30Days,
       recentViews,
+      recentRsvpEvents,
       topInvitations,
       viewsByDay,
       confirmationEvents,
@@ -50,6 +51,19 @@ export const GET: APIRoute = async (context) => {
         FROM analytics a
         LEFT JOIN invitations i ON a.invitation_id = i.id
         WHERE a.event_type = "view"
+        ORDER BY a.timestamp DESC
+        LIMIT 10
+      `).all(),
+
+      // Recent RSVP events (last 10)
+      db.prepare(`
+        SELECT 
+          a.id, a.timestamp, a.ip_address, a.user_agent,
+          a.event_type, a.event_data,
+          i.name, i.lastname, i.slug
+        FROM analytics a
+        LEFT JOIN invitations i ON a.invitation_id = i.id
+        WHERE a.event_type IN ('rsvp_button_click', 'rsvp_action_success', 'rsvp_action_error', 'rsvp_action_exception')
         ORDER BY a.timestamp DESC
         LIMIT 10
       `).all(),
@@ -112,6 +126,7 @@ export const GET: APIRoute = async (context) => {
         viewsLast7Days: viewsLast7Days?.count || 0,
         viewsLast30Days: viewsLast30Days?.count || 0,
         recentViews: recentViews?.results || [],
+        recentRsvpEvents: recentRsvpEvents?.results || [],
         topInvitations: topInvitations?.results || [],
         viewsByDay: viewsByDay?.results || [],
         confirmationEvents: confirmationEvents?.results || [],

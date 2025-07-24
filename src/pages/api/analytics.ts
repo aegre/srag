@@ -15,13 +15,25 @@ export const POST: APIRoute = async (context) => {
     const analyticsData = await context.request.json();
 
     // Validate required fields
-    if (!analyticsData.invitation_id || !analyticsData.event_type) {
+    if (!analyticsData.event_type) {
       return new Response(JSON.stringify({
-        error: 'ID de invitación y tipo de evento son requeridos'
+        error: 'Tipo de evento es requerido'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
+    }
+
+    // Get invitation_id from slug if provided
+    let invitationId = analyticsData.invitation_id;
+    if (analyticsData.slug && !invitationId) {
+      const invitation = await db.prepare(
+        'SELECT id FROM invitations WHERE slug = ?'
+      ).bind(analyticsData.slug).first();
+
+      if (invitation) {
+        invitationId = invitation.id;
+      }
     }
 
     // Get real IP address from headers
@@ -32,11 +44,12 @@ export const POST: APIRoute = async (context) => {
 
     // Insert analytics record
     const result = await db.prepare(`
-      INSERT INTO analytics (invitation_id, event_type, ip_address, user_agent)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO analytics (invitation_id, event_type, event_data, ip_address, user_agent)
+      VALUES (?, ?, ?, ?, ?)
     `).bind(
-      analyticsData.invitation_id,
+      invitationId,
       analyticsData.event_type,
+      analyticsData.event_data ? JSON.stringify(analyticsData.event_data) : null,
       ipAddress,
       analyticsData.user_agent || 'unknown'
     ).run();

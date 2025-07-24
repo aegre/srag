@@ -15,6 +15,7 @@ const deadline = settings?.rsvp_deadline || "1 de Septiembre";
 const rsvpEnabled = settings?.rsvp_enabled !== false;
 const whatsappMessage = "¡Hola! Confirmo mi asistencia a los XV años de Julietta el 13 de septiembre.";
 const invitationSlug = invitation?.slug;
+const invitationId = invitation?.id;
 ---
 
 <InvitationSection id="section-details-rsvp">
@@ -69,7 +70,7 @@ const invitationSlug = invitation?.slug;
             )}
 
             <!-- Direct Confirmation Button -->
-            {invitationSlug && !invitation?.is_confirmed && (
+            {invitationSlug && !invitation?.is_confirmed ? (
               <button 
                 id="confirm-btn"
                 data-action="confirm"
@@ -79,28 +80,20 @@ const invitationSlug = invitation?.slug;
                 </svg>
                 <span id="confirm-text">Confirmar Asistencia</span>
               </button>
-            )}
+            ) : null}
 
-            <!-- Already Confirmed with Unconfirm Button -->
-            {invitationSlug && invitation?.is_confirmed && (
-              <div class="space-y-3">
-                <div class="flex items-center justify-center space-x-3 w-full px-6 py-3 rounded-full border border-green-400 bg-green-50 text-green-700">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  <span class="font-hero text-sm font-light">¡Asistencia Confirmada!</span>
-                </div>
-                <button 
-                  id="unconfirm-btn"
-                  data-action="unconfirm"
-                  class="rsvp-btn flex items-center justify-center space-x-3 w-full px-6 py-3 rounded-full border border-red-400 text-red-600 font-hero text-sm font-light transition-all duration-300 hover:border-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                  </svg>
-                  <span id="unconfirm-text">Cancelar Confirmación</span>
-                </button>
-              </div>
-            )}
+            <!-- Cancel Confirmation Button -->
+            {invitationSlug && invitation?.is_confirmed ? (
+              <button 
+                id="unconfirm-btn"
+                data-action="unconfirm"
+                class="rsvp-btn flex items-center justify-center space-x-3 w-full px-6 py-3 rounded-full border border-red-400 text-red-600 font-hero text-sm font-light transition-all duration-300 hover:border-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                <span id="unconfirm-text">Cancelar Confirmación</span>
+              </button>
+            ) : null}
           </div>
         </div>
       ) : (
@@ -115,7 +108,7 @@ const invitationSlug = invitation?.slug;
       )}
 
   <!-- Confirmation JavaScript -->
-  <script define:vars={{ invitationSlug }}>
+  <script define:vars={{ invitationSlug, invitationId }}>
     if (invitationSlug) {
       const confirmBtn = document.getElementById('confirm-btn');
       const confirmText = document.getElementById('confirm-text');
@@ -138,6 +131,7 @@ const invitationSlug = invitation?.slug;
       
       async function handleConfirmationAction(action, button, textElement) {
         try {
+
           // Disable button and show loading
           button.disabled = true;
           const loadingText = action === 'confirm' ? 'Confirmando...' : 'Cancelando...';
@@ -154,6 +148,31 @@ const invitationSlug = invitation?.slug;
           const result = await response.json();
           
           if (result.success) {
+            // Send analytics event for successful action
+            try {
+              await fetch('/api/analytics', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  event_type: 'rsvp_action_success',
+                  invitation_id: invitationId,
+                  slug: invitationSlug,
+                  event_data: {
+                    action: action,
+                    slug: invitationSlug,
+                    button_type: action === 'confirm' ? 'confirm' : 'cancel',
+                    success: true,
+                    timestamp: new Date().toISOString()
+                  }
+                })
+              });
+            } catch (analyticsError) {
+              console.error('Error sending success analytics:', analyticsError);
+              // Don't fail the main action if analytics fails
+            }
+
             // Show success state
             const successText = action === 'confirm' ? '¡Confirmado!' : '¡Cancelado!';
             textElement.textContent = successText;
@@ -166,12 +185,76 @@ const invitationSlug = invitation?.slug;
               button.classList.remove('border-red-400', 'text-red-600', 'hover:border-red-600', 'hover:bg-red-50');
             }
             
-            // Reload page after 2 seconds to show updated state
+            // Show success state for 3 seconds, then update button state
             setTimeout(() => {
-              window.location.reload();
-            }, 2000);
-            
+              if (action === 'confirm') {
+                // Replace confirm button with cancel button
+                const buttonContainer = button.parentNode;
+                const originalHTML = buttonContainer.innerHTML;
+                
+                // Find and replace only the confirm button
+                const confirmButtonHTML = `
+                  <button 
+                    id="unconfirm-btn"
+                    data-action="unconfirm"
+                    class="rsvp-btn flex items-center justify-center space-x-3 w-full px-6 py-3 rounded-full border border-red-400 text-red-600 font-hero text-sm font-light transition-all duration-300 hover:border-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    <span id="unconfirm-text">Cancelar Confirmación</span>
+                  </button>
+                `;
+                
+                // Replace only the confirm button, keeping other buttons intact
+                buttonContainer.innerHTML = originalHTML.replace(
+                  /<button[^>]*id="confirm-btn"[^>]*>[\s\S]*?<\/button>/,
+                  confirmButtonHTML
+                );
+                
+                // Add event listener to new button
+                const newUnconfirmBtn = buttonContainer.querySelector('#unconfirm-btn');
+                const newUnconfirmText = buttonContainer.querySelector('#unconfirm-text');
+                if (newUnconfirmBtn && newUnconfirmText) {
+                  newUnconfirmBtn.addEventListener('click', async () => {
+                    await handleConfirmationAction('unconfirm', newUnconfirmBtn, newUnconfirmText);
+                  });
+                }
+              } else {
+                // Replace cancel button with confirm button
+                const buttonContainer = button.parentNode;
+                const originalHTML = buttonContainer.innerHTML;
+                
+                // Find and replace only the cancel button
+                const cancelButtonHTML = `
+                  <button 
+                    id="confirm-btn"
+                    data-action="confirm"
+                    class="rsvp-btn flex items-center justify-center space-x-3 w-full px-6 py-3 rounded-full border border-secondary-light/40 text-secondary-light font-hero text-sm font-light transition-all duration-300 hover:border-secondary-light hover:bg-secondary-light/10 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    <span id="confirm-text">Confirmar Asistencia</span>
+                  </button>
+                `;
+                
+                // Replace only the cancel button, keeping other buttons intact
+                buttonContainer.innerHTML = originalHTML.replace(
+                  /<button[^>]*id="unconfirm-btn"[^>]*>[\s\S]*?<\/button>/,
+                  cancelButtonHTML
+                );
+                
+                // Add event listener to new button
+                const newConfirmBtn = buttonContainer.querySelector('#confirm-btn');
+                const newConfirmText = buttonContainer.querySelector('#confirm-text');
+                if (newConfirmBtn && newConfirmText) {
+                  newConfirmBtn.addEventListener('click', async () => {
+                    await handleConfirmationAction('confirm', newConfirmBtn, newConfirmText);
+                  });
+                }
+              }
+            }, 3000);
           } else {
+
             // Show error state
             textElement.textContent = 'Error - Intentar de nuevo';
             button.classList.add('bg-red-600', 'border-red-600', 'text-white');
@@ -194,6 +277,7 @@ const invitationSlug = invitation?.slug;
           
         } catch (error) {
           console.error(`Error ${action}ing invitation:`, error);
+          
           
           // Show error state
           textElement.textContent = 'Error - Intentar de nuevo';

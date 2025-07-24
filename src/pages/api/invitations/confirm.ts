@@ -60,7 +60,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Log analytics event
     try {
       await db.prepare(`
-        INSERT INTO analytics_events (event_type, event_data, ip_address, user_agent, created_at)
+        INSERT INTO analytics (event_type, event_data, ip_address, user_agent, created_at)
         VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
       `).bind(
         'invitation_confirmation_change',
