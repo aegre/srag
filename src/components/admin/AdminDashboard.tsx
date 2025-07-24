@@ -4,16 +4,20 @@ import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { adminApi, ApiError } from '../../utils/api';
 import SettingsForm from './SettingsForm';
 import AnalyticsTab from './AnalyticsTab';
+import CreateUserForm from './CreateUserForm';
+import { useToast } from '../ui/Toast';
+import { ToastProvider } from '../ui/Toast';
 
 interface AdminDashboardProps {
   initialToken?: string;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
+const AdminDashboardContent: React.FC = () => {
   const { token, isLoading: authLoading, logout } = useAdminAuth();
+  const { showToast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [activeTab, setActiveTab] = useState<'invitations' | 'analytics' | 'settings'>('invitations');
+  const [activeTab, setActiveTab] = useState<'invitations' | 'analytics' | 'settings' | 'users'>('invitations');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,15 +55,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
   };
 
   const handleLogout = () => {
-    if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+    showToast({
+      type: 'info',
+      title: 'Cerrando sesión',
+      message: 'Has cerrado sesión exitosamente.'
+    });
       logout();
-    }
   };
 
   const handleDeleteInvitation = async (id: number) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar esta invitación? Esta acción no se puede deshacer.')) {
-      return;
-    }
+    // For now, we'll delete without confirmation, but show a toast
+    // In a real app, you might want to add a confirmation dialog
+    showToast({
+      type: 'warning',
+      title: 'Eliminando invitación',
+      message: 'La invitación será eliminada permanentemente.'
+    });
 
     try {
       await adminApi.deleteInvitation(id);
@@ -69,12 +80,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
       // Reload stats to update counts
       const statsResult = await adminApi.getStats();
       setStats(statsResult.data);
+      
+      showToast({
+        type: 'success',
+        title: 'Invitación eliminada',
+        message: 'La invitación ha sido eliminada exitosamente.'
+      });
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         logout();
         return;
       }
-      alert(`Error: ${err instanceof Error ? err.message : 'Error al eliminar la invitación'}`);
+      const errorMessage = err instanceof Error ? err.message : 'Error al eliminar la invitación';
+      showToast({
+        type: 'error',
+        title: 'Error al eliminar',
+        message: errorMessage
+      });
     }
   };
 
@@ -99,7 +121,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
   };
 
   const handleSettingsSuccess = () => {
-    alert('¡Configuración actualizada exitosamente!');
+    showToast({
+      type: 'success',
+      title: 'Configuración actualizada',
+      message: 'Los cambios han sido guardados exitosamente.'
+    });
     setActiveTab('invitations');
   };
 
@@ -130,8 +156,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      showToast({
+        type: 'success',
+        title: 'Exportación completada',
+        message: 'El archivo CSV ha sido descargado exitosamente.'
+      });
     } catch (err) {
-      alert(`Error: ${err instanceof Error ? err.message : 'Error al exportar las invitaciones'}`);
+      const errorMessage = err instanceof Error ? err.message : 'Error al exportar las invitaciones';
+      showToast({
+        type: 'error',
+        title: 'Error en la exportación',
+        message: errorMessage
+      });
     } finally {
       setExporting(false);
     }
@@ -240,7 +277,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
             {[
               { key: 'invitations', label: 'Invitaciones' },
               { key: 'analytics', label: 'Analíticas' },
-              { key: 'settings', label: 'Configuración' }
+              { key: 'settings', label: 'Configuración' },
+              { key: 'users', label: 'Usuarios' }
             ].map((tab) => (
               <button
                 key={tab.key}
@@ -278,6 +316,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialToken }) => {
             <SettingsForm 
               onSuccess={handleSettingsSuccess}
               onCancel={handleSettingsCancel}
+            />
+          </div>
+          
+          <div className={activeTab === 'users' ? 'block' : 'hidden'}>
+            <CreateUserForm 
+              onSuccess={() => {
+                // Toast is handled inside CreateUserForm component
+              }}
+              onCancel={() => setActiveTab('invitations')}
             />
           </div>
         </div>
@@ -439,8 +486,8 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
                 </>
               )}
             </button>
-            <button 
-              onClick={onCreateInvitation}
+          <button 
+            onClick={onCreateInvitation}
               className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -448,7 +495,7 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
               </svg>
               <span className="hidden sm:inline">Crear Nueva Invitación</span>
               <span className="sm:hidden">Nueva Invitación</span>
-            </button>
+          </button>
           </div>
         </div>
 
@@ -587,6 +634,7 @@ interface InvitationCardProps {
 }
 
 const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onDelete }) => {
+  const { showToast } = useToast();
   const [copied, setCopied] = useState(false);
   const invitationUrl = `${window.location.origin}/invite/${invitation.slug}`;
 
@@ -594,6 +642,11 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
     try {
       await navigator.clipboard.writeText(invitationUrl);
       setCopied(true);
+      showToast({
+        type: 'success',
+        title: 'URL copiada',
+        message: 'La URL de la invitación ha sido copiada al portapapeles.'
+      });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       // Fallback for older browsers
@@ -604,6 +657,11 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
       document.execCommand('copy');
       document.body.removeChild(textArea);
       setCopied(true);
+      showToast({
+        type: 'success',
+        title: 'URL copiada',
+        message: 'La URL de la invitación ha sido copiada al portapapeles.'
+      });
       setTimeout(() => setCopied(false), 2000);
     }
   };
@@ -618,12 +676,24 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
     try {
       if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
         await navigator.share(shareData);
+        showToast({
+          type: 'success',
+          title: 'Invitación compartida',
+          message: 'La invitación ha sido compartida exitosamente.'
+        });
       } else {
         // Fallback to copy URL
         handleCopyUrl();
       }
     } catch (err) {
       // If sharing is cancelled or fails, fallback to copy URL
+      if (err instanceof Error && err.name !== 'AbortError') {
+        showToast({
+          type: 'error',
+          title: 'Error al compartir',
+          message: 'No se pudo compartir la invitación. Se copió la URL al portapapeles.'
+        });
+      }
       handleCopyUrl();
     }
   };
@@ -722,6 +792,14 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
         </div>
       </div>
     </div>
+  );
+};
+
+const AdminDashboard: React.FC = () => {
+    return (
+    <ToastProvider>
+      <AdminDashboardContent />
+    </ToastProvider>
   );
 };
 

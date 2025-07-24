@@ -176,4 +176,24 @@ export interface InvitationCardProps {
   invitation: Invitation;
   onEdit: (id: number) => void;
   onDelete: (id: number) => void;
+}
+
+// User management types
+export interface CreateUserRequest {
+  username: string;
+  email: string;
+  password: string;
+  role: 'admin' | 'editor';
+}
+
+export interface CreateUserResponse {
+  success: boolean;
+  message: string;
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    role: string;
+    created_at: string;
+  };
 } 

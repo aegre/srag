@@ -81,7 +81,8 @@ async function initializeDatabase() {
     '0001_initial_schema.sql',
     '0002_seed_data.sql',
     '0003_restructure_invitations.sql',
-    '0004_default_settings.sql'
+    '0004_default_settings.sql',
+    '0005_update_admin_users_role.sql'
   ];
 
   console.log('\n📋 Running database migrations...');

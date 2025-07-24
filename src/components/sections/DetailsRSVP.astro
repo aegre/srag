@@ -8,10 +8,32 @@ export interface Props {
 
 const { settings, invitation } = Astro.props;
 
+// Function to format date in Spanish
+function formatDateInSpanish(dateString: string): string {
+  if (!dateString) return '';
+  
+  try {
+    // Parse date string as YYYY-MM-DD format to avoid timezone issues
+    const [year, month, day] = dateString.split('-').map(Number);
+    
+    // Create date using UTC to avoid timezone shifts
+    const date = new Date(Date.UTC(year, month, day));
+    
+    // Get month name in Spanish
+    const monthName = date.toLocaleDateString('es-ES', { month: 'long' });
+    
+    return `${day} de ${monthName.charAt(0).toUpperCase() + monthName.slice(1)}`;
+  } catch (error) {
+    // If date parsing fails, return the original string
+    return dateString;
+  }
+}
+
 // Use settings if available, otherwise fallback to defaults
 const confirmationPhone = settings?.rsvp_phone || "+525555555555";
 const whatsappNumber = settings?.rsvp_whatsapp || confirmationPhone;
-const deadline = settings?.rsvp_deadline || "1 de Septiembre";
+const rawDeadline = settings?.rsvp_deadline || "2024-09-01";
+const deadline = formatDateInSpanish(rawDeadline);
 const rsvpEnabled = settings?.rsvp_enabled === 1 || settings?.rsvp_enabled === true;
 const whatsappMessage = "¡Hola! Confirmo mi asistencia a los XV años de Julietta el 13 de septiembre.";
 const invitationSlug = invitation?.slug;

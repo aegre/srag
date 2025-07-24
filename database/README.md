@@ -77,8 +77,8 @@ wrangler d1 execute julifestdb --local --file=database/migrations/0001_initial_s
 # Run SQL command directly
 wrangler d1 execute julifestdb --local --command="SELECT * FROM invitations;"
 
-# Production commands (remove --local flag)
-wrangler d1 execute julifestdb-prod --command="SELECT COUNT(*) FROM invitations;"
+# Production commands (remove --local flag and add --env production)
+wrangler d1 execute julifestdb-prod --command="SELECT COUNT(*) FROM invitations;" --env production
 ```
 
 ## 🔧 Configuration
@@ -155,6 +155,39 @@ Tracks user behavior:
 2. Update `wrangler.toml` with production database ID
 3. Run production migrations: `npm run db:migrate:prod`
 4. Deploy: `wrangler pages deploy dist`
+
+### Production Environment Commands
+
+**Important**: Production databases are configured under `[env.production]` in `wrangler.toml`, so you must use the `--env production` flag.
+
+```bash
+# List production databases
+wrangler d1 list --env production
+
+# Apply migrations to production
+wrangler d1 migrations apply julifestdb-prod --remote --env production
+
+# Check migration status in production
+wrangler d1 migrations list julifestdb-prod --remote --env production
+
+# Execute SQL on production database
+wrangler d1 execute julifestdb-prod --command="SELECT * FROM invitations;" --env production
+
+# View production database info
+wrangler d1 info julifestdb-prod --env production
+```
+
+**Preview/Development Commands** (no environment flag needed):
+```bash
+# List preview databases
+wrangler d1 list
+
+# Apply migrations to preview
+wrangler d1 migrations apply julifestdb --remote
+
+# Check migration status in preview
+wrangler d1 migrations list julifestdb --remote
+```
 
 ## 📈 Monitoring
 

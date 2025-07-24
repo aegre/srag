@@ -112,4 +112,5 @@ export const adminApi = {
 
   // Auth
   validateToken: () => api.get<APIResponse<any>>('/api/auth/validate'),
+  createUser: (data: any) => api.post<APIResponse<any>>('/api/auth/create-user', data),
 }; 
