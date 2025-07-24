@@ -6,6 +6,6 @@
 INSERT INTO admin_users (username, email, password_hash, role) VALUES (
     'admin',
     'admin@example.com',
-    '$2b$10$rBV2HQ/qjKlbcl6KH.7/m.YXsG9JStE6RdYsHUDSYKZCRWKJhP8iO',
+    '$2b$10$3g0RBd8Q/3dxDbA.Km8ntuRqhcN50jKhSPiQousJJ8LRFeOvV78wG',
     'admin'
 ); 

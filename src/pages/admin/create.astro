@@ -1,0 +1,11 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import InvitationForm from '../../components/admin/InvitationForm';
+import AdminRoute from '../../components/admin/AdminRoute';
+---
+
+<Layout title="Create Invitation - Admin Dashboard">
+  <AdminRoute client:load>
+    <InvitationForm client:load />
+  </AdminRoute>
+</Layout> 

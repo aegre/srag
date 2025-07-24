@@ -1,0 +1,198 @@
+import type { APIRoute } from 'astro';
+import { jwtVerify } from 'jose';
+
+// Helper function to verify JWT token
+async function verifyToken(token: string, secret: string) {
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+    return payload;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Helper function to authenticate admin requests
+async function authenticateAdmin(context: any) {
+  const authHeader = context.request.headers.get('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return null;
+  }
+
+  const token = authHeader.substring(7);
+  const secret = (context.locals as any).runtime?.env?.JWT_SECRET || 'your-secret-key-change-in-production';
+
+  const payload = await verifyToken(token, secret);
+  if (!payload) {
+    return null;
+  }
+
+  return payload;
+}
+
+// GET - List all invitations
+export const GET: APIRoute = async (context) => {
+  try {
+    // Authenticate admin
+    const user = await authenticateAdmin(context);
+    if (!user) {
+      return new Response(JSON.stringify({
+        error: 'Unauthorized'
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const db = (context.locals as any).runtime?.env?.DB;
+    if (!db) {
+      throw new Error('Database not available');
+    }
+
+    // Get query parameters for pagination
+    const url = new URL(context.request.url);
+    const page = parseInt(url.searchParams.get('page') || '1');
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+    const offset = (page - 1) * limit;
+
+    // Get total count
+    const countResult = await db.prepare('SELECT COUNT(*) as total FROM invitations').first();
+    const total = countResult?.total || 0;
+
+    // Get invitations with pagination
+    const invitations = await db.prepare(`
+      SELECT 
+        id, slug, name, lastname, number_of_passes, 
+        is_confirmed, is_active, view_count,
+        created_at, updated_at
+      FROM invitations 
+      ORDER BY created_at DESC 
+      LIMIT ? OFFSET ?
+    `).bind(limit, offset).all();
+
+    // Get RSVP counts for each invitation
+    const invitationsWithStats = await Promise.all(
+      invitations.results.map(async (invitation: any) => {
+        const rsvpCount = await db.prepare(
+          'SELECT COUNT(*) as count FROM rsvp_responses WHERE invitation_id = ?'
+        ).bind(invitation.id).first();
+
+        return {
+          ...invitation,
+          rsvp_count: rsvpCount?.count || 0
+        };
+      })
+    );
+
+    return new Response(JSON.stringify({
+      success: true,
+      data: invitationsWithStats,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    console.error('Error listing invitations:', error);
+    return new Response(JSON.stringify({
+      error: 'Internal server error'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+};
+
+// POST - Create new invitation
+export const POST: APIRoute = async (context) => {
+  try {
+    // Authenticate admin
+    const user = await authenticateAdmin(context);
+    if (!user) {
+      return new Response(JSON.stringify({
+        error: 'Unauthorized'
+      }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    const db = (context.locals as any).runtime?.env?.DB;
+    if (!db) {
+      throw new Error('Database not available');
+    }
+
+    const invitationData = await context.request.json();
+
+    // Validate required fields
+    if (!invitationData.name || !invitationData.lastname || !invitationData.slug) {
+      return new Response(JSON.stringify({
+        error: 'Name, last name, and slug are required'
+      }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Check if slug already exists
+    const existingInvitation = await db.prepare(
+      'SELECT id FROM invitations WHERE slug = ?'
+    ).bind(invitationData.slug).first();
+
+    if (existingInvitation) {
+      return new Response(JSON.stringify({
+        error: 'Slug already exists. Please choose a different URL slug.'
+      }), {
+        status: 409,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Insert new invitation
+    const result = await db.prepare(`
+      INSERT INTO invitations (
+        slug, name, lastname, number_of_passes,
+        is_confirmed, is_active
+      ) VALUES (?, ?, ?, ?, ?, ?)
+    `).bind(
+      invitationData.slug,
+      invitationData.name,
+      invitationData.lastname,
+      invitationData.number_of_passes || 1,
+      invitationData.is_confirmed || false,
+      invitationData.is_active !== false // default to true
+    ).run();
+
+    if (!result.success) {
+      throw new Error('Failed to create invitation');
+    }
+
+    // Get the created invitation
+    const newInvitation = await db.prepare(
+      'SELECT * FROM invitations WHERE id = ?'
+    ).bind(result.meta.last_row_id).first();
+
+    return new Response(JSON.stringify({
+      success: true,
+      data: newInvitation,
+      message: 'Invitation created successfully'
+    }), {
+      status: 201,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+  } catch (error) {
+    console.error('Error creating invitation:', error);
+    return new Response(JSON.stringify({
+      error: 'Internal server error'
+    }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}; 

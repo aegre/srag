@@ -79,7 +79,8 @@ async function initializeDatabase() {
   // Run migrations
   const migrations = [
     '0001_initial_schema.sql',
-    '0002_seed_data.sql'
+    '0002_seed_data.sql',
+    '0003_restructure_invitations.sql'
   ];
 
   console.log('\n📋 Running database migrations...');

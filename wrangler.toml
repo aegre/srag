@@ -5,8 +5,8 @@ compatibility_date = "2024-01-15"
 [[d1_databases]]
 binding = "DB"
 database_name = "julifestdb"
-database_id = "dbe5f30e-c490-4020-bdb4-e47cb0884140"
-preview_database_id = "dbe5f30e-c490-4020-bdb4-e47cb0884140"
+database_id = "1a40dfa5-1ed4-4ba3-9e6e-8f2da451af27"
+preview_database_id = "1a40dfa5-1ed4-4ba3-9e6e-8f2da451af27"
 
 [env.production]
 name = "julifestxv"

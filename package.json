@@ -12,7 +12,7 @@
     "db:migrate": "wrangler d1 migrations apply julifestdb --local",
     "db:migrate:prod": "wrangler d1 migrations apply julifestdb-prod",
     "db:studio": "wrangler d1 execute julifestdb --local --command='SELECT name FROM sqlite_master WHERE type=\"table\";'",
-    "db:reset": "wrangler d1 execute julifestdb --local --command='DROP TABLE IF EXISTS invitations; DROP TABLE IF EXISTS analytics; DROP TABLE IF EXISTS rsvp_responses; DROP TABLE IF EXISTS admin_users; DROP TABLE IF EXISTS sessions;' && npm run db:migrate",
+    "db:reset": "wrangler d1 execute julifestdb --local --command='DROP TABLE IF EXISTS rsvp_responses; DROP TABLE IF EXISTS analytics; DROP TABLE IF EXISTS invitation_details; DROP TABLE IF EXISTS invitations; DROP TABLE IF EXISTS sessions; DROP TABLE IF EXISTS admin_users;' && npm run db:migrate",
     "deploy": "npm run build && wrangler pages deploy dist",
     "cf:dev": "wrangler pages dev dist --compatibility-date=2024-01-15",
     "cf:deploy": "wrangler pages deploy dist",
