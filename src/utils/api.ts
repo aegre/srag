@@ -96,6 +96,20 @@ export const adminApi = {
   getSettings: () => api.get<APIResponse<any>>('/api/settings'),
   updateSettings: (data: any) => api.put<APIResponse<any>>('/api/settings', data),
 
+  // Export
+  exportInvitations: () => {
+    const token = localStorage.getItem('admin_token');
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return fetch('/api/invitations/export', {
+      method: 'GET',
+      headers
+    });
+  },
+
   // Auth
   validateToken: () => api.get<APIResponse<any>>('/api/auth/validate'),
 }; 
