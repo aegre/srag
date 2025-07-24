@@ -7,13 +7,8 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: 'server', // Enable SSR
   adapter: cloudflare(),
-  integrations: [react({
-    include: ['**/*.{jsx,tsx}']
-  })],
+  integrations: [react()],
   vite: {
-    plugins: [tailwindcss()],
-    ssr: {
-      noExternal: ['react', 'react-dom']
-    }
-  },
+    plugins: [tailwindcss()]
+  }
 });
