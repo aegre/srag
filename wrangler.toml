@@ -7,6 +7,7 @@ binding = "DB"
 database_name = "julifestdb"
 database_id = "1a40dfa5-1ed4-4ba3-9e6e-8f2da451af27"
 preview_database_id = "1a40dfa5-1ed4-4ba3-9e6e-8f2da451af27"
+migrations_dir = "database/migrations"
 
 [env.production]
 name = "julifestxv"

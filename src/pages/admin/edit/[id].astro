@@ -1,5 +1,5 @@
 ---
-import Layout from '../../../layouts/Layout.astro';
+import AdminLayout from '../../../layouts/AdminLayout.astro';
 import InvitationForm from '../../../components/admin/InvitationForm';
 import AdminRoute from '../../../components/admin/AdminRoute';
 
@@ -12,16 +12,16 @@ const search = Astro.url.searchParams.get('search') || '';
 const filter = Astro.url.searchParams.get('filter') || '';
 ---
 
-<Layout title="Editar Invitación - Panel de Administración">
-  <AdminRoute client:load>
+<AdminLayout title="Editar Invitación - Panel de Administración">
+  <AdminRoute client:only="react">
     <InvitationForm
       mode="edit"
       invitationId={id}
       searchParams={{ search, filter }}
-      client:load
+      client:only="react"
     />
   </AdminRoute>
-</Layout>
+</AdminLayout>
 
 <script>
   // Handle delete functionality

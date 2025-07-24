@@ -1,0 +1,24 @@
+---
+import Layout from './Layout.astro';
+
+export interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Admin Dashboard - Julietta XV años",
+  description = "Panel de administración para gestionar invitaciones"
+} = Astro.props;
+---
+
+<Layout 
+  title={title}
+  description={description}
+  image="/images/admin-preview.webp"
+  url="https://julifestxv.aegre.me/admin"
+  type="website"
+  noIndex={true}
+>
+  <slot />
+</Layout> 

@@ -1,0 +1,49 @@
+---
+import Layout from './Layout.astro';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  guestName?: string;
+  guestLastname?: string;
+  slug?: string;
+  preview?: boolean;
+}
+
+const { 
+  title,
+  description,
+  guestName,
+  guestLastname,
+  slug,
+  preview = false
+} = Astro.props;
+
+// Generate dynamic content based on guest info
+const dynamicTitle = guestName && guestLastname 
+  ? `${guestName} ${guestLastname} - Invitación XV años Julietta`
+  : "Invitación XV años Julietta";
+
+const dynamicDescription = guestName && guestLastname
+  ? `Invitación especial para ${guestName} ${guestLastname} a los XV años de Julietta. Una celebración mágica llena de amor y alegría.`
+  : "Invitación a los XV años de Julietta. Una celebración mágica llena de amor y alegría.";
+
+const dynamicUrl = slug 
+  ? `https://julifestxv.aegre.me/invite/${slug}`
+  : "https://julifestxv.aegre.me";
+
+const dynamicImage = guestName && guestLastname
+  ? `/images/invitation-${slug}.webp`
+  : "/images/girl.webp";
+---
+
+<Layout 
+  title={title || dynamicTitle}
+  description={description || dynamicDescription}
+  image={dynamicImage}
+  url={dynamicUrl}
+  type="website"
+  noIndex={preview}
+>
+  <slot />
+</Layout> 

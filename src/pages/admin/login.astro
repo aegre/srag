@@ -1,8 +1,8 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import AdminLayout from '../../layouts/AdminLayout.astro';
 import AdminLogin from '../../components/admin/AdminLogin';
 ---
 
-<Layout title="Admin Login - Julietta XV Años">
-  <AdminLogin client:load />
-</Layout> 
+<AdminLayout title="Admin Login - Julietta XV Años">
+  <AdminLogin client:only="react" />
+</AdminLayout> 

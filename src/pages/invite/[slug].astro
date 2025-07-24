@@ -1,6 +1,6 @@
 ---
 import Welcome from '../../components/Welcome.astro';
-import Layout from '../../layouts/Layout.astro';
+import InvitationLayout from '../../layouts/InvitationLayout.astro';
 import NotFound from '../404.astro';
 
 export interface Props {
@@ -17,7 +17,7 @@ let settings = null;
 let error = null;
 
 try {
-  const db = Astro.locals.runtime?.env?.DB;
+  const db = (Astro.locals as any).runtime?.env?.DB;
   if (db && slug) {
     // Get all settings (with cache busting)
     const settingsResult = await db.prepare(
@@ -76,11 +76,16 @@ if (!invitation && !error) {
 }
 ---
 
-<Layout>
+<InvitationLayout 
+  guestName={invitation?.name}
+  guestLastname={invitation?.lastname}
+  slug={slug}
+  preview={preview}
+>
 	<Welcome 
 		preview={preview} 
 		invitation={invitation}
 		slug={slug}
 		settings={settings}
 	/>
-</Layout>
+</InvitationLayout>
