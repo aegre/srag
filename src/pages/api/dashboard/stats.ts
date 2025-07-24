@@ -30,7 +30,7 @@ async function authenticateAdmin(context: any) {
 }
 
 // GET - Dashboard statistics
-export const GET: APIRoute = async (context) => {
+export const GET: APIRoute = async (context, env) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);

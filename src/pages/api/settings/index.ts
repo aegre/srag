@@ -30,7 +30,7 @@ async function authenticateAdmin(context: any) {
 }
 
 // GET - Get current settings
-export const GET: APIRoute = async (context) => {
+export const GET: APIRoute = async (context, env) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -93,7 +93,7 @@ export const GET: APIRoute = async (context) => {
 };
 
 // PUT - Update settings
-export const PUT: APIRoute = async (context) => {
+export const PUT: APIRoute = async (context, env) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);

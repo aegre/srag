@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 
-export const POST: APIRoute = async (context) => {
+export const POST: APIRoute = async (context, env) => {
   try {
     const db = env.DB;
     if (!db) {

@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 
 // GET - Get public settings (no authentication required)
-export const GET: APIRoute = async (context) => {
+export const GET: APIRoute = async (context, env) => {
   try {
     const db = env.DB;
     if (!db) {

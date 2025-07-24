@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
-export const POST: APIRoute = async (context) => {
+export const POST: APIRoute = async (context, env) => {
   try {
     const { username, password, rememberMe } = await context.request.json();
 

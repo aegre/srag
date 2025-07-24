@@ -30,7 +30,7 @@ async function authenticateAdmin(context: any) {
 }
 
 // GET - List all invitations
-export const GET: APIRoute = async (context) => {
+export const GET: APIRoute = async (context, env) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
@@ -104,7 +104,7 @@ export const GET: APIRoute = async (context) => {
 };
 
 // POST - Create new invitation
-export const POST: APIRoute = async (context) => {
+export const POST: APIRoute = async (context, env) => {
   try {
     // Authenticate admin
     const user = await authenticateAdmin(context);
