@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 // GET - Get public settings (no authentication required)
 export const GET: APIRoute = async (context) => {
   try {
-    const db = (context as any).env?.DB;
+    const db = env.DB;
     if (!db) {
       throw new Error('Database not available');
     }

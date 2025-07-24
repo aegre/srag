@@ -19,7 +19,7 @@ async function authenticateAdmin(context: any) {
   }
 
   const token = authHeader.substring(7);
-  const secret = (context as any).env?.JWT_SECRET || 'your-secret-key-change-in-production';
+  const secret = env.JWT_SECRET || 'your-secret-key-change-in-production';
 
   const payload = await verifyToken(token, secret);
   if (!payload) {
@@ -43,7 +43,7 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    const db = (context as any).env?.DB;
+    const db = env.DB;
     if (!db) {
       throw new Error('Base de datos no disponible');
     }
@@ -118,7 +118,7 @@ export const PUT: APIRoute = async (context) => {
       });
     }
 
-    const db = (context as any).env?.DB;
+    const db = env.DB;
     if (!db) {
       throw new Error('Base de datos no disponible');
     }
@@ -232,7 +232,7 @@ export const DELETE: APIRoute = async (context) => {
       });
     }
 
-    const db = (context as any).env?.DB;
+    const db = env.DB;
     if (!db) {
       throw new Error('Base de datos no disponible');
     }
