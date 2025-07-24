@@ -1,11 +1,11 @@
 ---
 import AdminLayout from '../../layouts/AdminLayout.astro';
-import AdminRoute from '../../components/admin/AdminRoute';
-import CreateUserForm from '../../components/admin/CreateUserForm';
+import AdminOnlyRoute from '../../components/admin/AdminOnlyRoute';
+import UserList from '../../components/admin/UserList';
 ---
 
 <AdminLayout title="Gestión de Usuarios - Julietta XV Años">
-  <AdminRoute client:load="react">
-    <CreateUserForm client:load="react" />
-  </AdminRoute>
+  <AdminOnlyRoute client:load="react">
+    <UserList client:load="react" />
+  </AdminOnlyRoute>
 </AdminLayout> 

@@ -9,6 +9,8 @@ interface UseAdminAuthReturn {
   token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
+  user: any | null;
+  isAdmin: boolean;
   logout: () => void;
   checkAuth: () => Promise<boolean>;
 }
@@ -19,12 +21,16 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<any | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const logout = () => {
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
     setToken(null);
     setIsAuthenticated(false);
+    setUser(null);
+    setIsAdmin(false);
     window.location.href = redirectTo;
   };
 
@@ -37,6 +43,8 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
       }
       setToken(null);
       setIsAuthenticated(false);
+      setUser(null);
+      setIsAdmin(false);
       setIsLoading(false);
       return false;
     }
@@ -58,6 +66,24 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
       // Token is valid
       setToken(storedToken);
       setIsAuthenticated(true);
+
+      // Get user info from localStorage
+      const userStr = localStorage.getItem('admin_user');
+      if (userStr) {
+        try {
+          const userData = JSON.parse(userStr);
+          setUser(userData);
+          setIsAdmin(userData.role === 'admin');
+        } catch (err) {
+          console.error('Error parsing user data:', err);
+          setUser(null);
+          setIsAdmin(false);
+        }
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
+
       setIsLoading(false);
       return true;
     } catch (error) {
@@ -65,6 +91,24 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
       // On network error, assume token is valid for now
       setToken(storedToken);
       setIsAuthenticated(true);
+
+      // Get user info from localStorage
+      const userStr = localStorage.getItem('admin_user');
+      if (userStr) {
+        try {
+          const userData = JSON.parse(userStr);
+          setUser(userData);
+          setIsAdmin(userData.role === 'admin');
+        } catch (err) {
+          console.error('Error parsing user data:', err);
+          setUser(null);
+          setIsAdmin(false);
+        }
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
+
       setIsLoading(false);
       return true;
     }
@@ -78,6 +122,8 @@ export const useAdminAuth = (options: UseAdminAuthOptions = {}): UseAdminAuthRet
     token,
     isLoading,
     isAuthenticated,
+    user,
+    isAdmin,
     logout,
     checkAuth
   };

@@ -1,4 +1,4 @@
-import type { APIResponse } from '../types/admin';
+import type { APIResponse, PaginatedResponse } from '../types/admin';
 
 interface ApiOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -113,4 +113,8 @@ export const adminApi = {
   // Auth
   validateToken: () => api.get<APIResponse<any>>('/api/auth/validate'),
   createUser: (data: any) => api.post<APIResponse<any>>('/api/auth/create-user', data),
+  getUsers: () => api.get<PaginatedResponse<any>>('/api/auth/users'),
+  getUser: (id: number) => api.get<APIResponse<any>>(`/api/auth/users/${id}`),
+  updateUser: (id: number, data: any) => api.put<APIResponse<any>>(`/api/auth/users/${id}`, data),
+  deleteUser: (id: number) => api.delete<APIResponse<void>>(`/api/auth/users/${id}`),
 }; 
