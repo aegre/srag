@@ -1,5 +1,16 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
+
+export interface Props {
+  settings?: any;
+}
+
+const { settings } = Astro.props;
+
+// Use settings if available, otherwise fallback to defaults
+const eventDate = settings?.event_date || '2024-09-13';
+const eventTime = settings?.event_time || '19:00';
+const eventDateTime = `${eventDate}T${eventTime}:00`;
 ---
 
 <InvitationSection id="section-countdown-timer">
@@ -65,10 +76,10 @@ import InvitationSection from '../InvitationSection.astro';
   </div>
 
   <!-- Countdown Timer JavaScript -->
-  <script>
+  <script define:vars={{ eventDateTime }}>
     function updateCountdown() {
       
-      const eventDate = new Date('2025-09-13T19:00:00').getTime();
+      const eventDate = new Date(eventDateTime).getTime();
       const now = new Date().getTime();
       const timeLeft = eventDate - now;
 

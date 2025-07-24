@@ -80,9 +80,18 @@ export const GET: APIRoute = async (context) => {
 
     const recentConfirmations = await db.prepare(`
       SELECT COUNT(*) as count 
-      FROM invitations 
-      WHERE is_confirmed = 1 
-      AND updated_at >= datetime('now', '-7 days')
+      FROM analytics 
+      WHERE event_type = 'invitation_confirmation_change' 
+      AND JSON_EXTRACT(event_data, '$.action') = 'confirm'
+      AND timestamp >= datetime('now', '-7 days')
+    `).first();
+
+    const recentUnconfirmations = await db.prepare(`
+      SELECT COUNT(*) as count 
+      FROM analytics 
+      WHERE event_type = 'invitation_confirmation_change' 
+      AND JSON_EXTRACT(event_data, '$.action') = 'unconfirm'
+      AND timestamp >= datetime('now', '-7 days')
     `).first();
 
     // Get top viewed invitations
@@ -100,6 +109,11 @@ export const GET: APIRoute = async (context) => {
       LIMIT 5
     `).all();
 
+    // Get publication status
+    const settings = await db.prepare(`
+      SELECT is_published FROM invitation_settings ORDER BY id DESC LIMIT 1
+    `).first();
+
     return new Response(JSON.stringify({
       success: true,
       data: {
@@ -111,9 +125,13 @@ export const GET: APIRoute = async (context) => {
         },
         recent: {
           views_last_7_days: recentViews?.count || 0,
-          rsvps_last_7_days: recentConfirmations?.count || 0
+          rsvps_last_7_days: recentConfirmations?.count || 0,
+          unconfirmations_last_7_days: recentUnconfirmations?.count || 0
         },
-        top_invitations: topInvitations.results || []
+        top_invitations: topInvitations.results || [],
+        settings: {
+          is_published: Boolean(settings?.is_published)
+        }
       }
     }), {
       status: 200,

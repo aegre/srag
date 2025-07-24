@@ -98,6 +98,9 @@ export interface DashboardStats {
     lastname: string;
     view_count: number;
   }>;
+  settings?: {
+    is_published: boolean;
+  };
 }
 
 // RSVP types - simplified

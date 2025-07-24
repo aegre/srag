@@ -87,6 +87,7 @@ export const adminApi = {
   // Invitations
   getInvitations: () => api.get<APIResponse<any[]>>('/api/invitations'),
   getInvitation: (id: number) => api.get<APIResponse<any>>(`/api/invitations/${id}`),
+  getAnalytics: () => api.get<APIResponse<any>>('/api/analytics/dashboard'),
   createInvitation: (data: any) => api.post<APIResponse<any>>('/api/invitations', data),
   updateInvitation: (id: number, data: any) => api.put<APIResponse<any>>(`/api/invitations/${id}`, data),
   deleteInvitation: (id: number) => api.delete<APIResponse<void>>(`/api/invitations/${id}`),

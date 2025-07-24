@@ -1,0 +1,107 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Próximamente - Julietta XV Años">
+  <main class="min-h-screen bg-primary flex items-center justify-center relative overflow-hidden">
+    <!-- Background decorative elements -->
+    <div class="absolute inset-0 max-w-6xl mx-auto pointer-events-none opacity-30">
+      <!-- Decorative clouds -->
+      <div class="absolute top-0 left-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-20" 
+           style="background-image: url('/images/cloud.webp'); transform: translate(-60%, -20%) rotate(40deg);">
+      </div>
+      
+      <div class="absolute bottom-0 right-0 w-80 h-80 md:w-[640px] md:h-[640px] bg-contain bg-no-repeat opacity-20" 
+           style="background-image: url('/images/cloud.webp'); transform: translate(60%, 30%) rotate(300deg);">
+      </div>
+      
+      <!-- Decorative flowers -->
+      <div class="absolute top-0 left-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat opacity-60" 
+           style="background-image: url('/images/flowers.webp');">
+      </div>
+      
+      <div class="absolute bottom-0 right-0 w-48 md:w-96 h-48 md:h-96 bg-contain bg-no-repeat opacity-60" 
+           style="background-image: url('/images/flowers.webp'); transform: rotate(180deg);">
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="relative z-10 text-center max-w-4xl mx-auto px-8">
+      <!-- Event title -->
+      <div class="mb-8">
+        <h1 class="font-angella text-4xl md:text-6xl lg:text-7xl text-secondary-light leading-tight mb-4">
+          Julietta
+        </h1>
+        <p class="font-hero text-xl md:text-2xl tracking-[0.2em] text-secondary-light uppercase font-medium">
+          XV Años
+        </p>
+      </div>
+
+      <!-- Coming soon message -->
+      <div class="space-y-6 mb-12">
+        <div class="space-y-4">
+          <h2 class="font-hero text-2xl md:text-3xl lg:text-4xl tracking-[0.15em] text-secondary-light font-light">
+            Próximamente
+          </h2>
+          <p class="font-hero text-base md:text-lg lg:text-xl text-secondary-light font-light leading-relaxed max-w-2xl mx-auto">
+            Las invitaciones estarán disponibles muy pronto. 
+            <br class="hidden sm:block" />
+            ¡Gracias por tu paciencia!
+          </p>
+        </div>
+      </div>
+
+      <!-- Decorative separator -->
+      <div class="flex justify-center items-center space-x-4 mb-12">
+        <hr class="w-16 h-px bg-gradient-to-r from-transparent via-secondary-light/40 to-transparent border-0" aria-hidden="true" />
+        <div class="w-3 h-3 bg-secondary-light rounded-full"></div>
+        <hr class="w-16 h-px bg-gradient-to-r from-transparent via-secondary-light/40 to-transparent border-0" aria-hidden="true" />
+      </div>
+
+      <!-- Additional message -->
+      <div class="space-y-4">
+        <p class="font-hero text-sm md:text-base text-secondary-light/80 font-light">
+          Estamos preparando algo muy especial para ti
+        </p>
+        <div class="flex justify-center">
+          <div class="animate-pulse">
+            <svg class="w-8 h-8 text-secondary-light/60" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Border decoration -->
+    <div class="absolute inset-8 border border-secondary-light/30 pointer-events-none rounded-lg"></div>
+  </main>
+</Layout>
+
+<style>
+  /* Ensure full height */
+  main {
+    min-height: 100vh;
+  }
+
+  /* Smooth animations */
+  .animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .space-y-6 {
+      margin-bottom: 2rem;
+    }
+  }
+</style> 
