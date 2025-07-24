@@ -736,7 +736,7 @@ const AnalyticsTab: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white shadow rounded-lg p-6">
           <div className="flex items-center">
             <div className="flex-shrink-0">
@@ -785,6 +785,22 @@ const AnalyticsTab: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Eventos RSVP</p>
+              <p className="text-2xl font-semibold text-gray-900">{analytics.recentRsvpEvents?.length || 0}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Top Invitations and Recent Activity */}
@@ -824,13 +840,13 @@ const AnalyticsTab: React.FC = () => {
           <h3 className="text-lg font-medium text-gray-900 mb-4">Actividad Reciente</h3>
           <div className="space-y-3">
             {/* Combine views and confirmations */}
-            {[...(analytics.recentViews || []), ...(analytics.confirmationEvents || [])]
+            {[...(analytics.recentViews || []), ...(analytics.recentRsvpEvents || [])]
               .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
               .slice(0, 10)
               .map((activity: any, index: number) => {
-                const isConfirmation = activity.action;
-                const isConfirm = activity.action === 'confirm';
-                const isUnconfirm = activity.action === 'unconfirm';
+                const isConfirmation = activity.event_type && activity.event_type.startsWith('rsvp_');
+                const isConfirm = activity.event_data && JSON.parse(activity.event_data).action === 'confirm';
+                const isUnconfirm = activity.event_data && JSON.parse(activity.event_data).action === 'unconfirm';
                 
                 return (
                   <div key={`${activity.id}-${index}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -857,20 +873,26 @@ const AnalyticsTab: React.FC = () => {
                           </svg>
                         )}
                       </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-900">
-                          {isConfirmation ? (
-                            <span>
-                              {isConfirm ? '✅ Confirmó' : '❌ Canceló'} /{activity.slug}
-                            </span>
-                          ) : (
-                            <span>
-                              {activity.name} {activity.lastname}
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs text-gray-500">{formatDate(activity.timestamp)}</p>
-                      </div>
+                                              <div className="ml-3">
+                          <p className="text-sm font-medium text-gray-900">
+                            {isConfirmation ? (
+                              <span>
+                                {isConfirm ? '✅ Confirmó' : '❌ Canceló'} /{activity.slug}
+                                <span className="text-xs text-gray-400 ml-2">
+                                  {activity.event_type === 'rsvp_button_click' && '(Click)'}
+                                  {activity.event_type === 'rsvp_action_success' && '(Éxito)'}
+                                  {activity.event_type === 'rsvp_action_error' && '(Error)'}
+                                  {activity.event_type === 'rsvp_action_exception' && '(Excepción)'}
+                                </span>
+                              </span>
+                            ) : (
+                              <span>
+                                {activity.name} {activity.lastname}
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-gray-500">{formatDate(activity.timestamp)}</p>
+                        </div>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-gray-500">
