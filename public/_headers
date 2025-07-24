@@ -16,4 +16,34 @@
 
 /audio/*
   Cache-Control: public, max-age=31536000
-  X-Robots-Tag: noindex 
+  X-Robots-Tag: noindex
+
+# Admin pages - strict no-indexing
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# Public invitation pages - no indexing
+/invite/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+
+# Coming soon and 404 pages - no indexing
+/coming-soon
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+
+/404
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer 
