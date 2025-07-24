@@ -13,12 +13,12 @@ const filter = Astro.url.searchParams.get('filter') || '';
 ---
 
 <AdminLayout title="Editar Invitación - Panel de Administración">
-  <AdminRoute client:only="react">
+  <AdminRoute client:load="react">
     <InvitationForm
       mode="edit"
       invitationId={id}
       searchParams={{ search, filter }}
-      client:only="react"
+      client:load="react"
     />
   </AdminRoute>
 </AdminLayout>

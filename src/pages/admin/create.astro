@@ -5,7 +5,7 @@ import AdminRoute from '../../components/admin/AdminRoute';
 ---
 
 <AdminLayout title="Create Invitation - Admin Dashboard">
-  <AdminRoute client:only="react">
-    <InvitationForm client:only="react" />
+  <AdminRoute client:load="react">
+    <InvitationForm client:load="react" />
   </AdminRoute>
 </AdminLayout> 

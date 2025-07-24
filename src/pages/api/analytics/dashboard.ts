@@ -75,7 +75,7 @@ export const GET: APIRoute = async (context) => {
           COUNT(a.id) as view_count
         FROM invitations i
         LEFT JOIN analytics a ON i.id = a.invitation_id AND a.event_type = "view"
-        WHERE i.is_active = 1
+        WHERE i.is_active = 1 AND view_count > 0
         GROUP BY i.id, i.name, i.lastname, i.slug
         ORDER BY view_count DESC
         LIMIT 10
