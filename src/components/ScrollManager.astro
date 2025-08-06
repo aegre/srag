@@ -45,29 +45,6 @@ const { sectionIds } = Astro.props;
 
 <script define:vars={{ sectionIds }}>
   document.addEventListener('DOMContentLoaded', function() {
-    // Safari mobile detection and auto-scroll for main window
-    const isSafariMobile = /iPad|iPhone|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/CriOS|FxiOS|OPiOS|mercury/.test(navigator.userAgent);
-    
-    if (isSafariMobile) {
-      // Wait for page to fully load, then scroll down 80% of the main window
-      setTimeout(() => {
-        const documentHeight = Math.max(
-          document.body.scrollHeight,
-          document.body.offsetHeight,
-          document.documentElement.clientHeight,
-          document.documentElement.scrollHeight,
-          document.documentElement.offsetHeight
-        );
-        const windowHeight = window.innerHeight;
-        const maxScroll = documentHeight - windowHeight;
-        const targetScroll = Math.min(maxScroll * 0.80, maxScroll);
-        
-        window.scrollTo({
-          top: targetScroll,
-          behavior: 'smooth'
-        });
-      }, 500); // Longer delay to ensure everything is loaded
-    }
     
     const scrollContainer = document.getElementById('scroll-container');
     const totalSections = sectionIds.length;
