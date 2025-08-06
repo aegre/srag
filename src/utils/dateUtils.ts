@@ -129,4 +129,53 @@ export function getEventDateTime(dateString: string, timeString: string): string
     console.error('Error creating event datetime:', error);
     return '';
   }
-} 
+}
+
+/**
+ * Formats a UTC timestamp to local timezone with consistent formatting
+ * @param dateString - UTC timestamp string from database
+ * @param options - Optional formatting options
+ * @returns Formatted date string in local timezone
+ */
+export const formatLocalDate = (
+  dateString: string,
+  options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }
+): string => {
+  // Ensure the date is treated as UTC and converted to local time
+  const date = new Date(dateString + 'Z'); // Add 'Z' to indicate UTC
+  return date.toLocaleDateString(undefined, options);
+};
+
+/**
+ * Formats a UTC timestamp to local timezone with short format (date only)
+ * @param dateString - UTC timestamp string from database
+ * @returns Formatted date string in local timezone
+ */
+export const formatLocalDateShort = (dateString: string): string => {
+  return formatLocalDate(dateString, {
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+/**
+ * Formats a UTC timestamp to local timezone with full format (including seconds)
+ * @param dateString - UTC timestamp string from database
+ * @returns Formatted date string in local timezone
+ */
+export const formatLocalDateFull = (dateString: string): string => {
+  return formatLocalDate(dateString, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}; 

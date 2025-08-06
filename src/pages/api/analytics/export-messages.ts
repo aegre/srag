@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { formatLocalDateFull } from '../../../utils/dateUtils';
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -61,7 +62,8 @@ export const GET: APIRoute = async (context) => {
         const guestName = eventData.guest_name || 'Anónimo';
         const messageText = eventData.message || '';
         const invitationSlug = message.invitation_slug || 'N/A';
-        const createdAt = new Date(message.timestamp).toLocaleString('es-ES');
+        // Convert UTC timestamp to local timezone
+        const createdAt = formatLocalDateFull(message.timestamp);
 
         // Escape CSV values (handle commas and quotes)
         const escapeCsvValue = (value: string) => {

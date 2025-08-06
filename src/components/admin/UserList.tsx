@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { adminApi, ApiError } from '../../utils/api';
 import { useToast, ToastProvider } from '../ui/Toast';
 import type { PaginatedResponse } from '../../types/admin';
+import { formatLocalDate } from '../../utils/dateUtils';
 
 interface User {
   id: number;
@@ -145,15 +146,7 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+  const formatDate = formatLocalDate;
 
   const getRoleLabel = (role: string) => {
     return role === 'admin' ? 'Administrador' : 'Editor';

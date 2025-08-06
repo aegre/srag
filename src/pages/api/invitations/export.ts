@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { formatLocalDateFull } from '../../../utils/dateUtils';
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -48,8 +49,8 @@ export const GET: APIRoute = async (context) => {
       invitation.number_of_passes,
       invitation.status_es,
       invitation.view_count,
-      invitation.created_at,
-      invitation.updated_at
+      formatLocalDateFull(invitation.created_at),
+      formatLocalDateFull(invitation.updated_at)
     ]);
 
     // Combine headers and rows

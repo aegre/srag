@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../../utils/api';
+import { formatLocalDate, formatLocalDateShort } from '../../utils/dateUtils';
 
 const AnalyticsTab: React.FC = () => {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -58,22 +59,8 @@ const AnalyticsTab: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const formatShortDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const formatDate = formatLocalDate;
+  const formatShortDate = formatLocalDateShort;
 
   if (loading) {
     return (
