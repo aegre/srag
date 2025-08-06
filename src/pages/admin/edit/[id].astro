@@ -31,7 +31,7 @@ const filter = Astro.url.searchParams.get('filter') || '';
     
     window.handleDeleteInvitation = async (invitationId) => {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem('admin_token');
         if (!token) {
           alert('No autorizado');
           return;
