@@ -10,8 +10,8 @@ export interface Props {
 const { settings, invitation } = Astro.props;
 
 // Use settings if available, otherwise fallback to defaults
-const confirmationPhone = settings?.rsvp_phone || "+525555555555";
-const whatsappNumber = settings?.rsvp_whatsapp || confirmationPhone;
+const confirmationPhone = settings?.rsvp_phone || "";
+const whatsappNumber = settings?.rsvp_whatsapp || "";
 const rawDeadline = settings?.rsvp_deadline || "2025-09-01";
 const deadline = formatDateInSpanish(rawDeadline);
 const rsvpEnabled = settings?.rsvp_enabled === 1 || settings?.rsvp_enabled === true;
