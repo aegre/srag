@@ -110,6 +110,19 @@ export const adminApi = {
     });
   },
 
+  exportMessages: () => {
+    const token = localStorage.getItem('admin_token');
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return fetch('/api/analytics/export-messages', {
+      method: 'GET',
+      headers
+    });
+  },
+
   // Auth
   validateToken: () => api.get<APIResponse<any>>('/api/auth/validate'),
   createUser: (data: any) => api.post<APIResponse<any>>('/api/auth/create-user', data),

@@ -5,6 +5,7 @@ const AnalyticsTab: React.FC = () => {
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     loadAnalytics();
@@ -21,6 +22,39 @@ const AnalyticsTab: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Error al cargar las analíticas');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleExportMessages = async () => {
+    if (exporting) return;
+    
+    setExporting(true);
+    try {
+      const response = await adminApi.exportMessages();
+      
+      if (!response.ok) {
+        throw new Error('Error al exportar los mensajes');
+      }
+
+      // Create a blob from the response and download it
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mensajes_julietta_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      // Show success message (you might want to add a toast system here)
+      console.log('Mensajes exportados exitosamente');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error al exportar los mensajes';
+      console.error('Error exporting messages:', errorMessage);
+      // You might want to show an error toast here
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -143,6 +177,22 @@ const AnalyticsTab: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-500">Eventos RSVP</p>
               <p className="text-2xl font-semibold text-gray-900">{analytics.recentRsvpEvents?.length || 0}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <div className="w-8 h-8 bg-pink-100 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">Mensajes Recibidos</p>
+              <p className="text-2xl font-semibold text-gray-900">{analytics.messages?.length || 0}</p>
             </div>
           </div>
         </div>
@@ -339,6 +389,74 @@ const AnalyticsTab: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Messages Section */}
+      {analytics.messages && analytics.messages.length > 0 && (
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Mensajes para Julietta</h3>
+            <button
+              onClick={handleExportMessages}
+              disabled={exporting}
+              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {exporting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Descargando...
+                </>
+              ) : (
+                <>
+                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Descargar CSV
+                </>
+              )}
+            </button>
+          </div>
+          <div className="space-y-4">
+            {analytics.messages.map((message: any, index: number) => {
+              const messageData = message.event_data ? JSON.parse(message.event_data) : {};
+              return (
+                <div key={`${message.id}-${index}`} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                          <svg className="w-4 h-4 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {messageData.guest_name || 'Anónimo'}
+                          </p>
+                          <p className="text-xs text-gray-500">{formatDate(message.timestamp)}</p>
+                        </div>
+                      </div>
+                      <div className="ml-10">
+                        <p className="text-sm text-gray-700 leading-relaxed">
+                          {messageData.message || 'Mensaje no disponible'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right text-xs text-gray-400 ml-4">
+                      <p>IP: {message.ip_address}</p>
+                      <p className="mt-1">
+                        {message.user_agent ? message.user_agent.substring(0, 30) + '...' : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

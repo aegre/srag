@@ -1,0 +1,165 @@
+---
+import InvitationSection from '../InvitationSection.astro';
+
+export interface Props {
+  settings?: any;
+  invitation?: any;
+}
+
+const { settings, invitation } = Astro.props;
+const invitationSlug = invitation?.slug;
+const invitationId = invitation?.id;
+---
+
+<InvitationSection id="section-message-to-quinceanera">
+  <div class="relative z-10 space-y-8 text-center">
+    
+    <!-- Header -->
+    <header class="m-1 mb-8">
+      <h2 class="font-hero text-2xl md:text-3xl tracking-[0.2em] text-secondary-light font-light">
+        Mensaje para Julietta
+      </h2>
+      <p class="font-hero text-sm md:text-base text-secondary-light/80 font-light mt-4">
+        Comparte tus mejores deseos y recuerdos
+      </p>
+    </header>
+
+    <!-- Message Form -->
+    <div class="max-w-md mx-auto space-y-6">
+      <!-- Guest Name -->
+      <div class="space-y-2">
+        <label for="guest-name" class="block font-hero text-sm md:text-base text-secondary-light font-light text-left">
+          Tu nombre
+        </label>
+        <input 
+          type="text" 
+          id="guest-name" 
+          name="guest-name"
+          class="w-full px-4 py-3 bg-white/10 border border-secondary-light/30 rounded-lg text-secondary-light placeholder-secondary-light/50 font-hero text-sm md:text-base focus:outline-none focus:border-secondary-light transition-colors"
+          placeholder="Escribe tu nombre completo"
+        />
+      </div>
+
+      <!-- Message -->
+      <div class="space-y-2">
+        <label for="guest-message" class="block font-hero text-sm md:text-base text-secondary-light font-light text-left">
+          Tu mensaje
+        </label>
+        <textarea 
+          id="guest-message" 
+          name="guest-message"
+          rows="4"
+          class="w-full px-4 py-3 bg-white/10 border border-secondary-light/30 rounded-lg text-secondary-light placeholder-secondary-light/50 font-hero text-sm md:text-base focus:outline-none focus:border-secondary-light transition-colors resize-none"
+          placeholder="Escribe tu mensaje especial para Julietta..."
+        ></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <button 
+        type="button"
+        id="submit-message"
+        class="w-full px-6 py-3 bg-secondary-light/20 border border-secondary-light/40 rounded-lg text-secondary-light font-hero text-sm md:text-base font-light hover:bg-secondary-light/30 hover:border-secondary-light/60 transition-all duration-300 transform hover:scale-105"
+      >
+        Enviar Mensaje
+      </button>
+
+      <!-- Success Message (hidden by default) -->
+      <div 
+        id="success-message" 
+        class="hidden px-4 py-3 bg-green-500/20 border border-green-400/40 rounded-lg text-green-400 font-hero text-sm md:text-base font-light"
+      >
+        ¡Mensaje enviado con éxito! Gracias por tus hermosas palabras.
+      </div>
+    </div>
+
+    <!-- Decorative Elements -->
+    <div class="absolute top-0 left-1/4 w-16 h-16 bg-contain bg-no-repeat opacity-30" 
+         style="background-image: url('/images/ornament.webp'); transform: rotate(45deg);">
+    </div>
+    
+    <div class="absolute bottom-0 right-1/4 w-16 h-16 bg-contain bg-no-repeat opacity-30" 
+         style="background-image: url('/images/ornament.webp'); transform: rotate(-45deg);">
+    </div>
+
+  </div>
+</InvitationSection>
+
+<script define:vars={{ invitationId, invitationSlug }}>
+  // Handle message submission
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired');
+    
+    const submitButton = document.getElementById('submit-message');
+    const successMessage = document.getElementById('success-message');
+    const guestNameInput = document.getElementById('guest-name');
+    const guestMessageInput = document.getElementById('guest-message');
+    
+    console.log('Elements found:', {
+      submitButton: !!submitButton,
+      successMessage: !!successMessage,
+      guestNameInput: !!guestNameInput,
+      guestMessageInput: !!guestMessageInput
+    });
+    
+    console.log('Invitation data:', { invitationId, invitationSlug });
+
+    if (submitButton && successMessage && guestNameInput && guestMessageInput) {
+      console.log('Adding click listener to button');
+      submitButton.addEventListener('click', async function() {
+        console.log('Button clicked!');
+        
+        const guestName = guestNameInput.value.trim();
+        const guestMessage = guestMessageInput.value.trim();
+
+        if (!guestName || !guestMessage) {
+          alert('Por favor completa todos los campos');
+          return;
+        }
+
+        // Send analytics event for the message
+        try {
+          await fetch('/api/analytics', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              event_type: 'message',
+              invitation_id: invitationId,
+              slug: invitationSlug,
+              event_data: {
+                guest_name: guestName,
+                message: guestMessage,
+                timestamp: new Date().toISOString()
+              },
+              user_agent: navigator.userAgent
+            })
+          });
+        } catch (error) {
+          console.log('Analytics tracking failed:', error);
+        }
+
+        // Show success message
+        successMessage.classList.remove('hidden');
+        
+        // Clear form
+        guestNameInput.value = '';
+        guestMessageInput.value = '';
+        
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          successMessage.classList.add('hidden');
+        }, 5000);
+
+        // Disable button temporarily
+        submitButton.disabled = true;
+        submitButton.textContent = 'Enviando...';
+        
+        setTimeout(() => {
+          submitButton.disabled = false;
+          submitButton.textContent = 'Enviar Mensaje';
+        }, 2000);
+      });
+    }
+  });
+</script> 

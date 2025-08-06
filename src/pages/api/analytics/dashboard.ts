@@ -22,7 +22,8 @@ export const GET: APIRoute = async (context) => {
       topInvitations,
       viewsByDay,
       confirmationEvents,
-      recentConfirmations
+      recentConfirmations,
+      messages
     ] = await Promise.all([
       // Total views
       db.prepare('SELECT COUNT(*) as count FROM analytics WHERE event_type = "view"').first(),
@@ -117,6 +118,17 @@ export const GET: APIRoute = async (context) => {
         AND ae.timestamp >= datetime('now', '-7 days')
         GROUP BY DATE(ae.timestamp), JSON_EXTRACT(ae.event_data, '$.action')
         ORDER BY date DESC
+      `).all(),
+
+      // Messages for Julietta
+      db.prepare(`
+        SELECT 
+          a.id, a.timestamp, a.ip_address, a.user_agent,
+          a.event_data
+        FROM analytics a
+        WHERE a.event_type = "message"
+        ORDER BY a.timestamp DESC
+        LIMIT 50
       `).all()
     ]);
 
@@ -131,7 +143,8 @@ export const GET: APIRoute = async (context) => {
         topInvitations: topInvitations?.results || [],
         viewsByDay: viewsByDay?.results || [],
         confirmationEvents: confirmationEvents?.results || [],
-        recentConfirmations: recentConfirmations?.results || []
+        recentConfirmations: recentConfirmations?.results || [],
+        messages: messages?.results || []
       }
     }), {
       status: 200,

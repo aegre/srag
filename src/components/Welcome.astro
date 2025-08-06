@@ -11,6 +11,7 @@ import DetailsRSVP from './sections/DetailsRSVP.astro';
 import ThankYou from './sections/ThankYou.astro';
 import ImportantInformation from './sections/ImportantInformation.astro';
 import GiftTable from './sections/GiftTable.astro';
+import MessageToQuinceanera from './sections/MessageToQuinceanera.astro';
 import FinalMessage from './sections/FinalMessage.astro';
 import MusicController from './MusicController.astro';
 import EntryScreen from './EntryScreen.astro';
@@ -38,6 +39,7 @@ const sections = [
   { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
   { id: 'section-important-information', component: ImportantInformation, enabled: true },
   { id: 'section-gift-table', component: GiftTable, enabled: true },
+  { id: 'section-message-to-quinceanera', component: MessageToQuinceanera, enabled: true },
   { id: 'section-final-message', component: FinalMessage, enabled: true },
 ];
 
@@ -113,6 +115,7 @@ const sectionIds = enabledSections.map(section => section.id);
       <DetailsRSVP settings={settings} invitation={invitation} />
       <ImportantInformation />
       <GiftTable />
+      <MessageToQuinceanera settings={settings} invitation={invitation} />
       <FinalMessage />
     </div>
 
