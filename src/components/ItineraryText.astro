@@ -1,0 +1,22 @@
+---
+interface Props {
+  title: string;
+  time: string;
+  position: 'left' | 'right';
+}
+
+const { title, time, position } = Astro.props;
+
+const containerClasses = position === 'left' 
+  ? 'w-1/2 pr-8 text-right' 
+  : 'w-1/2 pl-8 text-left';
+---
+
+<div class={containerClasses}>
+  <h3 class="font-hero text-xs md:text-base text-secondary-light font-light">
+    {title}
+  </h3>
+  <p class="font-hero text-xs md:text-base text-secondary-light/80 font-light">
+    {time}
+  </p>
+</div> 
