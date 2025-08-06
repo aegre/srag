@@ -15,20 +15,15 @@ export const GET: APIRoute = async (context) => {
         i.number_of_passes,
         i.is_confirmed,
         i.is_active,
-        i.view_count,
+        count(a.invitation_id) as view_count,
         i.created_at,
         i.updated_at,
         CASE 
           WHEN i.is_confirmed = 1 THEN 'Confirmada'
           WHEN i.is_active = 1 THEN 'Pendiente'
           ELSE 'Inactiva'
-        END as status_es,
-        CASE 
-          WHEN i.is_confirmed = 1 THEN 'Confirmed'
-          WHEN i.is_active = 1 THEN 'Pending'
-          ELSE 'Inactive'
-        END as status_en
-      FROM invitations i
+        END as status_es
+      FROM invitations i JOIN analytics a on i.id = a.invitation_id and a.event_type = 'view'
       ORDER BY i.created_at DESC
     `).all();
 
@@ -40,7 +35,6 @@ export const GET: APIRoute = async (context) => {
       'Slug',
       'Número de Pases',
       'Estado',
-      'Estado (EN)',
       'Vistas',
       'Fecha de Creación',
       'Última Actualización'
@@ -53,7 +47,6 @@ export const GET: APIRoute = async (context) => {
       invitation.slug,
       invitation.number_of_passes,
       invitation.status_es,
-      invitation.status_en,
       invitation.view_count,
       invitation.created_at,
       invitation.updated_at
