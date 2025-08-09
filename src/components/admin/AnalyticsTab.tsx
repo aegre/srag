@@ -1,6 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../../utils/api';
 import { formatLocalDate, formatLocalDateShort } from '../../utils/dateUtils';
+import { Line, Bar, Doughnut } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Tooltip,
+  Legend
+);
 
 const AnalyticsTab: React.FC = () => {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -61,6 +84,104 @@ const AnalyticsTab: React.FC = () => {
 
   const formatDate = formatLocalDate;
   const formatShortDate = formatLocalDateShort;
+
+  // Prepare chart data
+  const baseChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top' as const },
+    },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true },
+    },
+  };
+
+  const viewsLineData = (() => {
+    const byDay = (analytics?.viewsByDay || []).slice().reverse();
+    const labels = byDay.map((d: any) => formatShortDate(d.date));
+    const data = byDay.map((d: any) => d.count);
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Vistas',
+          data,
+          borderColor: 'rgb(147, 51, 234)',
+          backgroundColor: 'rgba(147, 51, 234, 0.2)',
+          tension: 0.3,
+          fill: true,
+        },
+      ],
+    };
+  })();
+
+  const confirmationsBarData = (() => {
+    const last7 = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      const dateStr = d.toISOString().split('T')[0];
+      return { dateStr, label: formatShortDate(dateStr) };
+    });
+    const rows: Array<{ date: string; action: string; count: number }> = analytics?.recentConfirmations || [];
+    const cleanAction = (a: string) => (a || '').replaceAll('"', '');
+    const confirmCounts = last7.map(({ dateStr }) =>
+      rows
+        .filter((r) => r.date === dateStr && cleanAction(r.action) === 'confirm')
+        .reduce((sum, r) => sum + Number(r.count || 0), 0)
+    );
+    const unconfirmCounts = last7.map(({ dateStr }) =>
+      rows
+        .filter((r) => r.date === dateStr && cleanAction(r.action) === 'unconfirm')
+        .reduce((sum, r) => sum + Number(r.count || 0), 0)
+    );
+    return {
+      labels: last7.map((d) => d.label),
+      datasets: [
+        {
+          label: 'Confirmaciones',
+          data: confirmCounts,
+          backgroundColor: 'rgba(34, 197, 94, 0.6)', // green-500
+          borderColor: 'rgb(34, 197, 94)',
+          borderWidth: 1,
+        },
+        {
+          label: 'Cancelaciones',
+          data: unconfirmCounts,
+          backgroundColor: 'rgba(239, 68, 68, 0.6)', // red-500
+          borderColor: 'rgb(239, 68, 68)',
+          borderWidth: 1,
+        },
+      ],
+    };
+  })();
+
+  const topInvitationsDoughnut = (() => {
+    const items = (analytics?.topInvitations || []).slice(0, 6);
+    const labels = items.map((inv: any) => `${inv.name} ${inv.lastname}`);
+    const data = items.map((inv: any) => Number(inv.view_count || 0));
+    const palette = [
+      'rgba(147, 51, 234, 0.7)', // purple-600
+      'rgba(59, 130, 246, 0.7)', // blue-500
+      'rgba(34, 197, 94, 0.7)',  // green-500
+      'rgba(234, 179, 8, 0.7)',  // yellow-500
+      'rgba(249, 115, 22, 0.7)', // orange-500
+      'rgba(236, 72, 153, 0.7)', // pink-500
+    ];
+    return {
+      labels,
+      datasets: [
+        {
+          label: 'Vistas',
+          data,
+          backgroundColor: palette.slice(0, data.length),
+          borderColor: 'white',
+          borderWidth: 2,
+        },
+      ],
+    };
+  })();
 
   if (loading) {
     return (
@@ -312,66 +433,41 @@ const AnalyticsTab: React.FC = () => {
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Views by Day Chart */}
+        {/* Vistas por día - Línea */}
         {analytics.viewsByDay.length > 0 && (
           <div className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Vistas por Día (Últimos 7 días)</h3>
-            <div className="grid grid-cols-7 gap-2">
-              {analytics.viewsByDay.map((day: any) => (
-                <div key={day.date} className="text-center">
-                  <div className="bg-purple-100 rounded-lg p-2 mb-1">
-                    <p className="text-lg font-semibold text-purple-600">{day.count}</p>
-                  </div>
-                  <p className="text-xs text-gray-500">{formatShortDate(day.date)}</p>
-                </div>
-              ))}
+            <div className="h-64">
+              <Line data={viewsLineData} options={baseChartOptions} />
             </div>
           </div>
         )}
 
-        {/* Confirmations by Day Chart */}
+        {/* Confirmaciones - Barras apiladas */}
         {analytics.recentConfirmations.length > 0 && (
           <div className="bg-white shadow rounded-lg p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Confirmaciones por Día (Últimos 7 días)</h3>
-            <div className="grid grid-cols-7 gap-2">
-              {Array.from({ length: 7 }, (_, i) => {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                
-                const confirmations = analytics.recentConfirmations.filter((c: any) => 
-                  c.date === dateStr && c.action === 'confirm'
-                );
-                const unconfirmations = analytics.recentConfirmations.filter((c: any) => 
-                  c.date === dateStr && c.action === 'unconfirm'
-                );
-                
-                const confirmCount = confirmations.reduce((sum: number, c: any) => sum + c.count, 0);
-                const unconfirmCount = unconfirmations.reduce((sum: number, c: any) => sum + c.count, 0);
-                
-                return (
-                  <div key={dateStr} className="text-center">
-                    <div className="space-y-1">
-                      {confirmCount > 0 && (
-                        <div className="bg-green-100 rounded p-1">
-                          <p className="text-sm font-semibold text-green-600">+{confirmCount}</p>
-                        </div>
-                      )}
-                      {unconfirmCount > 0 && (
-                        <div className="bg-red-100 rounded p-1">
-                          <p className="text-sm font-semibold text-red-600">-{unconfirmCount}</p>
-                        </div>
-                      )}
-                      {(confirmCount === 0 && unconfirmCount === 0) && (
-                        <div className="bg-gray-100 rounded p-1">
-                          <p className="text-sm font-semibold text-gray-400">0</p>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{formatShortDate(dateStr)}</p>
-                  </div>
-                );
-              }).reverse()}
+            <div className="h-64">
+              <Bar
+                data={confirmationsBarData}
+                options={{
+                  ...baseChartOptions,
+                  scales: {
+                    x: { stacked: true, grid: { display: false } },
+                    y: { stacked: true, beginAtZero: true },
+                  },
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Top invitaciones - Dona */}
+        {analytics.topInvitations.length > 0 && (
+          <div className="bg-white shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Top Invitaciones por Vistas</h3>
+            <div className="h-64">
+              <Doughnut data={topInvitationsDoughnut} options={baseChartOptions} />
             </div>
           </div>
         )}
