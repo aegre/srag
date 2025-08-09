@@ -29,7 +29,7 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    // Get all message events from analytics
+    // Get all non-hidden message events from analytics
     const messages = await db.prepare(`
       SELECT 
         a.event_data,
@@ -37,16 +37,20 @@ export const GET: APIRoute = async (context) => {
         i.slug as invitation_slug
       FROM analytics a
       LEFT JOIN invitations i ON a.invitation_id = i.id
-      WHERE a.event_type = 'message'
+      LEFT JOIN message_visibility mv ON mv.analytics_id = a.id
+      WHERE a.event_type = 'message' AND mv.analytics_id IS NULL
       ORDER BY a.timestamp DESC
     `).all();
 
     if (!messages.results || messages.results.length === 0) {
-      return new Response(JSON.stringify({
-        error: 'No hay mensajes para exportar'
-      }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
+      const header = ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Fecha'];
+      const csvContent = header.join(',') + '\n';
+      return new Response(csvContent, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/csv; charset=utf-8',
+          'Content-Disposition': `attachment; filename="mensajes_julietta_${new Date().toISOString().split('T')[0]}.csv"`
+        }
       });
     }
 

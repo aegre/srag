@@ -30,6 +30,8 @@ const AnalyticsTab: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [hiddenMessageIds, setHiddenMessageIds] = useState<number[]>([]);
+  const [activeMessagesTab, setActiveMessagesTab] = useState<'visible' | 'hidden'>('visible');
 
   useEffect(() => {
     loadAnalytics();
@@ -46,6 +48,46 @@ const AnalyticsTab: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Error al cargar las analíticas');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Initialize hidden ids from server data when analytics is loaded
+  useEffect(() => {
+    if (analytics && Array.isArray(analytics.messages)) {
+      const serverHidden = analytics.messages
+        .filter((m: any) => m.is_hidden === 1 || m.is_hidden === true)
+        .map((m: any) => m.id);
+      setHiddenMessageIds(serverHidden);
+    }
+  }, [analytics]);
+
+  const hideMessage = async (id: number) => {
+    try {
+      await adminApi.hideMessage(id);
+      setHiddenMessageIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+    } catch (e) {
+      console.error('Error hiding message', e);
+    }
+  };
+
+  const unhideMessage = async (id: number) => {
+    try {
+      await adminApi.unhideMessage(id);
+      setHiddenMessageIds((prev) => prev.filter((hid) => hid !== id));
+    } catch (e) {
+      console.error('Error unhiding message', e);
+    }
+  };
+
+  const unhideAllMessages = async () => {
+    try {
+      // Perform sequentially to keep API simple; small list sizes expected
+      for (const id of hiddenMessageIds) {
+        await adminApi.unhideMessage(id);
+      }
+      setHiddenMessageIds([]);
+    } catch (e) {
+      console.error('Error restoring all messages', e);
     }
   };
 
@@ -220,6 +262,11 @@ const AnalyticsTab: React.FC = () => {
     );
   }
 
+  // Derived message lists
+  const allMessages: any[] = analytics?.messages || [];
+  const visibleMessages = allMessages.filter((m: any) => !hiddenMessageIds.includes(m.id));
+  const hiddenMessages = allMessages.filter((m: any) => hiddenMessageIds.includes(m.id));
+
   return (
     <div className="space-y-6">
       {/* Overview Cards */}
@@ -352,15 +399,20 @@ const AnalyticsTab: React.FC = () => {
                 const isUnconfirm = activity.event_data && JSON.parse(activity.event_data).action === 'unconfirm';
                 
                 return (
-                  <div key={`${activity.id}-${index}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={`${activity.id}-${index}`}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
                         isConfirmation 
                           ? isConfirm 
                             ? 'bg-green-100' 
                             : 'bg-red-100'
                           : 'bg-blue-100'
-                      }`}>
+                        }`}
+                      >
                         {isConfirmation ? (
                           <svg className={`w-4 h-4 ${isConfirm ? 'text-green-600' : 'text-red-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isConfirm ? (
@@ -412,14 +464,7 @@ const AnalyticsTab: React.FC = () => {
                         <p className="text-xs text-gray-500">{formatDate(activity.timestamp)}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-xs text-gray-500">
-                        IP: {activity.ip_address}
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        {activity.user_agent ? activity.user_agent.substring(0, 30) + '...' : 'N/A'}
-                      </p>
-                    </div>
+                    {/* IP and User-Agent intentionally omitted for cleaner UI */}
                   </div>
                 );
               })}
@@ -476,37 +521,84 @@ const AnalyticsTab: React.FC = () => {
       {/* Messages Section */}
       {analytics.messages && analytics.messages.length > 0 && (
         <div className="bg-white shadow rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">Mensajes para Julietta</h3>
-            <button
-              onClick={handleExportMessages}
-              disabled={exporting}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {exporting ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Descargando...
-                </>
-              ) : (
-                <>
-                  <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Descargar CSV
-                </>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <h3 className="text-lg font-medium text-gray-900">Mensajes para Julietta</h3>
+              <div className="inline-flex rounded-md border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setActiveMessagesTab('visible')}
+                  className={`px-3 py-1.5 text-xs font-medium ${
+                    activeMessagesTab === 'visible'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Visibles ({visibleMessages.length})
+                </button>
+                <button
+                  onClick={() => setActiveMessagesTab('hidden')}
+                  className={`px-3 py-1.5 text-xs font-medium border-l border-gray-200 ${
+                    activeMessagesTab === 'hidden'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Ocultos ({hiddenMessages.length})
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {activeMessagesTab === 'hidden' && (
+                <button
+                  onClick={unhideAllMessages}
+                  disabled={hiddenMessages.length === 0}
+                  className={`inline-flex items-center px-3 py-2 text-xs font-medium rounded-md ${
+                    hiddenMessages.length === 0
+                      ? 'bg-gray-300 text-white cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                  }`}
+                >
+                  Restaurar todos
+                </button>
               )}
-            </button>
+              {activeMessagesTab === 'visible' && (
+                <button
+                  onClick={handleExportMessages}
+                  disabled={exporting}
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {exporting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Descargando...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Descargar CSV
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
           </div>
           <div className="space-y-4">
-            {analytics.messages.map((message: any, index: number) => {
+            {(activeMessagesTab === 'visible' ? visibleMessages : hiddenMessages).length === 0 && (
+              <p className="text-gray-500 text-center py-4">
+                {activeMessagesTab === 'visible' ? 'No hay mensajes para mostrar' : 'No hay mensajes ocultos'}
+              </p>
+            )}
+
+            {(activeMessagesTab === 'visible' ? visibleMessages : hiddenMessages).map((message: any, index: number) => {
               const messageData = message.event_data ? JSON.parse(message.event_data) : {};
               return (
                 <div key={`${message.id}-${index}`} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
@@ -527,12 +619,25 @@ const AnalyticsTab: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right text-xs text-gray-400 ml-4">
-                      <p>IP: {message.ip_address}</p>
-                      <p className="mt-1">
-                        {message.user_agent ? message.user_agent.substring(0, 30) + '...' : 'N/A'}
-                      </p>
-                    </div>
+                    {activeMessagesTab === 'visible' ? (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('¿Ocultar este mensaje? Podrás restaurarlo más tarde.')) {
+                            hideMessage(message.id);
+                          }
+                        }}
+                        className="text-xs text-gray-600 hover:text-gray-800 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
+                      >
+                        Ocultar
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => unhideMessage(message.id)}
+                        className="text-xs text-white bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded"
+                      >
+                        Restaurar
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -540,6 +645,8 @@ const AnalyticsTab: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Hidden Messages Section removed; handled via tabs in Messages card */}
     </div>
   );
 };

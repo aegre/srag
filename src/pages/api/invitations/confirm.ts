@@ -57,26 +57,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    // Log analytics event
-    try {
-      await db.prepare(`
-        INSERT INTO analytics (event_type, event_data, ip_address, user_agent, created_at)
-        VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-      `).bind(
-        'invitation_confirmation_change',
-        JSON.stringify({
-          slug,
-          action,
-          is_confirmed: isConfirmed,
-          timestamp: new Date().toISOString()
-        }),
-        clientIP,
-        request.headers.get('user-agent') || 'unknown'
-      ).run();
-    } catch (analyticsError) {
-      console.error('Error logging analytics:', analyticsError);
-      // Don't fail the main request if analytics fails
-    }
 
     const message = action === 'confirm'
       ? 'Invitación confirmada exitosamente'

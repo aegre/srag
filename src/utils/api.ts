@@ -123,6 +123,12 @@ export const adminApi = {
     });
   },
 
+  // Messages visibility
+  hideMessage: (analyticsId: number) =>
+    api.post<APIResponse>('/api/analytics/messages', { analytics_id: analyticsId }),
+  unhideMessage: (analyticsId: number) =>
+    api.delete<APIResponse>(`/api/analytics/messages?analytics_id=${analyticsId}`),
+
   // Auth
   validateToken: () => api.get<APIResponse<any>>('/api/auth/validate'),
   createUser: (data: any) => api.post<APIResponse<any>>('/api/auth/create-user', data),
