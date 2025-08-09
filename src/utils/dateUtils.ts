@@ -147,8 +147,18 @@ export const formatLocalDate = (
     minute: '2-digit'
   }
 ): string => {
-  // Ensure the date is treated as UTC and converted to local time
-  const date = new Date(dateString + 'Z'); // Add 'Z' to indicate UTC
+  // Normalize to ISO format and ensure UTC so it converts consistently to local time
+  if (!dateString) return '';
+  let normalized = dateString.trim();
+  // Replace space between date and time with 'T' if present
+  if (normalized.includes(' ') && !normalized.includes('T')) {
+    normalized = normalized.replace(' ', 'T');
+  }
+  // Append 'Z' only if not already present
+  if (!normalized.endsWith('Z') && !/([+-]\d{2}:?\d{2})$/.test(normalized)) {
+    normalized += 'Z';
+  }
+  const date = new Date(normalized);
   return date.toLocaleDateString(undefined, options);
 };
 

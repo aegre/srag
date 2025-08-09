@@ -608,7 +608,7 @@ const AnalyticsTab: React.FC = () => {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">
-                            {messageData.guest_name || 'Anónimo'}
+                            {messageData.guest_name || 'Anónimo'}{message.invitation_slug ? ` · /${message.invitation_slug}` : ''}
                           </p>
                           <p className="text-xs text-gray-500">{formatDate(message.timestamp)}</p>
                         </div>

@@ -38,7 +38,7 @@ export const GET: APIRoute = async (context) => {
     `).all();
 
     if (!messages.results || messages.results.length === 0) {
-      const header = ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Fecha'];
+      const header = ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Slug', 'Fecha'];
       const csvContent = header.join(',') + '\n';
       return new Response(csvContent, {
         status: 200,
@@ -52,7 +52,7 @@ export const GET: APIRoute = async (context) => {
     // Parse event_data and create CSV
     const csvRows = [
       // CSV Header
-      ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Fecha']
+      ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Slug', 'Fecha']
     ];
 
     for (const message of messages.results) {
@@ -75,6 +75,7 @@ export const GET: APIRoute = async (context) => {
         csvRows.push([
           escapeCsvValue(guestName),
           escapeCsvValue(messageText),
+          escapeCsvValue(invitationSlug),
           escapeCsvValue(invitationSlug),
           escapeCsvValue(createdAt)
         ]);

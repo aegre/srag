@@ -120,13 +120,15 @@ export const GET: APIRoute = async (context) => {
         ORDER BY date DESC
       `).all(),
 
-      // Messages for Julietta with hidden flag
+      // Messages for Julietta with hidden flag and slug
       db.prepare(`
         SELECT 
           a.id, a.timestamp, a.ip_address, a.user_agent,
           a.event_data,
+          i.slug AS invitation_slug,
           CASE WHEN mv.analytics_id IS NOT NULL THEN 1 ELSE 0 END AS is_hidden
         FROM analytics a
+        LEFT JOIN invitations i ON a.invitation_id = i.id
         LEFT JOIN message_visibility mv ON mv.analytics_id = a.id
         WHERE a.event_type = "message"
         ORDER BY a.timestamp DESC
