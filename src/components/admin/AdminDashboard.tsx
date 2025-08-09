@@ -269,9 +269,9 @@ const AdminDashboardContent: React.FC = () => {
               color="green" 
             />
             <StatCard 
-              title="Total de Vistas" 
+              title="Total de invitaciones Vistas" 
               value={stats.totals.views} 
-              icon="eye"
+              icon="chart"
               color="blue" 
             />
             <StatCard 
