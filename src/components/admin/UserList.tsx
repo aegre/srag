@@ -55,7 +55,7 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
       if (response.success) {
         setUsers(response.data || []);
         setPagination(response.pagination || {
-          page: 1,
+          page,
           limit: 10,
           total: 0,
           totalPages: 0

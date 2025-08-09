@@ -98,13 +98,13 @@
       console.log('Hiding entry screen, with audio:', withAudio);
       
       // Add fade out animation
-      entryScreen.style.transition = 'opacity 0.8s ease-out, visibility 0.8s ease-out';
-      entryScreen.style.opacity = '0';
-      entryScreen.style.visibility = 'hidden';
+      entryScreen?.style && (entryScreen.style.transition = 'opacity 0.8s ease-out, visibility 0.8s ease-out');
+      entryScreen?.style && (entryScreen.style.opacity = '0');
+      entryScreen?.style && (entryScreen.style.visibility = 'hidden');
       
       // Remove from DOM after animation
       setTimeout(() => {
-        entryScreen.remove();
+        entryScreen?.remove?.();
         
         // Dispatch custom event to notify that user has interacted
         window.dispatchEvent(new CustomEvent('userInteractionComplete', { 

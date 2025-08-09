@@ -16,7 +16,6 @@ interface InvitationFormProps {
 const InvitationForm: React.FC<InvitationFormProps> = ({ 
   onSuccess, 
   onCancel,
-  onDelete,
   initialData,
   mode = 'create',
   invitationId,

@@ -112,7 +112,7 @@ const invitationId = invitation?.id;
       )}
 
   <!-- Confirmation JavaScript -->
-  <script define:vars={{ invitationSlug, invitationId, rsvpEnabled }}>
+  <script is:inline define:vars={{ invitationSlug, invitationId, rsvpEnabled }}>
     if (invitationSlug && rsvpEnabled) {
       const confirmBtn = document.getElementById('confirm-btn');
       const confirmText = document.getElementById('confirm-text');

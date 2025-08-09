@@ -128,8 +128,8 @@
     });
 
     // Listen for user interaction event from entry screen
-    window.addEventListener('userInteractionComplete', function(event) {
-      const withAudio = event.detail?.withAudio;
+    window.addEventListener('userInteractionComplete', function(e) {
+      const withAudio = (e as CustomEvent)?.detail?.withAudio;
       console.log('User interaction detected, with audio:', withAudio);
       
       if (withAudio) {

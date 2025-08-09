@@ -20,7 +20,6 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
-    const token = authHeader.substring(7);
     const body: ChangePasswordRequest = await request.json();
 
     // Validate request body

@@ -61,9 +61,8 @@ const colorPalette = [
       
       <!-- Color swatches -->
       <div class="flex justify-center items-center">
-        {colorPalette.map((color, index) => (
+        {colorPalette.map((color) => (
           <div 
-            key={index}
             class="w-12 h-16 md:w-16 md:h-20  border border-secondary-light/20 shadow-sm"
             style={`background-color: ${color};`}
             role="img"

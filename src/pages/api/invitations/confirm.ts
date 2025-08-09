@@ -35,12 +35,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
       });
     }
 
-    // Get client IP for analytics
-    const clientIP = request.headers.get('x-forwarded-for') ||
-      request.headers.get('cf-connecting-ip') ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
-
     // Update the invitation based on action
     const isConfirmed = action === 'confirm' ? 1 : 0;
     const result = await db.prepare(

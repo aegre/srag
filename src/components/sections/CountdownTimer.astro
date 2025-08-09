@@ -77,7 +77,7 @@ const eventDateTime = getEventDateTime(eventDate, eventTime);
   </div>
 
   <!-- Countdown Timer JavaScript -->
-  <script define:vars={{ eventDateTime }}>
+  <script is:inline define:vars={{ eventDateTime }}>
     function updateCountdown() {
       
       const eventDate = new Date(eventDateTime).getTime();

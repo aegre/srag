@@ -14,11 +14,6 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    const token = authHeader.substring(7);
-
-    // Validate token (you might want to add proper JWT validation here)
-    // For now, we'll assume the token is valid if it exists
-
     const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       return new Response(JSON.stringify({

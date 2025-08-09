@@ -91,20 +91,20 @@ import InvitationSection from '../InvitationSection.astro';
   };
 
   // Get elements
-  const iframe = document.getElementById('maps-iframe');
+  const iframe = document.getElementById('maps-iframe') as HTMLIFrameElement | null;
   const buttons = document.querySelectorAll('.location-btn');
   const locationDetails = document.querySelectorAll('.location-details');
 
   // Function to switch location
-  function switchLocation(location) {
+  function switchLocation(location: 'iglesia' | 'recepcion') {
     // Update iframe source
-    if (mapUrls[location]) {
+    if (iframe && mapUrls[location]) {
       iframe.src = mapUrls[location];
     }
     
     // Update active button state
     buttons.forEach(btn => btn.classList.remove('active'));
-    document.getElementById(`btn-${location}`).classList.add('active');
+    document.getElementById(`btn-${location}`)?.classList.add('active');
     
     // Show/hide location details
     locationDetails.forEach(detail => {
@@ -120,7 +120,9 @@ import InvitationSection from '../InvitationSection.astro';
   buttons.forEach(button => {
     button.addEventListener('click', () => {
       const location = button.getAttribute('data-location');
-      switchLocation(location);
+      if (location === 'iglesia' || location === 'recepcion') {
+        switchLocation(location);
+      }
     });
   });
 </script> 

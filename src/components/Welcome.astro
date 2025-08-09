@@ -8,7 +8,6 @@ import Itinerary from './sections/Itinerary.astro';
 import EventLocation from './sections/EventLocation.astro';
 import DressCode from './sections/DressCode.astro';
 import DetailsRSVP from './sections/DetailsRSVP.astro';
-import ThankYou from './sections/ThankYou.astro';
 import ImportantInformation from './sections/ImportantInformation.astro';
 import GiftTable from './sections/GiftTable.astro';
 import MessageToQuinceanera from './sections/MessageToQuinceanera.astro';
@@ -115,13 +114,13 @@ const sectionIds = enabledSections.map(section => section.id);
       <DetailsRSVP settings={settings} invitation={invitation} />
       <ImportantInformation />
       <GiftTable />
-      <MessageToQuinceanera settings={settings} invitation={invitation} />
+      <MessageToQuinceanera invitation={invitation} />
       <FinalMessage />
     </div>
 
     <!-- View tracking script -->
     {!preview && invitation && (
-      <script define:vars={{ invitationId: invitation.id }}>
+      <script is:inline define:vars={{ invitationId: invitation.id }}>
         // Track view when user actually enters the invitation
         window.addEventListener('userInteractionComplete', function() {
           // Only track if not in preview mode

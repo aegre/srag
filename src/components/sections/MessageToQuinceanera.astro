@@ -2,11 +2,10 @@
 import InvitationSection from '../InvitationSection.astro';
 
 export interface Props {
-  settings?: any;
   invitation?: any;
 }
 
-const { settings, invitation } = Astro.props;
+const { invitation } = Astro.props;
 const invitationSlug = invitation?.slug;
 const invitationId = invitation?.id;
 ---
@@ -84,7 +83,7 @@ const invitationId = invitation?.id;
   </div>
 </InvitationSection>
 
-<script define:vars={{ invitationId, invitationSlug }}>
+<script is:inline define:vars={{ invitationId, invitationSlug }}>
   // Handle message submission
   document.addEventListener('DOMContentLoaded', function() {
     console.log('DOMContentLoaded fired');

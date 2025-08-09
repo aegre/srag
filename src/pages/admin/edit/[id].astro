@@ -13,12 +13,12 @@ const filter = Astro.url.searchParams.get('filter') || '';
 ---
 
 <AdminLayout title="Editar Invitación - Panel de Administración">
-  <AdminRoute client:load="react">
+  <AdminRoute client:load>
     <InvitationForm
       mode="edit"
-      invitationId={id}
+      invitationId={id as string}
       searchParams={{ search, filter }}
-      client:load="react"
+      client:load
     />
   </AdminRoute>
 </AdminLayout>
@@ -29,7 +29,7 @@ const filter = Astro.url.searchParams.get('filter') || '';
     const search = new URLSearchParams(window.location.search).get('search') || '';
     const filter = new URLSearchParams(window.location.search).get('filter') || '';
     
-    window.handleDeleteInvitation = async (invitationId) => {
+    (window as any).handleDeleteInvitation = async (invitationId: string) => {
       try {
         const token = localStorage.getItem('admin_token');
         if (!token) {

@@ -26,7 +26,7 @@ interface FormData {
   is_active: boolean;
 }
 
-const EditUserFormContent: React.FC<EditUserFormProps> = ({ userId, onSuccess }) => {
+const EditUserFormContent: React.FC<EditUserFormProps> = ({ userId }) => {
   const { showToast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<FormData>({

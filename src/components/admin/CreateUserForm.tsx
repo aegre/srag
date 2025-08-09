@@ -16,7 +16,7 @@ interface FormData {
   role: 'admin' | 'editor';
 }
 
-const CreateUserFormContent: React.FC<CreateUserFormProps> = ({ onSuccess, onCancel }) => {
+const CreateUserFormContent: React.FC<CreateUserFormProps> = ({ onSuccess }) => {
   const { showToast } = useToast();
   const [formData, setFormData] = useState<FormData>({
     username: '',
