@@ -1,7 +1,11 @@
 -- Make invitations.lastname optional (nullable)
 -- SQLite requires table recreation to change column nullability
+-- This migration includes backup and restore of analytics data
 
 PRAGMA foreign_keys=OFF;
+
+-- Backup analytics data
+CREATE TABLE IF NOT EXISTS analytics_backup AS SELECT * FROM analytics;
 
 -- Create new table with lastname nullable
 CREATE TABLE IF NOT EXISTS invitations_new (
@@ -33,6 +37,10 @@ CREATE INDEX IF NOT EXISTS idx_invitations_slug ON invitations(slug);
 CREATE INDEX IF NOT EXISTS idx_invitations_created_at ON invitations(created_at);
 CREATE INDEX IF NOT EXISTS idx_invitations_active ON invitations(is_active);
 CREATE INDEX IF NOT EXISTS idx_invitations_confirmed ON invitations(is_confirmed);
+
+-- Restore analytics data
+INSERT INTO analytics SELECT * FROM analytics_backup;
+DROP TABLE analytics_backup;
 
 PRAGMA foreign_keys=ON;
 
