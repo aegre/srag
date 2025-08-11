@@ -28,7 +28,7 @@ export interface Invitation {
   id: number;
   slug: string;
   name: string;
-  lastname: string;
+  lastname: string | null;
   number_of_passes: number;
   is_confirmed: boolean;
   is_active: boolean;
@@ -55,7 +55,7 @@ export interface InvitationSettings {
 
 export interface CreateInvitationRequest {
   name: string;
-  lastname: string;
+  lastname?: string | null;
   slug: string;
   number_of_passes: number;
   is_confirmed?: boolean;

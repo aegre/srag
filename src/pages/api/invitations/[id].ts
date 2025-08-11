@@ -136,9 +136,9 @@ export const PUT: APIRoute = async (context) => {
     const invitationData = await context.request.json();
 
     // Validate required fields
-    if (!invitationData.name || !invitationData.lastname || !invitationData.slug) {
+    if (!invitationData.name || !invitationData.slug) {
       return new Response(JSON.stringify({
-        error: 'El nombre, apellido y URL personalizada son requeridos'
+        error: 'El nombre y la URL personalizada son requeridos'
       }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
@@ -182,7 +182,7 @@ export const PUT: APIRoute = async (context) => {
     `).bind(
       invitationData.slug,
       invitationData.name,
-      invitationData.lastname,
+      invitationData.lastname || null,
       invitationData.number_of_passes || 1,
       invitationData.is_confirmed || false,
       invitationData.is_active !== false, // default to true

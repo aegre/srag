@@ -9,7 +9,7 @@ const { invitation } = Astro.props;
 
 // Use invitation data if available, otherwise fallback to default
 const guestName = invitation?.name || 'Gabriela';
-const guestLastname = invitation?.lastname || 'Durán';
+const guestLastname = invitation?.lastname || '';
 const numberOfPasses = invitation?.number_of_passes || 5;
 ---
 

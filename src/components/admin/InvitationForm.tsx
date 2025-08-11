@@ -83,7 +83,8 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
   };
 
   const generateSlug = (firstName: string, lastName: string): string => {
-    return `${firstName}-${lastName}`
+    const base = lastName ? `${firstName}-${lastName}` : firstName;
+    return base
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
       .replace(/\s+/g, '-') // Replace spaces with hyphens
@@ -118,7 +119,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
   const validateForm = (): string | null => {
     if (!formData.name.trim()) return 'El nombre es requerido';
-    if (!formData.lastname.trim()) return 'El apellido es requerido';
+    // lastname is optional
     if (!formData.slug.trim()) return 'La URL personalizada es requerida';
     if (!/^[a-z0-9-]+$/.test(formData.slug)) return 'La URL personalizada solo puede contener letras minúsculas, números y guiones';
     if (formData.number_of_passes < 1 || formData.number_of_passes > 10) return 'El número de pases debe estar entre 1 y 10';
@@ -147,7 +148,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       // Prepare request data
       const requestData: CreateInvitationRequest = {
         name: formData.name.trim(),
-        lastname: formData.lastname.trim(),
+        lastname: formData.lastname.trim() || null,
         slug: formData.slug.trim(),
         number_of_passes: formData.number_of_passes,
         is_confirmed: formData.is_confirmed,
@@ -294,13 +295,12 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
                 <div>
                   <label htmlFor="lastname" className="block text-sm font-medium text-gray-700">
-                    Apellido *
+                    Apellido (opcional)
                   </label>
                   <input
                     type="text"
                     name="lastname"
                     id="lastname"
-                    required
                     value={formData.lastname}
                     onChange={handleInputChange}
                     disabled={isLoading}
