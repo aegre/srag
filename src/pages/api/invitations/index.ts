@@ -61,12 +61,12 @@ export const GET: APIRoute = async (context) => {
     // Get invitations with pagination and view counts
     const invitations = await db.prepare(`
       SELECT 
-        i.id, i.slug, i.name, i.lastname, i.number_of_passes, 
+        i.id, i.slug, i.name, i.lastname, i.secondary_name, i.secondary_lastname, i.number_of_passes, 
         i.is_confirmed, i.is_active, i.created_at, i.updated_at,
         COALESCE(COUNT(a.id), 0) as view_count
       FROM invitations i
       LEFT JOIN analytics a ON i.id = a.invitation_id AND a.event_type = 'view'
-      GROUP BY i.id, i.slug, i.name, i.lastname, i.number_of_passes, 
+      GROUP BY i.id, i.slug, i.name, i.lastname, i.secondary_name, i.secondary_lastname, i.number_of_passes, 
                i.is_confirmed, i.is_active, i.created_at, i.updated_at
       ORDER BY i.created_at DESC 
       LIMIT ? OFFSET ?
@@ -151,13 +151,15 @@ export const POST: APIRoute = async (context) => {
     // Insert new invitation
     const result = await db.prepare(`
       INSERT INTO invitations (
-        slug, name, lastname, number_of_passes,
+        slug, name, lastname, secondary_name, secondary_lastname, number_of_passes,
         is_confirmed, is_active
-      ) VALUES (?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       invitationData.slug,
       invitationData.name,
       invitationData.lastname || null,
+      invitationData.secondary_name || null,
+      invitationData.secondary_lastname || null,
       invitationData.number_of_passes || 1,
       invitationData.is_confirmed || false,
       invitationData.is_active !== false // default to true

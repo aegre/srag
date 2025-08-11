@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { InvitationFormData, CreateInvitationRequest } from '../../types/admin';
+import { getSpanishConjunction } from '../../utils/textUtils';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { adminApi, ApiError } from '../../utils/api';
 
@@ -25,6 +26,8 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
   const [formData, setFormData] = useState<InvitationFormData>({
     name: '',
     lastname: '',
+    secondary_name: '',
+    secondary_lastname: '',
     slug: '',
     number_of_passes: 1,
     is_confirmed: false,
@@ -38,11 +41,11 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
   // Auto-generate slug from names
   useEffect(() => {
-    if ((formData.name || formData.lastname) && !slugGenerated && mode === 'create') {
-      const slug = generateSlug(formData.name, formData.lastname);
+    if ((formData.name || formData.lastname || formData.secondary_name || formData.secondary_lastname) && !slugGenerated && mode === 'create') {
+      const slug = generateSlug(formData.name, formData.lastname, formData.secondary_name, formData.secondary_lastname);
       setFormData(prev => ({ ...prev, slug }));
     }
-  }, [formData.name, formData.lastname, slugGenerated, mode]);
+  }, [formData.name, formData.lastname, formData.secondary_name, formData.secondary_lastname, slugGenerated, mode]);
 
   // Load invitation data when in edit mode
   useEffect(() => {
@@ -64,6 +67,8 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
         setFormData({
           name: result.data.name || '',
           lastname: result.data.lastname || '',
+          secondary_name: result.data.secondary_name || '',
+          secondary_lastname: result.data.secondary_lastname || '',
           slug: result.data.slug || '',
           number_of_passes: result.data.number_of_passes || 1,
           is_confirmed: Boolean(result.data.is_confirmed),
@@ -82,8 +87,22 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     }
   };
 
-  const generateSlug = (firstName: string, lastName: string): string => {
-    const base = lastName ? `${firstName}-${lastName}` : firstName;
+  const getConjunctionForSlug = getSpanishConjunction;
+
+  const generateSlug = (
+    firstName: string,
+    lastName?: string,
+    secondaryName?: string,
+    secondaryLastname?: string
+  ): string => {
+    // Build a human-readable base then normalize
+    const primary = `${firstName}${lastName ? ` ${lastName}` : ''}`.trim();
+    const hasSecondary = Boolean(secondaryName && secondaryName.trim().length > 0);
+    const secondary = hasSecondary
+      ? `${secondaryName}${secondaryLastname ? ` ${secondaryLastname}` : ''}`.trim()
+      : '';
+    const base = `${primary}${hasSecondary ? `-${secondary}` : ''}`.trim();
+
     return base
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
@@ -107,7 +126,7 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     }
 
     // Track if slug was manually edited
-    if (name === 'slug' && value !== generateSlug(formData.name, formData.lastname)) {
+    if (name === 'slug' && value !== generateSlug(formData.name, formData.lastname, formData.secondary_name, formData.secondary_lastname)) {
       setSlugGenerated(true);
     }
 
@@ -149,6 +168,8 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       const requestData: CreateInvitationRequest = {
         name: formData.name.trim(),
         lastname: formData.lastname.trim() || null,
+        secondary_name: formData.secondary_name?.trim() || null,
+        secondary_lastname: formData.secondary_lastname?.trim() || null,
         slug: formData.slug.trim(),
         number_of_passes: formData.number_of_passes,
         is_confirmed: formData.is_confirmed,
@@ -306,6 +327,38 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                     disabled={isLoading}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
                     placeholder="Rodriguez"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="secondary_name" className="block text-sm font-medium text-gray-700">
+                    Segundo nombre (pareja) (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    name="secondary_name"
+                    id="secondary_name"
+                    value={formData.secondary_name}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
+                    placeholder="Juan Carlos"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="secondary_lastname" className="block text-sm font-medium text-gray-700">
+                    Segundo apellido (pareja) (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    name="secondary_lastname"
+                    id="secondary_lastname"
+                    value={formData.secondary_lastname}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
+                    placeholder="Pérez"
                   />
                 </div>
 

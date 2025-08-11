@@ -29,6 +29,8 @@ export interface Invitation {
   slug: string;
   name: string;
   lastname: string | null;
+  secondary_name?: string | null;
+  secondary_lastname?: string | null;
   number_of_passes: number;
   is_confirmed: boolean;
   is_active: boolean;
@@ -56,6 +58,8 @@ export interface InvitationSettings {
 export interface CreateInvitationRequest {
   name: string;
   lastname?: string | null;
+  secondary_name?: string | null;
+  secondary_lastname?: string | null;
   slug: string;
   number_of_passes: number;
   is_confirmed?: boolean;
@@ -65,6 +69,8 @@ export interface CreateInvitationRequest {
 export interface UpdateInvitationRequest {
   name?: string;
   lastname?: string;
+  secondary_name?: string | null;
+  secondary_lastname?: string | null;
   number_of_passes?: number;
   is_confirmed?: boolean;
   is_active?: boolean;
@@ -144,6 +150,8 @@ export interface PaginatedResponse<T> extends APIResponse<T[]> {
 export interface InvitationFormData {
   name: string;
   lastname: string;
+  secondary_name?: string;
+  secondary_lastname?: string;
   slug: string;
   number_of_passes: number;
   is_confirmed: boolean;

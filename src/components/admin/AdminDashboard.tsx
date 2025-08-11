@@ -5,6 +5,7 @@ import { adminApi, ApiError } from '../../utils/api';
 import SettingsForm from './SettingsForm';
 import AnalyticsTab from './AnalyticsTab';
 import { useToast } from '../ui/Toast';
+import { buildCoupleDisplayName } from '../../utils/textUtils';
 import { ToastProvider } from '../ui/Toast';
 
 interface AdminDashboardProps {
@@ -474,7 +475,9 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
   const filteredInvitations = invitations.filter(invitation => {
     const matchesSearch = searchTerm === '' || 
       invitation.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      invitation.lastname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (invitation.lastname?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+      (invitation.secondary_name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+      (invitation.secondary_lastname?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
       invitation.slug.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'all' ||
@@ -682,6 +685,14 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
   const [copied, setCopied] = useState(false);
   const invitationUrl = `${window.location.origin}/invite/${invitation.slug}`;
 
+  const getDisplayName = (): string =>
+    buildCoupleDisplayName(
+      invitation.name,
+      invitation.lastname,
+      invitation.secondary_name,
+      invitation.secondary_lastname
+    );
+
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(invitationUrl);
@@ -753,7 +764,7 @@ const InvitationCard: React.FC<InvitationCardProps> = ({ invitation, onEdit, onD
               onClick={() => onEdit(invitation.id)}
               className="text-lg font-medium text-gray-900 hover:text-purple-600 transition-colors text-left flex items-center gap-2 group"
             >
-              {invitation.name} {invitation.lastname}
+              {getDisplayName()}
               <svg className="w-4 h-4 text-gray-400 group-hover:text-purple-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
