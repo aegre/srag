@@ -16,15 +16,17 @@ export const GET: APIRoute = async (context) => {
         i.number_of_passes,
         i.is_confirmed,
         i.is_active,
-        count(a.invitation_id) as view_count,
+        COALESCE(COUNT(a.id), 0) AS view_count,
         i.created_at,
         i.updated_at,
         CASE 
           WHEN i.is_confirmed = 1 THEN 'Confirmada'
           WHEN i.is_active = 1 THEN 'Pendiente'
           ELSE 'Inactiva'
-        END as status_es
-      FROM invitations i JOIN analytics a on i.id = a.invitation_id and a.event_type = 'view'
+        END AS status_es
+      FROM invitations i
+      LEFT JOIN analytics a ON i.id = a.invitation_id AND a.event_type = 'view'
+      GROUP BY i.id, i.name, i.lastname, i.slug, i.number_of_passes, i.is_confirmed, i.is_active, i.created_at, i.updated_at
       ORDER BY i.created_at DESC
     `).all();
 

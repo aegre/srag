@@ -85,7 +85,12 @@ export const adminApi = {
   getStats: () => api.get<APIResponse<any>>('/api/dashboard/stats'),
 
   // Invitations
-  getInvitations: () => api.get<APIResponse<any[]>>('/api/invitations'),
+  // Fetch a larger page by default so the admin can see all invitations
+  getInvitations: (params?: { page?: number; limit?: number }) => {
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 1000;
+    return api.get<APIResponse<any[]>>(`/api/invitations?page=${page}&limit=${limit}`);
+  },
   getInvitation: (id: number) => api.get<APIResponse<any>>(`/api/invitations/${id}`),
   getAnalytics: () => api.get<APIResponse<any>>('/api/analytics/dashboard'),
   createInvitation: (data: any) => api.post<APIResponse<any>>('/api/invitations', data),

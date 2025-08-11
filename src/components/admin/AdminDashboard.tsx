@@ -37,7 +37,7 @@ const AdminDashboardContent: React.FC = () => {
       // Load stats and invitations in parallel
       const [statsResult, invitationsResult] = await Promise.all([
         adminApi.getStats(),
-        adminApi.getInvitations()
+        adminApi.getInvitations({ page: 1, limit: 1000 })
       ]);
 
       setStats(statsResult.data);
@@ -431,14 +431,14 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
   const getInitialStatusFilter = () => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
-      const filter = urlParams.get('filter') as 'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened';
-      return filter && ['all', 'confirmed', 'pending', 'inactive', 'unopened'].includes(filter) ? filter : 'all';
+      const filter = urlParams.get('filter') as 'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened' | 'opened';
+      return filter && ['all', 'confirmed', 'pending', 'inactive', 'unopened', 'opened'].includes(filter) ? filter : 'all';
     }
     return 'all';
   };
 
   const [searchTerm, setSearchTerm] = useState(getInitialSearchTerm);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened'>(getInitialStatusFilter);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened' | 'opened'>(getInitialStatusFilter);
 
   // Update URL with current filters
   const updateURL = (newSearchTerm: string, newStatusFilter: string) => {
@@ -465,7 +465,7 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
   };
 
   // Handle status filter change
-  const handleStatusFilterChange = (filter: 'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened') => {
+  const handleStatusFilterChange = (filter: 'all' | 'confirmed' | 'pending' | 'inactive' | 'unopened' | 'opened') => {
     setStatusFilter(filter);
     updateURL(searchTerm, filter);
   };
@@ -481,7 +481,8 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
       (statusFilter === 'confirmed' && invitation.is_confirmed) ||
       (statusFilter === 'pending' && !invitation.is_confirmed && invitation.is_active) ||
       (statusFilter === 'inactive' && !invitation.is_active) ||
-      (statusFilter === 'unopened' && invitation.view_count === 0);
+      (statusFilter === 'unopened' && invitation.view_count === 0) ||
+      (statusFilter === 'opened' && invitation.view_count > 0);
     
     return matchesSearch && matchesStatus;
   });
@@ -584,7 +585,7 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
               >
                 Pendientes ({invitations.filter(i => !i.is_confirmed && i.is_active).length})
               </button>
-                          <button
+              <button
               onClick={() => handleStatusFilterChange('inactive')}
               className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
                 statusFilter === 'inactive'
@@ -604,6 +605,16 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
             >
               Sin Abrir ({invitations.filter(i => i.view_count === 0).length})
             </button>
+              <button
+                onClick={() => handleStatusFilterChange('opened')}
+                className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+                  statusFilter === 'opened'
+                    ? 'bg-blue-100 text-blue-800'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                Vistas ({invitations.filter(i => i.view_count > 0).length})
+              </button>
             </div>
           </div>
 
@@ -611,7 +622,7 @@ const InvitationsTab: React.FC<InvitationsTabProps> = ({
           <div className="text-sm text-gray-600">
             Mostrando {filteredInvitations.length} de {invitations.length} invitaciones
             {searchTerm && ` para "${searchTerm}"`}
-            {statusFilter !== 'all' && ` (${statusFilter === 'confirmed' ? 'confirmados' : statusFilter === 'pending' ? 'pendientes' : 'inactivos'})`}
+            {statusFilter !== 'all' && ` (${statusFilter === 'confirmed' ? 'confirmados' : statusFilter === 'pending' ? 'pendientes' : statusFilter === 'inactive' ? 'inactivos' : statusFilter === 'unopened' ? 'sin abrir' : 'abiertas'})`}
           </div>
         </div>
         
