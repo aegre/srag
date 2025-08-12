@@ -1,7 +1,41 @@
 import type { APIRoute } from 'astro';
+import { formatDateInTimezone, formatDateShort } from '../../../utils/dateUtils';
 
 export const GET: APIRoute = async (context) => {
   try {
+    // Get timezone from query parameters
+    const url = new URL(context.request.url);
+    const timezone = url.searchParams.get('timezone') || 'UTC';
+
+    // Calculate timezone offset in hours (simplified approach)
+    const getTimezoneOffset = (tz: string): number => {
+      const offsets: { [key: string]: number } = {
+        'America/Mexico_City': -6,
+        'America/New_York': -5,
+        'America/Los_Angeles': -8,
+        'America/Chicago': -6,
+        'America/Denver': -7,
+        'America/Phoenix': -7,
+        'America/Anchorage': -9,
+        'America/Honolulu': -10,
+        'Europe/London': 0,
+        'Europe/Paris': 1,
+        'Europe/Berlin': 1,
+        'Europe/Madrid': 1,
+        'Europe/Rome': 1,
+        'Asia/Tokyo': 9,
+        'Asia/Shanghai': 8,
+        'Asia/Kolkata': 5.5,
+        'Australia/Sydney': 10,
+        'Australia/Melbourne': 10,
+        'Pacific/Auckland': 12,
+        'UTC': 0
+      };
+      return offsets[tz] || 0;
+    };
+
+    const timezoneOffset = getTimezoneOffset(timezone);
+
     const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
       return new Response(JSON.stringify({
@@ -84,17 +118,17 @@ export const GET: APIRoute = async (context) => {
         LIMIT 10
       `).all(),
 
-      // Views by day (last 7 days)
+      // Views by day (last 7 days) - with timezone conversion in SQL
       db.prepare(`
         SELECT 
-          DATE(a.timestamp) as date,
+          DATE(datetime(a.timestamp, ? || ' hours')) as date,
           COUNT(*) as count
         FROM analytics a
         WHERE a.event_type = "view" 
         AND a.timestamp >= datetime('now', '-7 days')
-        GROUP BY DATE(a.timestamp)
+        GROUP BY DATE(datetime(a.timestamp, ? || ' hours'))
         ORDER BY date DESC
-      `).all(),
+      `).bind(timezoneOffset, timezoneOffset).all(),
 
       // Confirmation events (last 10)
       db.prepare(`
@@ -103,23 +137,23 @@ export const GET: APIRoute = async (context) => {
           JSON_EXTRACT(ae.event_data, '$.slug') as slug,
           JSON_EXTRACT(ae.event_data, '$.action') as action
         FROM analytics ae
-        WHERE ae.event_type = 'invitation_confirmation_change'
+        WHERE ae.event_type = 'rsvp_action_success'
         ORDER BY ae.timestamp DESC
         LIMIT 10
       `).all(),
 
-      // Recent confirmations by day (last 7 days)
+      // Recent confirmations by day (last 7 days) - with timezone conversion in SQL
       db.prepare(`
         SELECT 
-          DATE(ae.timestamp) as date,
+          DATE(datetime(ae.timestamp, ? || ' hours')) as date,
           JSON_EXTRACT(ae.event_data, '$.action') as action,
           COUNT(*) as count
         FROM analytics ae
-        WHERE ae.event_type = 'invitation_confirmation_change'
+        WHERE ae.event_type = 'rsvp_action_success'
         AND ae.timestamp >= datetime('now', '-7 days')
-        GROUP BY DATE(ae.timestamp), JSON_EXTRACT(ae.event_data, '$.action')
+        GROUP BY DATE(datetime(ae.timestamp, ? || ' hours')), JSON_EXTRACT(ae.event_data, '$.action')
         ORDER BY date DESC
-      `).all(),
+      `).bind(timezoneOffset, timezoneOffset).all(),
 
       // Messages for Julietta with hidden flag and slug
       db.prepare(`
@@ -137,6 +171,19 @@ export const GET: APIRoute = async (context) => {
       `).all()
     ]);
 
+    // Format dates for viewsByDay and recentConfirmations
+    const formattedViewsByDay = (viewsByDay?.results || []).map((item: any) => ({
+      ...item,
+      date: formatDateShort(item.date),
+      originalDate: item.date // Keep original for matching
+    }));
+
+    const formattedRecentConfirmations = (recentConfirmations?.results || []).map((item: any) => ({
+      ...item,
+      date: formatDateShort(item.date),
+      originalDate: item.date // Keep original for matching
+    }));
+
     return new Response(JSON.stringify({
       success: true,
       data: {
@@ -146,9 +193,9 @@ export const GET: APIRoute = async (context) => {
         recentViews: recentViews?.results || [],
         recentRsvpEvents: recentRsvpEvents?.results || [],
         topInvitations: topInvitations?.results || [],
-        viewsByDay: viewsByDay?.results || [],
+        viewsByDay: formattedViewsByDay,
         confirmationEvents: confirmationEvents?.results || [],
-        recentConfirmations: recentConfirmations?.results || [],
+        recentConfirmations: formattedRecentConfirmations,
         messages: messages?.results || []
       }
     }), {

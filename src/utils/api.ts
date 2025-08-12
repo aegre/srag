@@ -92,7 +92,13 @@ export const adminApi = {
     return api.get<APIResponse<any[]>>(`/api/invitations?page=${page}&limit=${limit}`);
   },
   getInvitation: (id: number) => api.get<APIResponse<any>>(`/api/invitations/${id}`),
-  getAnalytics: () => api.get<APIResponse<any>>('/api/analytics/dashboard'),
+  getAnalytics: (timezone?: string) => {
+    const url = new URL('/api/analytics/dashboard', window.location.origin);
+    if (timezone) {
+      url.searchParams.set('timezone', timezone);
+    }
+    return api.get<APIResponse<any>>(url.toString());
+  },
   createInvitation: (data: any) => api.post<APIResponse<any>>('/api/invitations', data),
   updateInvitation: (id: number, data: any) => api.put<APIResponse<any>>(`/api/invitations/${id}`, data),
   deleteInvitation: (id: number) => api.delete<APIResponse<void>>(`/api/invitations/${id}`),
@@ -102,27 +108,37 @@ export const adminApi = {
   updateSettings: (data: any) => api.put<APIResponse<any>>('/api/settings', data),
 
   // Export
-  exportInvitations: () => {
+  exportInvitations: (timezone?: string) => {
     const token = localStorage.getItem('admin_token');
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    return fetch('/api/invitations/export', {
+    const url = new URL('/api/invitations/export', window.location.origin);
+    if (timezone) {
+      url.searchParams.set('timezone', timezone);
+    }
+
+    return fetch(url.toString(), {
       method: 'GET',
       headers
     });
   },
 
-  exportMessages: () => {
+  exportMessages: (timezone?: string) => {
     const token = localStorage.getItem('admin_token');
     const headers: Record<string, string> = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    return fetch('/api/analytics/export-messages', {
+    const url = new URL('/api/analytics/export-messages', window.location.origin);
+    if (timezone) {
+      url.searchParams.set('timezone', timezone);
+    }
+
+    return fetch(url.toString(), {
       method: 'GET',
       headers
     });

@@ -81,7 +81,7 @@ export const GET: APIRoute = async (context) => {
     const recentConfirmations = await db.prepare(`
       SELECT COUNT(*) as count 
       FROM analytics 
-      WHERE event_type = 'invitation_confirmation_change' 
+      WHERE event_type = 'rsvp_action_success' 
       AND JSON_EXTRACT(event_data, '$.action') = 'confirm'
       AND timestamp >= datetime('now', '-7 days')
     `).first();
@@ -89,7 +89,7 @@ export const GET: APIRoute = async (context) => {
     const recentUnconfirmations = await db.prepare(`
       SELECT COUNT(*) as count 
       FROM analytics 
-      WHERE event_type = 'invitation_confirmation_change' 
+      WHERE event_type = 'rsvp_action_success' 
       AND JSON_EXTRACT(event_data, '$.action') = 'unconfirm'
       AND timestamp >= datetime('now', '-7 days')
     `).first();

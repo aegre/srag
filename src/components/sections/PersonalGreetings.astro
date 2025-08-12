@@ -1,5 +1,15 @@
 ---
 import InvitationSection from '../InvitationSection.astro';
+import { getSpanishConjunction } from '../../utils/textUtils';
+
+// Godparents names
+const godmotherName = "Ma. Lourdes";
+const godmotherLastname = "Velázquez";
+const godfatherName = "Humberto";
+const godfatherLastname = "Rodríguez";
+
+// Get proper conjunction
+const conjunction = getSpanishConjunction(godmotherName, godfatherName);
 ---
 
 <InvitationSection id="section-personal-greetings">
@@ -16,16 +26,16 @@ import InvitationSection from '../InvitationSection.astro';
     <section class="space-y-8">
       <div class="space-y-4">
         <p class="font-angella text-4xl md:text-7xl lg:text-8xl text-secondary-light leading-tight">
-          Ma. Lourdes Velázquez
+          {godmotherName} {godmotherLastname}
         </p>
        <!-- Elegant separator -->
       <div class="flex justify-center items-center space-x-4">
         <hr class="w-12 h-px bg-gradient-to-r from-transparent via-secondary-light/40 to-transparent border-0" aria-hidden="true" />
-        <span class="font-angella text-3xl md:text-4xl text-secondary-light/60">y</span>
+        <span class="font-angella text-3xl md:text-4xl text-secondary-light/60">{conjunction}</span>
         <hr class="w-12 h-px bg-gradient-to-r from-transparent via-secondary-light/40 to-transparent border-0" aria-hidden="true" />
       </div>
         <p class="font-angella text-4xl md:text-7xl lg:text-8xl text-secondary-light leading-tight">
-        Humberto Rodríguez
+        {godfatherName} {godfatherLastname}
         </p>
       </div>
     </section>

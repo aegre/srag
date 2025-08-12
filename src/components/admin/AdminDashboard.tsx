@@ -180,7 +180,9 @@ const AdminDashboardContent: React.FC = () => {
     
     setExporting(true);
     try {
-      const response = await adminApi.exportInvitations();
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await adminApi.exportInvitations(timezone);
       
       if (!response.ok) {
         throw new Error('Error al exportar las invitaciones');

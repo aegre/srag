@@ -1,6 +1,7 @@
 ---
 import SingleNameDisplay from './SingleNameDisplay.astro';
 import CoupleNameDisplay from './CoupleNameDisplay.astro';
+import { getSpanishConjunction } from '../utils/textUtils';
 
 export interface Props {
   invitation?: any;
@@ -17,6 +18,9 @@ const secondaryLastname = invitation?.secondary_lastname || null;
 
 // Determine if this is a couple invitation
 const isCouple = secondaryName && secondaryName.trim() !== '';
+
+// Get the proper Spanish conjunction for the couple names
+const conjunction = isCouple ? getSpanishConjunction(secondaryName) : 'y';
 ---
 
 {isCouple ? (
@@ -25,7 +29,7 @@ const isCouple = secondaryName && secondaryName.trim() !== '';
     primaryLastname={primaryLastname}
     secondaryName={secondaryName}
     secondaryLastname={secondaryLastname}
-    conjunction="y"
+    conjunction={conjunction}
     className={className}
   />
 ) : (

@@ -43,7 +43,9 @@ const AnalyticsTab: React.FC = () => {
     setError(null);
 
     try {
-      const result = await adminApi.getAnalytics();
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const result = await adminApi.getAnalytics(timezone);
       setAnalytics(result.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar las analíticas');
@@ -97,7 +99,9 @@ const AnalyticsTab: React.FC = () => {
     
     setExporting(true);
     try {
-      const response = await adminApi.exportMessages();
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const response = await adminApi.exportMessages(timezone);
       
       if (!response.ok) {
         throw new Error('Error al exportar los mensajes');
@@ -142,9 +146,41 @@ const AnalyticsTab: React.FC = () => {
   };
 
   const viewsLineData = (() => {
-    const byDay = (analytics?.viewsByDay || []).slice().reverse();
-    const labels = byDay.map((d: any) => formatShortDate(d.date));
-    const data = byDay.map((d: any) => d.count);
+    // Generate labels without using date formatting - just create '01 ene' format manually
+    const monthAbbreviations = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    
+    const last7 = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      const dateStr = d.toISOString().split('T')[0];
+      
+      // Extract day and month manually
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = monthAbbreviations[d.getMonth()];
+      const label = `${day} ${month}`;
+      
+      return { dateStr, label };
+    });
+    
+    // Create a map of dates to view counts from backend data
+    const viewsMap = new Map<string, number>();
+    const backendViews = analytics?.viewsByDay || [];
+    
+    // Initialize all dates with 0
+    last7.forEach(({ dateStr }) => {
+      viewsMap.set(dateStr, 0);
+    });
+    
+    // Fill in actual view counts from backend data
+    backendViews.forEach((item: any) => {
+      const originalDate = item.originalDate || item.date;
+      const count = Number(item.count || 0);
+      viewsMap.set(originalDate, count);
+    });
+    
+    const labels = last7.map((d) => d.label);
+    const data = last7.map(({ dateStr }) => viewsMap.get(dateStr) || 0);
+    
     return {
       labels,
       datasets: [
@@ -161,22 +197,31 @@ const AnalyticsTab: React.FC = () => {
   })();
 
   const confirmationsBarData = (() => {
+    // Generate labels without using date formatting - just create '01 ene' format manually
+    const monthAbbreviations = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    
     const last7 = Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
       const dateStr = d.toISOString().split('T')[0];
-      return { dateStr, label: formatShortDate(dateStr) };
+      
+      // Extract day and month manually
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = monthAbbreviations[d.getMonth()];
+      const label = `${day} ${month}`;
+      
+      return { dateStr, label };
     });
-    const rows: Array<{ date: string; action: string; count: number }> = analytics?.recentConfirmations || [];
+    const rows: Array<{ date: string; action: string; count: number; originalDate?: string }> = analytics?.recentConfirmations || [];
     const cleanAction = (a: string) => (a || '').replaceAll('"', '');
     const confirmCounts = last7.map(({ dateStr }) =>
       rows
-        .filter((r) => r.date === dateStr && cleanAction(r.action) === 'confirm')
+        .filter((r) => (r.originalDate || r.date) === dateStr && cleanAction(r.action) === 'confirm')
         .reduce((sum, r) => sum + Number(r.count || 0), 0)
     );
     const unconfirmCounts = last7.map(({ dateStr }) =>
       rows
-        .filter((r) => r.date === dateStr && cleanAction(r.action) === 'unconfirm')
+        .filter((r) => (r.originalDate || r.date) === dateStr && cleanAction(r.action) === 'unconfirm')
         .reduce((sum, r) => sum + Number(r.count || 0), 0)
     );
     return {

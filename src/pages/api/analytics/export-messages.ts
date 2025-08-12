@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
-import { formatLocalDateFull } from '../../../utils/dateUtils';
+import { formatDateInTimezone } from '../../../utils/dateUtils';
+import { buildCoupleDisplayName } from '../../../utils/textUtils';
 
 export const GET: APIRoute = async (context) => {
   try {
@@ -13,6 +14,10 @@ export const GET: APIRoute = async (context) => {
         headers: { 'Content-Type': 'application/json' }
       });
     }
+
+    // Get timezone from query parameters
+    const url = new URL(context.request.url);
+    const timezone = url.searchParams.get('timezone') || 'UTC';
 
     const db = (context.locals as any).runtime?.env?.DB;
     if (!db) {
@@ -64,23 +69,18 @@ export const GET: APIRoute = async (context) => {
         const eventData = JSON.parse(message.event_data);
         const messageText = eventData.message || '';
         const invitationSlug = message.invitation_slug || 'N/A';
-        // Convert UTC timestamp to local timezone
-        const createdAt = formatLocalDateFull(message.timestamp);
+        // Convert UTC timestamp to specified timezone
+        const createdAt = formatDateInTimezone(message.timestamp, timezone);
 
         // Format guest name with secondary name and conjunction
         let guestName = 'Anónimo';
         if (message.name) {
-          // Format main guest name (handle optional lastname)
-          const mainGuest = `${message.name} ${message.lastname || ''}`.trim();
-
-          // Check if there's a secondary guest
-          if (message.secondary_name) {
-            // Format secondary guest name (handle optional lastname)
-            const secondaryGuest = `${message.secondary_name} ${message.secondary_lastname || ''}`.trim();
-            guestName = `${mainGuest} y ${secondaryGuest}`;
-          } else {
-            guestName = mainGuest;
-          }
+          guestName = buildCoupleDisplayName(
+            message.name,
+            message.lastname,
+            message.secondary_name,
+            message.secondary_lastname
+          );
         }
 
         // Escape CSV values (handle commas and quotes)

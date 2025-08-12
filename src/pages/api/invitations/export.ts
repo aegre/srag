@@ -1,8 +1,13 @@
 import type { APIRoute } from 'astro';
-import { formatLocalDateFull } from '../../../utils/dateUtils';
+import { formatDateInTimezone } from '../../../utils/dateUtils';
+import { buildCoupleDisplayName } from '../../../utils/textUtils';
 
 export const GET: APIRoute = async (context) => {
   try {
+    // Get timezone from query parameters
+    const url = new URL(context.request.url);
+    const timezone = url.searchParams.get('timezone') || 'UTC';
+
     // Get database from context
     const db = (context.locals as any).runtime?.env?.DB;
 
@@ -35,8 +40,8 @@ export const GET: APIRoute = async (context) => {
     // Create CSV content
     const csvHeaders = [
       'ID',
-      'Invitado Principal',
-      'Invitado Secundario',
+      'Invitado(s)',
+      'Invitado Secundario (Legacy)',
       'Slug',
       'Número de Pases',
       'Estado',
@@ -46,25 +51,24 @@ export const GET: APIRoute = async (context) => {
     ];
 
     const csvRows = invitations.results.map((invitation: any) => {
-      // Format main guest name
-      const mainGuest = `${invitation.name} ${invitation.lastname || ''}`.trim();
-
-      // Format secondary guest name (if exists)
-      let secondaryGuest = '';
-      if (invitation.secondary_name) {
-        secondaryGuest = `${invitation.secondary_name} ${invitation.secondary_lastname || ''}`.trim();
-      }
+      // Format guest name with conjunction
+      const guestName = buildCoupleDisplayName(
+        invitation.name,
+        invitation.lastname,
+        invitation.secondary_name,
+        invitation.secondary_lastname
+      );
 
       return [
         invitation.id,
-        mainGuest,
-        secondaryGuest,
+        guestName,
+        '', // Empty secondary guest column (now included in main guest name)
         invitation.slug,
         invitation.number_of_passes,
         invitation.status_es,
         invitation.view_count,
-        formatLocalDateFull(invitation.created_at),
-        formatLocalDateFull(invitation.updated_at)
+        formatDateInTimezone(invitation.created_at, timezone),
+        formatDateInTimezone(invitation.updated_at, timezone)
       ];
     });
 

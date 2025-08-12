@@ -12,6 +12,12 @@ const MONTH_NAMES = [
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
+// Spanish month abbreviations
+const MONTH_ABBREVIATIONS = [
+  'ene', 'feb', 'mar', 'abr', 'may', 'jun',
+  'jul', 'ago', 'sep', 'oct', 'nov', 'dic'
+];
+
 /**
  * Parse a date string (YYYY-MM-DD) and return a UTC Date object
  * This avoids timezone conversion issues
@@ -75,6 +81,19 @@ export function formatDateInSpanish(dateString: string): string {
   if (!dayNumber || !monthName) return '';
 
   return `${dayNumber} de ${monthName}`;
+}
+
+/**
+ * Format date in short Spanish format (e.g., "01 ene" from "2025-01-01")
+ */
+export function formatDateShort(dateString: string): string {
+  const date = parseDateUTC(dateString);
+  if (!date) return '';
+
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const monthAbbr = MONTH_ABBREVIATIONS[date.getUTCMonth()];
+
+  return `${day} ${monthAbbr}`;
 }
 
 /**
@@ -188,4 +207,83 @@ export const formatLocalDateFull = (dateString: string): string => {
     minute: '2-digit',
     second: '2-digit'
   });
+};
+
+/**
+ * Formats a database timestamp (already in server timezone) to local timezone
+ * This function handles timestamps that are stored in the server's timezone, not UTC
+ * @param dateString - Database timestamp string (server timezone)
+ * @returns Formatted date string in local timezone
+ */
+export const formatDatabaseDate = (dateString: string): string => {
+  if (!dateString) return '';
+
+  try {
+    // Parse the date string as-is (assuming it's in server timezone)
+    const date = new Date(dateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original if parsing fails
+    }
+
+    // Format using the user's local timezone
+    return date.toLocaleString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZoneName: 'short'
+    });
+  } catch (error) {
+    console.error('Error formatting database date:', dateString, error);
+    return dateString; // Return original if formatting fails
+  }
+};
+
+/**
+ * Formats a UTC timestamp to a specific timezone
+ * @param dateString - UTC timestamp string from database
+ * @param timezone - Target timezone (e.g., 'America/Mexico_City', 'America/New_York')
+ * @returns Formatted date string in the specified timezone
+ */
+export const formatDateInTimezone = (dateString: string, timezone: string): string => {
+  if (!dateString) return '';
+
+  try {
+    // Normalize to ISO format and ensure UTC
+    let normalized = dateString.trim();
+    // Replace space between date and time with 'T' if present
+    if (normalized.includes(' ') && !normalized.includes('T')) {
+      normalized = normalized.replace(' ', 'T');
+    }
+    // Append 'Z' only if not already present
+    if (!normalized.endsWith('Z') && !/([+-]\d{2}:?\d{2})$/.test(normalized)) {
+      normalized += 'Z';
+    }
+
+    const date = new Date(normalized);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return dateString; // Return original if parsing fails
+    }
+
+    // Format using the specified timezone
+    return date.toLocaleString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: timezone,
+      timeZoneName: 'short'
+    });
+  } catch (error) {
+    console.error('Error formatting date in timezone:', dateString, timezone, error);
+    return dateString; // Return original if formatting fails
+  }
 }; 
