@@ -357,7 +357,15 @@ const AnalyticsTab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Invitations */}
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Invitaciones Más Vistas</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Invitaciones Más Vistas</h3>
+            <a
+              href="/admin/analytics/top-invitations"
+              className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+            >
+              Ver todas
+            </a>
+          </div>
           <div className="space-y-3">
             {analytics.topInvitations.length > 0 ? (
               analytics.topInvitations.map((invitation: any, index: number) => (
@@ -387,7 +395,15 @@ const AnalyticsTab: React.FC = () => {
 
         {/* Recent Activity */}
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Actividad Reciente</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium text-gray-900">Actividad Reciente</h3>
+            <a
+              href="/admin/analytics/recent-activity"
+              className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+            >
+              Ver todas
+            </a>
+          </div>
           <div className="space-y-3">
             {/* Combine views and confirmations */}
             {[...(analytics.recentViews || []), ...(analytics.recentRsvpEvents || [])]

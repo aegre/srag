@@ -21,6 +21,33 @@ const AdminDashboardContent: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Initialize active tab from URL parameter and handle browser navigation
+  useEffect(() => {
+    const updateTabFromUrl = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      if (tabParam && ['invitations', 'analytics', 'settings'].includes(tabParam)) {
+        setActiveTab(tabParam as 'invitations' | 'analytics' | 'settings');
+      } else {
+        setActiveTab('invitations');
+      }
+    };
+
+    // Initial load
+    updateTabFromUrl();
+
+    // Handle browser back/forward navigation
+    const handlePopState = () => {
+      updateTabFromUrl();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
   // Load dashboard data when token is available
   useEffect(() => {
     if (token) {
@@ -127,10 +154,23 @@ const AdminDashboardContent: React.FC = () => {
       message: 'Los cambios han sido guardados exitosamente.'
     });
     setActiveTab('invitations');
+    updateUrlTab('invitations');
   };
 
   const handleSettingsCancel = () => {
     setActiveTab('invitations');
+    updateUrlTab('invitations');
+  };
+
+  const handleTabChange = (tab: 'invitations' | 'analytics' | 'settings') => {
+    setActiveTab(tab);
+    updateUrlTab(tab);
+  };
+
+  const updateUrlTab = (tab: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tab);
+    window.history.pushState({}, '', url.toString());
   };
 
   const [exporting, setExporting] = useState(false);
@@ -294,7 +334,7 @@ const AdminDashboardContent: React.FC = () => {
             ].map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key as 'invitations' | 'analytics' | 'settings')}
+                onClick={() => handleTabChange(tab.key as 'invitations' | 'analytics' | 'settings')}
                 className={`whitespace-nowrap py-3 sm:py-2 px-3 sm:px-1 border-b-2 font-medium text-xs sm:text-sm capitalize min-w-fit ${
                   activeTab === tab.key
                     ? 'border-purple-500 text-purple-600'

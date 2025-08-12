@@ -1,0 +1,17 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminRoute from '../../../components/admin/AdminRoute';
+import TopInvitationsPage from '../../../components/admin/TopInvitationsPage';
+
+// Get query parameters
+const url = new URL(Astro.request.url);
+const page = url.searchParams.get('page') || '1';
+const limit = url.searchParams.get('limit') || '50';
+---
+
+<AdminLayout title="Invitaciones Más Vistas - Julietta XV Años">
+  <AdminRoute client:load>
+    <TopInvitationsPage page={page} limit={limit} client:load />
+  </AdminRoute>
+</AdminLayout>
+

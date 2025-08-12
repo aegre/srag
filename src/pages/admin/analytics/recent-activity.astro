@@ -1,0 +1,24 @@
+---
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import AdminRoute from '../../../components/admin/AdminRoute';
+import RecentActivityPage from '../../../components/admin/RecentActivityPage';
+
+// Get query parameters
+const url = new URL(Astro.request.url);
+const page = url.searchParams.get('page') || '1';
+const limit = url.searchParams.get('limit') || '50';
+const eventType = url.searchParams.get('eventType') || '';
+const invite = url.searchParams.get('invite') || '';
+---
+
+<AdminLayout title="Actividad Reciente - Julietta XV Años">
+  <AdminRoute client:load>
+    <RecentActivityPage 
+      page={page} 
+      limit={limit} 
+      eventType={eventType}
+      invite={invite}
+      client:load 
+    />
+  </AdminRoute>
+</AdminLayout>
