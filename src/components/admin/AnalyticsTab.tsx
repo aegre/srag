@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminApi } from '../../utils/api';
 import { formatLocalDate, formatLocalDateShort } from '../../utils/dateUtils';
+import { buildCoupleDisplayName } from '../../utils/textUtils';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -492,7 +493,12 @@ const AnalyticsTab: React.FC = () => {
                             </span>
                           ) : (
                             <span>
-                              {activity.name} {activity.lastname}
+                              {buildCoupleDisplayName(
+                                activity.name,
+                                activity.lastname,
+                                activity.secondary_name,
+                                activity.secondary_lastname
+                              )}
                             </span>
                           )}
                         </p>

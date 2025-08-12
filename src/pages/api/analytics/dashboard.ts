@@ -48,7 +48,7 @@ export const GET: APIRoute = async (context) => {
       db.prepare(`
         SELECT 
           a.id, a.timestamp, a.ip_address, a.user_agent,
-          i.name, i.lastname, i.slug
+          i.name, i.lastname, i.slug, i.secondary_name, i.secondary_lastname
         FROM analytics a
         LEFT JOIN invitations i ON a.invitation_id = i.id
         WHERE a.event_type = "view"
@@ -61,7 +61,7 @@ export const GET: APIRoute = async (context) => {
         SELECT 
           a.id, a.timestamp, a.ip_address, a.user_agent,
           a.event_type, a.event_data,
-          i.name, i.lastname, i.slug
+          i.name, i.lastname, i.slug, i.secondary_name, i.secondary_lastname
         FROM analytics a
         LEFT JOIN invitations i ON a.invitation_id = i.id
         WHERE a.event_type IN ('rsvp_button_click', 'rsvp_action_success', 'rsvp_action_error', 'rsvp_action_exception')
