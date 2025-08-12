@@ -1,11 +1,14 @@
 ---
 import Layout from './Layout.astro';
+import { buildCoupleDisplayName } from '../utils/textUtils';
 
 export interface Props {
   title?: string;
   description?: string;
   guestName?: string;
   guestLastname?: string;
+  secondaryName?: string;
+  secondaryLastname?: string;
   slug?: string;
   preview?: boolean;
 }
@@ -15,16 +18,20 @@ const {
   description,
   guestName,
   guestLastname,
+  secondaryName,
+  secondaryLastname,
   slug,
 } = Astro.props;
 
 // Generate dynamic content based on guest info
-const dynamicTitle = guestName && guestLastname 
-  ? `${guestName} ${guestLastname} - Invitación XV años Julietta`
+const guestDisplayName = buildCoupleDisplayName(guestName, guestLastname, secondaryName, secondaryLastname);
+
+const dynamicTitle = guestDisplayName 
+  ? `${guestDisplayName} - Invitación XV años Julietta`
   : "Invitación XV años Julietta";
 
-const dynamicDescription = guestName && guestLastname
-  ? `Invitación especial para ${guestName} ${guestLastname} a los XV años de Julietta. Una celebración mágica llena de amor y alegría.`
+const dynamicDescription = guestDisplayName
+  ? `Invitación especial para ${guestDisplayName} a los XV años de Julietta. Una celebración mágica llena de amor y alegría.`
   : "Invitación a los XV años de Julietta. Una celebración mágica llena de amor y alegría.";
 
 const dynamicUrl = slug 
