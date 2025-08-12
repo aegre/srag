@@ -3,6 +3,7 @@ import type { InvitationFormData, CreateInvitationRequest } from '../../types/ad
 import { getSpanishConjunction } from '../../utils/textUtils';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { adminApi, ApiError } from '../../utils/api';
+import AdminHeader from './AdminHeader';
 
 interface InvitationFormProps {
   onSuccess?: (invitation: any) => void;
@@ -35,6 +36,9 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     ...(mode === 'create' ? initialData : {}) // Only use initialData in create mode
   });
 
+  // Check if secondary name should be enabled (either has data or is being edited with existing data)
+  const [enableSecondaryName, setEnableSecondaryName] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [slugGenerated, setSlugGenerated] = useState(false);
@@ -53,6 +57,13 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
       loadInvitationData();
     }
   }, [mode, invitationId, token]);
+
+  // Enable secondary name fields if editing an invitation that has secondary name data
+  useEffect(() => {
+    if (mode === 'edit' && (formData.secondary_name || formData.secondary_lastname)) {
+      setEnableSecondaryName(true);
+    }
+  }, [mode, formData.secondary_name, formData.secondary_lastname]);
 
   const loadInvitationData = async () => {
     if (!invitationId || !token) return;
@@ -133,6 +144,18 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
     // Clear error when user starts typing
     if (error) {
       setError(null);
+    }
+  };
+
+  const handleSecondaryNameToggle = (checked: boolean) => {
+    setEnableSecondaryName(checked);
+    if (!checked) {
+      // Clear secondary name fields when disabling
+      setFormData(prev => ({
+        ...prev,
+        secondary_name: '',
+        secondary_lastname: ''
+      }));
     }
   };
 
@@ -250,46 +273,53 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={handleCancel}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {mode === 'create' ? 'Crear Nueva Invitación' : 'Editar Invitación'}
-              </h1>
-            </div>
-            {mode === 'edit' && (
-            <div className="flex items-center space-x-4">
-                <a 
-                  href={formData.slug ? `/invite/${formData.slug}?preview=true` : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    formData.slug 
-                      ? 'bg-gray-600 hover:bg-gray-700 text-white' 
-                      : 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                  }`}
-                  onClick={!formData.slug ? (e) => e.preventDefault() : undefined}
-                >
-                  Vista Previa
-                </a>
-            </div>
-            )}
-          </div>
-        </div>
-      </header>
+      {/* Standard Admin Header */}
+      <AdminHeader 
+        title={mode === 'create' ? 'Crear Nueva Invitación' : 'Editar Invitación'} 
+        showBackButton={true}
+      />
+      
+      
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Actions Bar */}
+        {mode === 'edit' && (
+          <div className="flex justify-end mb-6">
+            <div className="flex items-center space-x-3">
+              <a 
+                href={formData.slug ? `/invite/${formData.slug}?preview=true` : '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  formData.slug 
+                    ? 'bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300' 
+                    : 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
+                }`}
+                onClick={!formData.slug ? (e) => e.preventDefault() : undefined}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span className="hidden sm:inline">Vista Previa</span>
+                <span className="sm:hidden">Vista</span>
+              </a>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isLoading}
+                className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 transition-colors duration-200"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span className="hidden sm:inline">Eliminar</span>
+                <span className="sm:hidden">Eliminar</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Guest Information */}
           <div className="bg-white shadow rounded-lg">
@@ -330,37 +360,59 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="secondary_name" className="block text-sm font-medium text-gray-700">
-                    Segundo nombre (pareja) (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    name="secondary_name"
-                    id="secondary_name"
-                    value={formData.secondary_name}
-                    onChange={handleInputChange}
-                    disabled={isLoading}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
-                    placeholder="Juan Carlos"
-                  />
+                {/* Secondary Name Toggle */}
+                <div className="sm:col-span-2">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id="enable_secondary_name"
+                      checked={enableSecondaryName}
+                      onChange={(e) => handleSecondaryNameToggle(e.target.checked)}
+                      disabled={isLoading}
+                      className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    />
+                    <label htmlFor="enable_secondary_name" className="ml-2 block text-sm text-gray-900">
+                      Incluir pareja / segundo invitado
+                    </label>
+                  </div>
                 </div>
 
-                <div>
-                  <label htmlFor="secondary_lastname" className="block text-sm font-medium text-gray-700">
-                    Segundo apellido (pareja) (opcional)
-                  </label>
-                  <input
-                    type="text"
-                    name="secondary_lastname"
-                    id="secondary_lastname"
-                    value={formData.secondary_lastname}
-                    onChange={handleInputChange}
-                    disabled={isLoading}
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
-                    placeholder="Pérez"
-                  />
-                </div>
+                {/* Secondary Name Fields - Only show when enabled */}
+                {enableSecondaryName && (
+                  <>
+                    <div>
+                      <label htmlFor="secondary_name" className="block text-sm font-medium text-gray-700">
+                        Nombre de la pareja
+                      </label>
+                      <input
+                        type="text"
+                        name="secondary_name"
+                        id="secondary_name"
+                        value={formData.secondary_name}
+                        onChange={handleInputChange}
+                        disabled={isLoading}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
+                        placeholder="Juan Carlos"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="secondary_lastname" className="block text-sm font-medium text-gray-700">
+                        Apellido de la pareja (opcional)
+                      </label>
+                      <input
+                        type="text"
+                        name="secondary_lastname"
+                        id="secondary_lastname"
+                        value={formData.secondary_lastname}
+                        onChange={handleInputChange}
+                        disabled={isLoading}
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500 sm:text-sm disabled:opacity-50"
+                        placeholder="Pérez"
+                      />
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
@@ -460,46 +512,33 @@ const InvitationForm: React.FC<InvitationFormProps> = ({
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center">
-            {mode === 'edit' && (
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={isLoading}
-                className="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Eliminar Invitación
-              </button>
-            )}
-            <div className="flex space-x-4 ml-auto">
+          {/* Main Action Buttons */}
+          <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={handleCancel}
               disabled={isLoading}
-              className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              className="bg-white border border-gray-300 text-gray-700 h-10 px-6 rounded-lg text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors duration-200"
             >
-                Cancelar
+              Cancelar
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-purple-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
+              className="bg-purple-600 text-white h-10 px-6 rounded-lg text-sm font-medium hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 transition-colors duration-200"
             >
               {isLoading ? (
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {mode === 'create' ? 'Creando...' : 'Actualizando...'}
+                  <span>{mode === 'create' ? 'Creando...' : 'Actualizando...'}</span>
                 </div>
               ) : (
-                  mode === 'create' ? 'Crear Invitación' : 'Actualizar Invitación'
+                <span>{mode === 'create' ? 'Crear' : 'Guardar'}</span>
               )}
             </button>
-            </div>
           </div>
+
+
         </form>
       </div>
     </main>
