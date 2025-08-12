@@ -5,10 +5,10 @@ import { buildCoupleDisplayName } from '../utils/textUtils';
 export interface Props {
   title?: string;
   description?: string;
-  guestName?: string;
-  guestLastname?: string;
-  secondaryName?: string;
-  secondaryLastname?: string;
+  guestName: string;
+  guestLastname: string | null;
+  secondaryName: string | null;
+  secondaryLastname: string | null;
   slug?: string;
   preview?: boolean;
 }
