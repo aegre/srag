@@ -1,0 +1,63 @@
+---
+export interface Props {
+  name: string;
+  lastname?: string | null;
+  variant?: 'hero' | 'angella';
+  size?: 'small' | 'medium' | 'large';
+  className?: string;
+  layout?: 'stacked' | 'inline';
+}
+
+const { 
+  name, 
+  lastname, 
+  variant = 'hero', 
+  size = 'medium',
+  className = "",
+  layout = 'stacked'
+} = Astro.props;
+
+// Define font classes based on variant
+const fontClasses = {
+  hero: 'font-hero',
+  angella: 'font-angella'
+};
+
+// Define size classes based on size
+const sizeClasses = {
+  small: 'text-md md:text-xl lg:text-2xl',
+  medium: 'text-lg md:text-xl lg:text-3xl',
+  large: 'text-2xl md:text-4xl lg:text-5xl'
+};
+
+// Define color classes based on variant
+const colorClasses = {
+  hero: 'text-white',
+  angella: 'text-secondary-light'
+};
+
+// Combine all classes
+const combinedClasses = [
+  fontClasses[variant],
+  sizeClasses[size],
+  colorClasses[variant],
+  'tracking-wide font-light capitalize',
+  className
+].join(' ');
+---
+
+{lastname ? (
+  layout === 'inline' ? (
+    <p class={combinedClasses}>
+      {name}&nbsp;{lastname}
+    </p>
+  ) : (
+    <p class={combinedClasses}>
+      {name}<br><br>{lastname}
+    </p>
+  )
+) : (
+  <p class={combinedClasses}>
+    {name}
+  </p>
+)}

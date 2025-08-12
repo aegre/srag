@@ -1,0 +1,55 @@
+---
+import NameText from './NameText.astro';
+import NameConjunction from './NameConjunction.astro';
+
+export interface Props {
+  primaryName: string;
+  primaryLastname?: string | null;
+  secondaryName: string;
+  secondaryLastname?: string | null;
+  conjunction?: string;
+  className?: string;
+}
+
+const { 
+  primaryName, 
+  primaryLastname, 
+  secondaryName, 
+  secondaryLastname, 
+  conjunction = "y",
+  className = "" 
+} = Astro.props;
+
+const textStyle = "small"
+---
+
+<div class={`text-center space-y-4 ${className}`}>
+  <!-- Primary person -->
+  <div>
+    <NameText 
+      name={primaryName} 
+      lastname={primaryLastname} 
+      variant="hero" 
+      size={textStyle}
+      layout="inline"
+    />
+  </div>
+
+  <!-- Elegant separator with conjunction -->
+  <NameConjunction 
+    conjunction={conjunction} 
+    variant="hero" 
+    size={textStyle}
+  />
+
+  <!-- Secondary person -->
+  <div>
+    <NameText 
+      name={secondaryName} 
+      lastname={secondaryLastname} 
+      variant="hero" 
+      size={textStyle}
+      layout="inline"
+    />
+  </div>
+</div>

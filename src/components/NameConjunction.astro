@@ -1,0 +1,52 @@
+---
+export interface Props {
+  conjunction?: string;
+  variant?: 'hero' | 'angella';
+  size?: 'small' | 'medium' | 'large';
+  className?: string;
+}
+
+const { 
+  conjunction = "y", 
+  variant = 'hero',
+  size = 'medium',
+  className = "" 
+} = Astro.props;
+
+// Define font classes based on variant
+const fontClasses = {
+  hero: 'font-hero',
+  angella: 'font-angella'
+};
+
+// Define size classes based on size
+const sizeClasses = {
+  small: 'text-lg md:text-xl lg:text-2xl',
+  medium: 'text-xl md:text-2xl lg:text-3xl',
+  large: 'text-3xl md:text-4xl'
+};
+
+// Define color classes based on variant
+const colorClasses = {
+  hero: 'text-white/60',
+  angella: 'text-secondary-light/60'
+};
+
+// Combine all classes
+const combinedClasses = [
+  fontClasses[variant],
+  sizeClasses[size],
+  colorClasses[variant],
+  'font-light',
+  className
+].join(' ');
+
+// Define line color based on variant
+const lineColor = variant === 'hero' ? 'via-white/40' : 'via-secondary-light/40';
+---
+
+<div class="flex justify-center items-center space-x-4">
+  <hr class={`w-12 h-px bg-gradient-to-r from-transparent ${lineColor} to-transparent border-0`} aria-hidden="true" />
+  <span class={combinedClasses}>{conjunction}</span>
+  <hr class={`w-12 h-px bg-gradient-to-r from-transparent ${lineColor} to-transparent border-0`} aria-hidden="true" />
+</div>

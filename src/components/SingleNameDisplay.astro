@@ -1,0 +1,20 @@
+---
+import NameText from './NameText.astro';
+
+export interface Props {
+  name: string;
+  lastname?: string | null;
+  className?: string;
+}
+
+const { name, lastname, className = "" } = Astro.props;
+---
+
+<div class={`text-center ${className}`}>
+  <NameText 
+    name={name} 
+    lastname={lastname} 
+    variant="hero" 
+    size="medium" 
+  />
+</div>

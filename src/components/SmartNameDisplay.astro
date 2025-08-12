@@ -1,0 +1,37 @@
+---
+import SingleNameDisplay from './SingleNameDisplay.astro';
+import CoupleNameDisplay from './CoupleNameDisplay.astro';
+
+export interface Props {
+  invitation?: any;
+  className?: string;
+}
+
+const { invitation, className = "" } = Astro.props;
+
+// Extract name data from invitation
+const primaryName = invitation?.name || '';
+const primaryLastname = invitation?.lastname || null;
+const secondaryName = invitation?.secondary_name || '';
+const secondaryLastname = invitation?.secondary_lastname || null;
+
+// Determine if this is a couple invitation
+const isCouple = secondaryName && secondaryName.trim() !== '';
+---
+
+{isCouple ? (
+  <CoupleNameDisplay
+    primaryName={primaryName}
+    primaryLastname={primaryLastname}
+    secondaryName={secondaryName}
+    secondaryLastname={secondaryLastname}
+    conjunction="y"
+    className={className}
+  />
+) : (
+  <SingleNameDisplay
+    name={primaryName}
+    lastname={primaryLastname}
+    className={className}
+  />
+)}
