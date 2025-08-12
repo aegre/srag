@@ -7,11 +7,19 @@ import TopInvitationsPage from '../../../components/admin/TopInvitationsPage';
 const url = new URL(Astro.request.url);
 const page = url.searchParams.get('page') || '1';
 const limit = url.searchParams.get('limit') || '50';
+const state = url.searchParams.get('state') || '';
+const status = url.searchParams.get('status') || '';
 ---
 
 <AdminLayout title="Invitaciones Más Vistas - Julietta XV Años">
   <AdminRoute client:load>
-    <TopInvitationsPage page={page} limit={limit} client:load />
+    <TopInvitationsPage 
+      page={page} 
+      limit={limit}
+      state={state}
+      status={status}
+      client:load 
+    />
   </AdminRoute>
 </AdminLayout>
 

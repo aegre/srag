@@ -3,6 +3,7 @@ import { adminApi, ApiError } from '../../utils/api';
 import { useToast, ToastProvider } from '../ui/Toast';
 import type { PaginatedResponse } from '../../types/admin';
 import { formatLocalDate } from '../../utils/dateUtils';
+import AdminHeader from './AdminHeader';
 
 interface User {
   id: number;
@@ -187,27 +188,33 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
   }
 
   return (
-    <div className="bg-white shadow rounded-lg">
-      <div className="px-4 py-5 sm:p-6">
-        <div className="mb-6 flex flex-col sm:flex-row justify-between items-start space-y-4 sm:space-y-0">
-          <div>
-            <h3 className="text-lg leading-6 font-medium text-gray-900 mb-2">
-              Usuarios del Sistema
-            </h3>
-            <p className="text-sm text-gray-600">
-              Gestiona los usuarios que tienen acceso al panel de administración.
-            </p>
+    <main className="min-h-screen bg-gray-50">
+      <AdminHeader title="Gestión de Usuarios" />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Lista de Usuarios</h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Gestiona los usuarios que tienen acceso al panel de administración
+              </p>
+            </div>
+            <a
+              href="/admin/users/create"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Crear Usuario
+            </a>
           </div>
-          <a
-            href="/admin/users/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 w-full sm:w-auto justify-center"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Crear Usuario
-          </a>
         </div>
+
+        <div className="bg-white shadow rounded-lg">
+          <div className="px-4 py-5 sm:p-6">
 
         {users.length === 0 ? (
           <div className="text-center py-12">
@@ -427,8 +434,10 @@ const UserListContent: React.FC<UserListProps> = ({ onEditUser, onRefresh }) => 
             )}
           </>
         )}
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -12,6 +12,8 @@ export const GET: APIRoute = async (context) => {
         i.id,
         i.name,
         i.lastname,
+        i.secondary_name,
+        i.secondary_lastname,
         i.slug,
         i.number_of_passes,
         i.is_confirmed,
@@ -26,15 +28,15 @@ export const GET: APIRoute = async (context) => {
         END AS status_es
       FROM invitations i
       LEFT JOIN analytics a ON i.id = a.invitation_id AND a.event_type = 'view'
-      GROUP BY i.id, i.name, i.lastname, i.slug, i.number_of_passes, i.is_confirmed, i.is_active, i.created_at, i.updated_at
+      GROUP BY i.id, i.name, i.lastname, i.secondary_name, i.secondary_lastname, i.slug, i.number_of_passes, i.is_confirmed, i.is_active, i.created_at, i.updated_at
       ORDER BY i.created_at DESC
     `).all();
 
     // Create CSV content
     const csvHeaders = [
       'ID',
-      'Nombre',
-      'Apellido',
+      'Invitado Principal',
+      'Invitado Secundario',
       'Slug',
       'Número de Pases',
       'Estado',
@@ -43,17 +45,28 @@ export const GET: APIRoute = async (context) => {
       'Última Actualización'
     ];
 
-    const csvRows = invitations.results.map((invitation: any) => [
-      invitation.id,
-      invitation.name,
-      invitation.lastname,
-      invitation.slug,
-      invitation.number_of_passes,
-      invitation.status_es,
-      invitation.view_count,
-      formatLocalDateFull(invitation.created_at),
-      formatLocalDateFull(invitation.updated_at)
-    ]);
+    const csvRows = invitations.results.map((invitation: any) => {
+      // Format main guest name
+      const mainGuest = `${invitation.name} ${invitation.lastname || ''}`.trim();
+
+      // Format secondary guest name (if exists)
+      let secondaryGuest = '';
+      if (invitation.secondary_name) {
+        secondaryGuest = `${invitation.secondary_name} ${invitation.secondary_lastname || ''}`.trim();
+      }
+
+      return [
+        invitation.id,
+        mainGuest,
+        secondaryGuest,
+        invitation.slug,
+        invitation.number_of_passes,
+        invitation.status_es,
+        invitation.view_count,
+        formatLocalDateFull(invitation.created_at),
+        formatLocalDateFull(invitation.updated_at)
+      ];
+    });
 
     // Combine headers and rows
     const csvContent = [

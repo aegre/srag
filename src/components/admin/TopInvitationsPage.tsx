@@ -6,6 +6,8 @@ import AdminHeader from './AdminHeader';
 interface TopInvitationsPageProps {
   page?: string;
   limit?: string;
+  state?: string;
+  status?: string;
 }
 
 interface Invitation {
@@ -15,6 +17,8 @@ interface Invitation {
   slug: string;
   is_active: boolean;
   is_confirmed: boolean;
+  secondary_name: string | null;
+  secondary_lastname: string | null;
   view_count: number;
   created_at: string;
   updated_at: string;
@@ -29,7 +33,9 @@ interface Pagination {
 
 const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({ 
   page: initialPage = '1', 
-  limit: initialLimit = '50' 
+  limit: initialLimit = '50',
+  state: initialState = '',
+  status: initialStatus = ''
 }) => {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [pagination, setPagination] = useState<Pagination>({
@@ -40,17 +46,34 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filters, setFilters] = useState({
+    state: initialState,
+    status: initialStatus
+  });
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     loadData();
-  }, [pagination.page, pagination.limit]);
+  }, [pagination.page, pagination.limit, filters.state, filters.status]);
 
   const loadData = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/analytics/top-invitations?page=${pagination.page}&limit=${pagination.limit}`);
+      const params = new URLSearchParams({
+        page: pagination.page.toString(),
+        limit: pagination.limit.toString()
+      });
+
+      if (filters.state) {
+        params.append('state', filters.state);
+      }
+      if (filters.status) {
+        params.append('status', filters.status);
+      }
+
+      const response = await fetch(`/api/analytics/top-invitations?${params.toString()}`);
       
       if (!response.ok) {
         throw new Error('Error al cargar los datos');
@@ -80,6 +103,33 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
     // Update URL without page reload
     const url = new URL(window.location.href);
     url.searchParams.set('page', newPage.toString());
+    window.history.pushState({}, '', url.toString());
+  };
+
+  const handleFilterChange = (filterType: 'state' | 'status', value: string) => {
+    setFilters(prev => ({ ...prev, [filterType]: value }));
+    setPagination(prev => ({ ...prev, page: 1 })); // Reset to page 1 when filters change
+    
+    // Update URL
+    const url = new URL(window.location.href);
+    if (value) {
+      url.searchParams.set(filterType, value);
+    } else {
+      url.searchParams.delete(filterType);
+    }
+    url.searchParams.set('page', '1');
+    window.history.pushState({}, '', url.toString());
+  };
+
+  const clearFilters = () => {
+    setFilters({ state: '', status: '' });
+    setPagination(prev => ({ ...prev, page: 1 }));
+    
+    // Update URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete('state');
+    url.searchParams.delete('status');
+    url.searchParams.set('page', '1');
     window.history.pushState({}, '', url.toString());
   };
 
@@ -138,15 +188,6 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
                 Lista completa de todas las invitaciones ordenadas por número de vistas
               </p>
             </div>
-            <a
-              href="/admin"
-              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            >
-              <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Volver al Panel
-            </a>
           </div>
         </div>
 
@@ -171,6 +212,71 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
               <p className="text-sm text-gray-600">Confirmadas</p>
             </div>
           </div>
+        </div>
+
+        {/* Filters Section */}
+        <div className="flex items-end w-full justify-end gap-4">
+          {/* Filters */}
+          {showFilters && (
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end flex-1">
+              <div className="flex-1 min-w-0">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Estado
+                </label>
+                <select
+                  value={filters.state}
+                  onChange={(e) => handleFilterChange('state', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                >
+                  <option value="">Todos los estados</option>
+                  <option value="viewed">Vistas</option>
+                  <option value="not_viewed">No vistas</option>
+                </select>
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  Confirmación
+                </label>
+                <select
+                  value={filters.status}
+                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                >
+                  <option value="">Todas las confirmaciones</option>
+                  <option value="confirmed">Confirmadas</option>
+                  <option value="pending">Pendientes</option>
+                </select>
+              </div>
+              
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Limpiar Filtros
+              </button>
+            </div>
+          )}
+          
+          {/* Toggle Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="inline-flex items-center justify-center w-10 h-10 border border-gray-300 shadow-sm rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 flex-shrink-0"
+            title={showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+          </button>
         </div>
 
         {/* Invitations List */}
@@ -204,7 +310,7 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
                     <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Vistas
                     </th>
-                    <th className="hidden md:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Estado
                     </th>
                     <th className="hidden lg:table-cell px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -227,6 +333,11 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">
                             {invitation.name} {invitation.lastname}
+                            {invitation.secondary_name && (
+                              <div className="text-gray-500 text-xs">
+                                {invitation.secondary_name} {invitation.secondary_lastname ? ` ${invitation.secondary_lastname}` : ''}
+                              </div>
+                            )}
                           </div>
                           <div className="sm:hidden text-xs text-gray-500">/{invitation.slug}</div>
                         </td>
@@ -236,7 +347,7 @@ const TopInvitationsPage: React.FC<TopInvitationsPageProps> = ({
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-semibold text-gray-900">{invitation.view_count}</div>
                         </td>
-                        <td className="hidden md:table-cell px-3 sm:px-6 py-4 whitespace-nowrap">
+                        <td className="hidden table-cell px-3 sm:px-6 py-4 whitespace-nowrap">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             invitation.is_confirmed 
                               ? 'bg-green-100 text-green-800' 

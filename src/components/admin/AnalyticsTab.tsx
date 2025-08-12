@@ -201,7 +201,20 @@ const AnalyticsTab: React.FC = () => {
 
   const topInvitationsDoughnut = (() => {
     const items = (analytics?.topInvitations || []).slice(0, 6);
-    const labels = items.map((inv: any) => `${inv.name} ${inv.lastname}`);
+    
+    // Format names for chart labels (only names, not lastnames for couples)
+    const labels = items.map((inv: any) => {
+      if (inv.secondary_name) {
+        // For couples, show only names: "Juan y María"
+        const mainName = inv.name;
+        const secondaryName = inv.secondary_name;
+        return `${mainName} y ${secondaryName}`;
+      } else {
+        // For single guests, show full name
+        return `${inv.name} ${inv.lastname || ''}`.trim();
+      }
+    });
+    
     const data = items.map((inv: any) => Number(inv.view_count || 0));
     const palette = [
       'rgba(147, 51, 234, 0.7)', // purple-600
@@ -376,7 +389,13 @@ const AnalyticsTab: React.FC = () => {
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900">
-                        {invitation.name} {invitation.lastname}
+                        {invitation.secondary_name ? (
+                          // For couples, show only names
+                          `${invitation.name} y ${invitation.secondary_name}`
+                        ) : (
+                          // For single guests, show full name
+                          `${invitation.name} ${invitation.lastname || ''}`.trim()
+                        )}
                       </p>
                       <p className="text-xs text-gray-500">/{invitation.slug}</p>
                     </div>

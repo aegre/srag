@@ -24,12 +24,16 @@ export const GET: APIRoute = async (context) => {
       });
     }
 
-    // Get all non-hidden message events from analytics
+    // Get all non-hidden message events from analytics with invitation data
     const messages = await db.prepare(`
       SELECT 
         a.event_data,
         a.timestamp,
-        i.slug as invitation_slug
+        i.slug as invitation_slug,
+        i.name,
+        i.lastname,
+        i.secondary_name,
+        i.secondary_lastname
       FROM analytics a
       LEFT JOIN invitations i ON a.invitation_id = i.id
       LEFT JOIN message_visibility mv ON mv.analytics_id = a.id
@@ -38,7 +42,7 @@ export const GET: APIRoute = async (context) => {
     `).all();
 
     if (!messages.results || messages.results.length === 0) {
-      const header = ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Slug', 'Fecha'];
+      const header = ['Nombre del Invitado', 'Mensaje', 'Slug', 'Fecha'];
       const csvContent = header.join(',') + '\n';
       return new Response(csvContent, {
         status: 200,
@@ -52,17 +56,32 @@ export const GET: APIRoute = async (context) => {
     // Parse event_data and create CSV
     const csvRows = [
       // CSV Header
-      ['Nombre del Invitado', 'Mensaje', 'Invitación', 'Slug', 'Fecha']
+      ['Nombre del Invitado', 'Mensaje', 'Slug', 'Fecha']
     ];
 
     for (const message of messages.results) {
       try {
         const eventData = JSON.parse(message.event_data);
-        const guestName = eventData.guest_name || 'Anónimo';
         const messageText = eventData.message || '';
         const invitationSlug = message.invitation_slug || 'N/A';
         // Convert UTC timestamp to local timezone
         const createdAt = formatLocalDateFull(message.timestamp);
+
+        // Format guest name with secondary name and conjunction
+        let guestName = 'Anónimo';
+        if (message.name) {
+          // Format main guest name (handle optional lastname)
+          const mainGuest = `${message.name} ${message.lastname || ''}`.trim();
+
+          // Check if there's a secondary guest
+          if (message.secondary_name) {
+            // Format secondary guest name (handle optional lastname)
+            const secondaryGuest = `${message.secondary_name} ${message.secondary_lastname || ''}`.trim();
+            guestName = `${mainGuest} y ${secondaryGuest}`;
+          } else {
+            guestName = mainGuest;
+          }
+        }
 
         // Escape CSV values (handle commas and quotes)
         const escapeCsvValue = (value: string) => {
@@ -75,7 +94,6 @@ export const GET: APIRoute = async (context) => {
         csvRows.push([
           escapeCsvValue(guestName),
           escapeCsvValue(messageText),
-          escapeCsvValue(invitationSlug),
           escapeCsvValue(invitationSlug),
           escapeCsvValue(createdAt)
         ]);
