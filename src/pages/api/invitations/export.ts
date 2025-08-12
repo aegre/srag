@@ -41,7 +41,6 @@ export const GET: APIRoute = async (context) => {
     const csvHeaders = [
       'ID',
       'Invitado(s)',
-      'Invitado Secundario (Legacy)',
       'Slug',
       'Número de Pases',
       'Estado',
@@ -62,7 +61,6 @@ export const GET: APIRoute = async (context) => {
       return [
         invitation.id,
         guestName,
-        '', // Empty secondary guest column (now included in main guest name)
         invitation.slug,
         invitation.number_of_passes,
         invitation.status_es,
