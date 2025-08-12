@@ -42,45 +42,15 @@ export interface Invitation {
   slug: string;
 
   // Personal information
-  celebrant_name: string;
-  celebrant_lastname: string | null;
-  event_date: string;
-  event_time: string;
-
-  // Venue information
-  venue_name: string;
-  venue_address: string;
-  venue_coordinates: string | null;
-
-  // Party details
-  dress_code: string | null;
-  max_passes: number;
-
-  // Content customization
-  personal_message: string | null;
-  parents_message: string | null;
-  itinerary: ItineraryItem[] | null;
-  important_info: string[] | null;
-
-  // Settings
-  music_enabled: boolean;
-  music_url: string | null;
-  background_music_volume: number;
-
-  // Gift registry
-  gift_registry_url: string | null;
-  gift_registry_message: string | null;
-
-  // RSVP settings
-  rsvp_enabled: boolean;
-  rsvp_deadline: string | null;
-  rsvp_phone: string | null;
-  rsvp_whatsapp: string | null;
+  name: string;
+  lastname: string;
+  secondary_name: string | null;
+  secondary_lastname: string | null;
+  number_of_passes: number;
 
   // Status and metadata
-  is_published: boolean;
-  password_protected: boolean;
-  password_hash: string | null;
+  is_confirmed: boolean;
+  is_active: boolean;
   view_count: number;
   created_at: string;
   updated_at: string;
@@ -126,6 +96,19 @@ export interface Session {
   user_id: number;
   expires_at: string;
   created_at: string;
+}
+
+export interface InvitationSettings {
+  id: number;
+  event_date: string | null;
+  event_time: string | null;
+  rsvp_enabled: boolean;
+  rsvp_deadline: string | null;
+  rsvp_phone: string | null;
+  rsvp_whatsapp: string | null;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // Input types for creating new records
