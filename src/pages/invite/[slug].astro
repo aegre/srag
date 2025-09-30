@@ -14,6 +14,7 @@ let invitation = null;
 let isPublished = false;
 let settings = null;
 let error = null;
+let showThankYouPage = false;
 
 try {
   const db = (Astro.locals as any).runtime?.env?.DB;
@@ -32,7 +33,8 @@ try {
         rsvp_deadline: settingsResult.rsvp_deadline,
         rsvp_phone: settingsResult.rsvp_phone,
         rsvp_whatsapp: settingsResult.rsvp_whatsapp,
-        is_published: isPublished
+        is_published: isPublished,
+        thank_you_page_enabled: settingsResult.thank_you_page_enabled === 1 || settingsResult.thank_you_page_enabled === true
       };
     } else {
       // Use default settings if none exist
@@ -43,11 +45,24 @@ try {
         rsvp_deadline: '2025-09-01',
         rsvp_phone: '+525555555555',
         rsvp_whatsapp: '+525555555555',
-        is_published: false
+        is_published: false,
+        thank_you_page_enabled: false
       };
       isPublished = false;
     }
     
+    // Check if event has passed and thank you page should be shown
+    if (settings?.event_date && settings?.thank_you_page_enabled) {
+      const eventDate = new Date(settings.event_date);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+      console.log({
+        eventDate,
+        today,
+      })
+      showThankYouPage = eventDate < today;
+    }
+
     // Load invitation if published OR if in preview mode
     if (isPublished || preview) {
       const result = await db.prepare(
@@ -88,5 +103,6 @@ if (!invitation && !error) {
 		invitation={invitation}
 		slug={slug}
 		settings={settings}
+		showThankYouPage={showThankYouPage}
 	/>
 </InvitationLayout>

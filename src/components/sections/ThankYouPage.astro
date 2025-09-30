@@ -1,0 +1,89 @@
+---
+import InvitationSection from '../InvitationSection.astro';
+
+export interface Props {
+  guestName?: string;
+  guestLastname?: string;
+  secondaryName?: string;
+  secondaryLastname?: string;
+}
+
+const { 
+  guestName = '', 
+  guestLastname = '', 
+  secondaryName = '', 
+  secondaryLastname = '' 
+} = Astro.props;
+
+// Build display name
+let displayName = guestName;
+if (guestLastname) {
+  displayName += ` ${guestLastname}`;
+}
+if (secondaryName) {
+  displayName += ` y ${secondaryName}`;
+  if (secondaryLastname) {
+    displayName += ` ${secondaryLastname}`;
+  }
+}
+---
+
+<InvitationSection id="section-thank-you">
+  <div class="relative z-10 space-y-12 text-center">
+    
+    <!-- Thank you message -->
+    <section class="space-y-8 max-w-2xl mx-auto">
+      
+      <!-- Main thank you message -->
+      <div class="space-y-6">
+        <h2 class="font-angella text-4xl md:text-5xl text-secondary-light font-light">
+          ¡Gracias!
+        </h2>
+        
+        <p class="font-hero text-lg md:text-xl text-secondary-light font-light leading-relaxed">
+          {displayName ? `¡${displayName}!` : '¡Gracias!'}
+        </p>
+        
+        <p class="font-hero text-base md:text-lg text-secondary-light/80 font-light leading-relaxed">
+          Tu presencia en mi celebración de XV años hizo que este día fuera aún más especial. 
+          Gracias por compartir conmigo este momento tan importante en mi vida.
+        </p>
+      </div>
+
+      <!-- Celebration message -->
+      <div class="space-y-4">
+        <p class="font-hero text-base md:text-lg text-secondary-light font-light leading-relaxed">
+          ¡Fue una noche mágica gracias a ti!
+        </p>
+        
+        <div class="flex items-center justify-center space-x-2">
+          <img
+            src="/images/corazones.png"
+            alt="Corazones"
+            class="w-6 md:w-8 h-auto select-none"
+            aria-hidden="true"
+          />
+          <p class="font-angella text-xl md:text-2xl text-secondary-light font-light">
+            Julietta
+          </p>
+          <img
+            src="/images/corazones.png"
+            alt="Corazones"
+            class="w-6 md:w-8 h-auto select-none"
+            aria-hidden="true"
+          />
+        </div>
+      </div>
+
+      <!-- Additional thank you message -->
+      <div class="pt-8">
+        <p class="font-hero text-sm md:text-base text-secondary-light/70 font-light leading-relaxed">
+          Con cariño y gratitud,
+        </p>
+      </div>
+
+    </section>
+
+  </div>
+</InvitationSection>
+

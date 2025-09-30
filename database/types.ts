@@ -107,6 +107,7 @@ export interface InvitationSettings {
   rsvp_phone: string | null;
   rsvp_whatsapp: string | null;
   is_published: boolean;
+  thank_you_page_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

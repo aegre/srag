@@ -51,6 +51,7 @@ export interface InvitationSettings {
   rsvp_phone?: string;
   rsvp_whatsapp?: string;
   is_published: boolean;
+  thank_you_page_enabled: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -84,6 +85,7 @@ export interface UpdateSettingsRequest {
   rsvp_phone?: string;
   rsvp_whatsapp?: string;
   is_published?: boolean;
+  thank_you_page_enabled?: boolean;
 }
 
 // Dashboard statistics types
@@ -166,6 +168,7 @@ export interface SettingsFormData {
   rsvp_phone: string;
   rsvp_whatsapp: string;
   is_published: boolean;
+  thank_you_page_enabled: boolean;
 }
 
 // Component prop types

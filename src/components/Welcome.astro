@@ -12,6 +12,7 @@ import ImportantInformation from './sections/ImportantInformation.astro';
 import GiftTable from './sections/GiftTable.astro';
 import MessageToQuinceanera from './sections/MessageToQuinceanera.astro';
 import FinalMessage from './sections/FinalMessage.astro';
+import ThankYouPage from './sections/ThankYouPage.astro';
 import MusicController from './MusicController.astro';
 import EntryScreen from './EntryScreen.astro';
 import ScrollManager from './ScrollManager.astro';
@@ -21,25 +22,27 @@ export interface Props {
   invitation?: any;
   slug?: string;
   settings?: any;
+  showThankYouPage?: boolean;
 }
 
-const { preview = false, invitation = null, slug = '', settings = null } = Astro.props;
+const { preview = false, invitation = null, slug = '', settings = null, showThankYouPage = false } = Astro.props;
 
 // Define sections configuration - easy to add/remove sections
 const sections = [
-  { id: 'section-main-invitation', component: MainInvitation, enabled: true },
-  { id: 'section-countdown-timer', component: CountdownTimer, enabled: true },
-  { id: 'section-invitation-details', component: InvitationDetails, enabled: true },
-  { id: 'section-parents-greetings', component: ParentsGreetings, enabled: true },
-  { id: 'section-personal-greetings', component: PersonalGreetings, enabled: true },
-  { id: 'section-itinerary', component: Itinerary, enabled: true },
-  { id: 'section-event-location', component: EventLocation, enabled: true },
-  { id: 'section-dress-code', component: DressCode, enabled: true },
-  { id: 'section-details-rsvp', component: DetailsRSVP, enabled: true },
-  { id: 'section-important-information', component: ImportantInformation, enabled: true },
-  { id: 'section-gift-table', component: GiftTable, enabled: true },
-  { id: 'section-message-to-quinceanera', component: MessageToQuinceanera, enabled: true },
-  { id: 'section-final-message', component: FinalMessage, enabled: true },
+  { id: 'section-main-invitation', component: MainInvitation, enabled: !showThankYouPage },
+  { id: 'section-countdown-timer', component: CountdownTimer, enabled: !showThankYouPage },
+  { id: 'section-invitation-details', component: InvitationDetails, enabled: !showThankYouPage },
+  { id: 'section-parents-greetings', component: ParentsGreetings, enabled: !showThankYouPage },
+  { id: 'section-personal-greetings', component: PersonalGreetings, enabled: !showThankYouPage },
+  { id: 'section-itinerary', component: Itinerary, enabled: !showThankYouPage },
+  { id: 'section-event-location', component: EventLocation, enabled: !showThankYouPage },
+  { id: 'section-dress-code', component: DressCode, enabled: !showThankYouPage },
+  { id: 'section-details-rsvp', component: DetailsRSVP, enabled: !showThankYouPage },
+  { id: 'section-important-information', component: ImportantInformation, enabled: !showThankYouPage },
+  { id: 'section-gift-table', component: GiftTable, enabled: !showThankYouPage },
+  { id: 'section-message-to-quinceanera', component: MessageToQuinceanera, enabled: !showThankYouPage },
+  { id: 'section-final-message', component: FinalMessage, enabled: !showThankYouPage },
+  { id: 'section-thank-you', component: ThankYouPage, enabled: showThankYouPage },
 ];
 
 // Filter enabled sections
@@ -102,20 +105,32 @@ const sectionIds = enabledSections.map(section => section.id);
 
     <!-- Scrollable content container -->
     <div id="scroll-container" class="relative h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory" style="z-index: 20;">
-      <!-- Dynamically render sections -->
-      <MainInvitation settings={settings} />
-      <CountdownTimer settings={settings} />
-      <InvitationDetails invitation={invitation} />
-      <ParentsGreetings />
-      <PersonalGreetings />
-      <Itinerary />
-      <EventLocation />
-      <DressCode />
-      <DetailsRSVP settings={settings} invitation={invitation} />
-      <ImportantInformation />
-      <GiftTable />
-      <MessageToQuinceanera invitation={invitation} />
-      <FinalMessage />
+      {showThankYouPage ? (
+        <!-- Show only thank you page after event -->
+        <ThankYouPage 
+          guestName={invitation?.name}
+          guestLastname={invitation?.lastname}
+          secondaryName={invitation?.secondary_name}
+          secondaryLastname={invitation?.secondary_lastname}
+        />
+      ) : (
+        <!-- Show regular invitation sections -->
+        <>
+          <MainInvitation settings={settings} />
+          <CountdownTimer settings={settings} />
+          <InvitationDetails invitation={invitation} />
+          <ParentsGreetings />
+          <PersonalGreetings />
+          <Itinerary />
+          <EventLocation />
+          <DressCode />
+          <DetailsRSVP settings={settings} invitation={invitation} />
+          <ImportantInformation />
+          <GiftTable />
+          <MessageToQuinceanera invitation={invitation} />
+          <FinalMessage />
+        </>
+      )}
     </div>
 
     <!-- View tracking script -->

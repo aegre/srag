@@ -56,8 +56,8 @@ export const GET: APIRoute = async (context) => {
     if (!settings) {
       // Create default settings if none exist
       const result = await db.prepare(`
-        INSERT INTO invitation_settings (event_date, event_time, rsvp_enabled, rsvp_deadline, rsvp_phone, rsvp_whatsapp, is_published) 
-        VALUES (NULL, NULL, 1, NULL, NULL, NULL, 0)
+        INSERT INTO invitation_settings (event_date, event_time, rsvp_enabled, rsvp_deadline, rsvp_phone, rsvp_whatsapp, is_published, thank_you_page_enabled) 
+        VALUES (NULL, NULL, 1, NULL, NULL, NULL, 0, 0)
       `).run();
 
       const newSettings = await db.prepare(
@@ -137,6 +137,7 @@ export const PUT: APIRoute = async (context) => {
         rsvp_phone = ?,
         rsvp_whatsapp = ?,
         is_published = ?,
+        thank_you_page_enabled = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ?
     `).bind(
@@ -147,6 +148,7 @@ export const PUT: APIRoute = async (context) => {
       settingsData.rsvp_phone || null,
       settingsData.rsvp_whatsapp || null,
       settingsData.is_published || false,
+      settingsData.thank_you_page_enabled || false,
       currentSettings.id
     ).run();
 

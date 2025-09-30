@@ -20,7 +20,8 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
     rsvp_deadline: '',
     rsvp_phone: '',
     rsvp_whatsapp: '',
-    is_published: false
+    is_published: false,
+    thank_you_page_enabled: false
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +46,8 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
           rsvp_deadline: result.data.rsvp_deadline || '',
           rsvp_phone: result.data.rsvp_phone || '',
           rsvp_whatsapp: result.data.rsvp_whatsapp || '',
-          is_published: result.data.is_published || false
+          is_published: result.data.is_published || false,
+          thank_you_page_enabled: result.data.thank_you_page_enabled === 1 || result.data.thank_you_page_enabled === true
         });
       }
     } catch (err) {
@@ -93,7 +95,8 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
         rsvp_deadline: formData.rsvp_deadline || undefined,
         rsvp_phone: formData.rsvp_phone.trim() || undefined,
         rsvp_whatsapp: formData.rsvp_whatsapp.trim() || undefined,
-        is_published: formData.is_published
+        is_published: formData.is_published,
+        thank_you_page_enabled: formData.thank_you_page_enabled
       };
 
 
@@ -223,6 +226,24 @@ const SettingsForm: React.FC<SettingsFormProps> = ({
                     Habilitar funcionalidad de RSVP
                   </label>
                 </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="thank_you_page_enabled"
+                    id="thank_you_page_enabled"
+                    checked={formData.thank_you_page_enabled}
+                    onChange={handleInputChange}
+                    disabled={isLoading}
+                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="thank_you_page_enabled" className="ml-2 block text-sm text-gray-900">
+                    Mostrar página de agradecimiento después del evento
+                  </label>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Cuando esté habilitado, los invitados verán una página especial de agradecimiento después de que termine el evento (basado en la fecha del evento).
+                </p>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
