@@ -112,6 +112,8 @@ const sectionIds = enabledSections.map(section => section.id);
           guestLastname={invitation?.lastname}
           secondaryName={invitation?.secondary_name}
           secondaryLastname={invitation?.secondary_lastname}
+          invitationId={invitation?.id}
+          preview={preview}
         />
       ) : (
         <!-- Show regular invitation sections -->
@@ -165,8 +167,8 @@ const sectionIds = enabledSections.map(section => section.id);
     <ScrollManager sectionIds={sectionIds} />
   </article>
 
-  <!-- Fixed Music Controller -->
-  <MusicController />
+  <!-- Fixed Music Controller - only show for regular invitation, not thank you page -->
+  {!showThankYouPage && <MusicController />}
 
   <!-- Entry Screen - shown first to enable user interaction -->
   {
