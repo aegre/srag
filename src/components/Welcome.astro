@@ -169,7 +169,10 @@ const sectionIds = enabledSections.map(section => section.id);
   <MusicController />
 
   <!-- Entry Screen - shown first to enable user interaction -->
-  <EntryScreen />
+  {
+    showThankYouPage ?  null : <EntryScreen /> 
+  }
+  
 </main>
 
 <style>
