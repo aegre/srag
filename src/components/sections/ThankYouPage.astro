@@ -6,13 +6,17 @@ export interface Props {
   guestLastname?: string;
   secondaryName?: string;
   secondaryLastname?: string;
+  invitationId?: number;
+  preview?: boolean;
 }
 
 const { 
   guestName = '', 
   guestLastname = '', 
   secondaryName = '', 
-  secondaryLastname = '' 
+  secondaryLastname = '',
+  invitationId,
+  preview = false
 } = Astro.props;
 
 // Build display name
@@ -28,6 +32,8 @@ if (secondaryName) {
     displayName += ` ${secondaryLastname}`;
   }
 }
+
+
 ---
 
 <InvitationSection id="section-thank-you">
@@ -88,4 +94,32 @@ if (secondaryName) {
 
   </div>
 </InvitationSection>
+
+<!-- View tracking script for thank you page -->
+{!preview && invitationId && (
+  <script is:inline define:vars={{ invitationId: invitationId }}>
+    // Track view when thank you page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      // Only track if not in preview mode
+      if (typeof window !== 'undefined' && window.location.search.includes('preview=true')) {
+        return;
+      }
+      
+      // Track the view
+      fetch('/api/analytics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          invitation_id: invitationId,
+          event_type: 'view',
+          user_agent: navigator.userAgent
+        })
+      }).catch(error => {
+        console.log('Analytics tracking failed:', error);
+      });
+    });
+  </script>
+)}
 
