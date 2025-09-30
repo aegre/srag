@@ -17,10 +17,12 @@ const {
 
 // Build display name
 let displayName = guestName;
+let pronoun = 'Tu';
 if (guestLastname) {
   displayName += ` ${guestLastname}`;
 }
 if (secondaryName) {
+  pronoun = 'Su';
   displayName += ` y ${secondaryName}`;
   if (secondaryLastname) {
     displayName += ` ${secondaryLastname}`;
@@ -45,7 +47,7 @@ if (secondaryName) {
         </p>
         
         <p class="font-hero text-base md:text-lg text-secondary-light/80 font-light leading-relaxed">
-          Tu presencia en mi celebración de XV años hizo que este día fuera aún más especial. 
+          {pronoun} presencia en mi celebración de XV años hizo que este día fuera aún más especial. 
           Gracias por compartir conmigo este momento tan importante en mi vida.
         </p>
       </div>
